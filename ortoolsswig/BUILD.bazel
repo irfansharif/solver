@@ -1,0 +1,42 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "linear_solver_go_wrap.cc",
+        "ortoolsswig.go",
+    ],
+    cdeps = [
+        ":ortools_dependencies",
+        "@ortools//ortools/base",  #keep
+        "@ortools//ortools/linear_solver",  #keep
+        "@ortools//ortools/linear_solver:linear_solver_cc_proto",  #keep
+    ],
+    cgo = True,
+    importpath = "github.com/gonzojive/ortoolsgo",
+    visibility = ["//visibility:public"],
+    # @ortools//examples/cpp:linear_programming
+)
+
+cc_library(
+    name = "ortools_dependencies",
+    srcs = [],
+    deps = [
+        "@ortools//ortools/base",  #keep
+        "@ortools//ortools/linear_solver",  #keep
+        "@ortools//ortools/linear_solver:linear_solver_cc_proto",  #keep
+    ],
+    hdrs = [
+        "@ortools//ortools/linear_solver:model_exporter_swig_helper.h",
+    ],
+)
+
+go_test(
+    name = "go_default_test",
+    srcs = ["ortoolsswig_test.go"],
+    embed = [":go_default_library"],
+    deps = [
+        "@com_github_google_go_cmp//cmp:go_default_library",
+        "@com_github_google_go_cmp//cmp/cmpopts:go_default_library",
+    ],
+)

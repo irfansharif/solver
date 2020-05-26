@@ -10,7 +10,7 @@
 
 // source: linear_solver.i
 // Package ortools does stuff
-package ortools
+package ortoolsswig
 
 import (
 	//"C"
@@ -76,7 +76,7 @@ func TestSolver(t *testing.T) {
 	t.Logf("solver status: %v", status)
 
 	opt := 3*x.SolutionValue() + 4*y.SolutionValue()
-	t.Logf("optimizal solution: 3 * %v + 4 * %v", x.SolutionValue(), y.SolutionValue(), opt)
+	t.Logf("optimizal solution: 3 * %v + 4 * %v = %v", x.SolutionValue(), y.SolutionValue(), opt)
 
 	if got, want := solver.NumVariables(), 2; got != want {
 		t.Errorf("got %d variables, want %d", got, want)
@@ -84,7 +84,10 @@ func TestSolver(t *testing.T) {
 	if got, want := solver.NumConstraints(), 3; got != want {
 		t.Errorf("got %d variables, want %d", got, want)
 	}
-	if got, want := x.SolutionValue(), 3.0; cmp.Equal(got, want, cmpOpts...) {
+	if got, want := x.SolutionValue(), 6.0; !cmp.Equal(got, want, cmpOpts...) {
 		t.Errorf("got x_opt = %v, want %v", got, want)
+	}
+	if got, want := y.SolutionValue(), 4.0; !cmp.Equal(got, want, cmpOpts...) {
+		t.Errorf("got y_opt = %v, want %v", got, want)
 	}
 }

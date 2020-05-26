@@ -1,18 +1,25 @@
+## OR tools for golang
+
+This project contains a cgo-based API for using Google's Operations Research
+tools. Code is generated in the `ortoolsswig` folder, but the generated code is
+ugly, so most people will want to use the `ortoolsgo` package, which is written
+on top of the swig bindings.
+
+The library compiles with bazel. For example, the tests can be run with this
+command:
+
 ```shell
-swig -go -cgo -c++ -intgosize 64 -o linear_solver_go_wrap.cc -module ortools linear_solver.i
+ibazel test //ortoolsswig:go_default_test
 ```
 
+### Regenerating the SWIG bindings
+
+For now, some generated files are checked in. They can be regenerated using this
+command:
 
 ```shell
-bazel build @ortools//examples/cpp:linear_programming
-```
-
-```
- //%pythoncode {
- //def setup_variable_operator(opname):
- //  setattr(Variable, opname,
- //          lambda self, *args: getattr(VariableExpr(self), opname)(*args))
- //for opname in LinearExpr.OVERRIDDEN_OPERATOR_METHODS:
- //  setup_variable_operator(opname)
- //}  // %pythoncode
+swig -go -cgo -c++ -intgosize 64 \
+  -I/home/red/lib/or-tools \
+  -o linear_solver_go_wrap.cc \
+  -module ortools linear_solver.i
 ```
