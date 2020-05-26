@@ -9,7 +9,7 @@ gazelle(name = "gazelle")
 go_library(
     name = "go_default_library",
     srcs = [
-        #"linear_solver_go_wrap.cc",
+        "linear_solver_go_wrap.cc",
         "ortools.go",
     ],
     cgo = True,

@@ -35,9 +35,9 @@
 %include "std_string.i"
 %include "stdint.i"
 
-%include "ortools/util/python/proto.i"
+//%include "ortools/util/python/proto.i"
 
-%import "ortools/util/python/vector.i"
+//%import "ortools/util/python/vector.i"
 
 // We need to forward-declare the proto here, so that the PROTO_* macros
 // involving them work correctly. The order matters very much: this declaration
@@ -233,20 +233,20 @@ class MPSolutionResponse;
   double Offset() const { return $self->offset();}
 }  // extend operations_research::MPObjective
 
-PY_PROTO_TYPEMAP(ortools.linear_solver.linear_solver_pb2,
-                 MPModelProto,
-                 operations_research::MPModelProto);
+// PY_PROTO_TYPEMAP(ortools.linear_solver.linear_solver_pb2,
+//                  MPModelProto,
+//                  operations_research::MPModelProto);
 
-PY_PROTO_TYPEMAP(ortools.linear_solver.linear_solver_pb2,
-                 MPSolutionResponse,
-                 operations_research::MPSolutionResponse);
+// PY_PROTO_TYPEMAP(ortools.linear_solver.linear_solver_pb2,
+//                  MPSolutionResponse,
+//                  operations_research::MPSolutionResponse);
 
-// Actual conversions. This also includes the conversion to std::vector<Class>.
-PY_CONVERT_HELPER_PTR(MPConstraint);
-PY_CONVERT(MPConstraint);
+// // Actual conversions. This also includes the conversion to std::vector<Class>.
+// PY_CONVERT_HELPER_PTR(MPConstraint);
+// PY_CONVERT(MPConstraint);
 
-PY_CONVERT_HELPER_PTR(MPVariable);
-PY_CONVERT(MPVariable);
+// PY_CONVERT_HELPER_PTR(MPVariable);
+// PY_CONVERT(MPVariable);
 
 %ignoreall
 
