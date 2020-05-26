@@ -1,16 +1,19 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_repository")
 
-local_repository(
-    name = "ortools",
-    path = "/home/red/git/or-tools-fork",
-)
-
-# git_repository(
+# local_repository(
 #     name = "ortools",
-#     commit = "5ff76b487a6c2006326765d6417964599eedc8c9",
-#     remote = "https://github.com/google/or-tools.git",
+#     path = "/home/red/git/or-tools-fork",
 # )
+
+git_repository(
+    name = "ortools",
+    commit = "27759328ec2ab4b9c2ac92dff68079654a4ae96c",
+    # TODO(reddaly): Switch back to official repo after
+    # https://github.com/google/or-tools/pull/2033 is merged.
+    #remote = "https://github.com/google/or-tools.git",
+    remote = "https://github.com/gonzojive/or-tools.git"
+)
 
 git_repository(
     name = "com_github_gflags_gflags",
