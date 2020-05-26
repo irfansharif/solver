@@ -9,7 +9,7 @@
  * ----------------------------------------------------------------------------- */
 
 // source: linear_solver.i
-
+// Package ortools does stuff
 package ortools
 
 /*
@@ -201,32 +201,32 @@ extern swig_type_28 _wrap_FindErrorInModelProto_ortools_b6bd11fe39dd864f(uintptr
 */
 import "C"
 
-import "unsafe"
-import _ "runtime/cgo"
-import "sync"
-
+import (
+	_ "runtime/cgo"
+	"sync"
+	"unsafe"
+)
 
 type _ unsafe.Pointer
-
-
 
 var Swig_escape_always_false bool
 var Swig_escape_val interface{}
 
-
 type _swig_fnptr *byte
 type _swig_memberptr *byte
 
-
 type _ sync.Mutex
 
+type swig_gostring struct {
+	p uintptr
+	n int
+}
 
-type swig_gostring struct { p uintptr; n int }
 func swigCopyString(s string) string {
-  p := *(*swig_gostring)(unsafe.Pointer(&s))
-  r := string((*[0x7fffffff]byte)(unsafe.Pointer(p.p))[:p.n])
-  Swig_free(p.p)
-  return r
+	p := *(*swig_gostring)(unsafe.Pointer(&s))
+	r := string((*[0x7fffffff]byte)(unsafe.Pointer(p.p))[:p.n])
+	Swig_free(p.p)
+	return r
 }
 
 func Swig_free(arg1 uintptr) {
@@ -251,6 +251,7 @@ func (p SwigcptrSolver) SwigIsSolver() {
 }
 
 type Operations_researchMPSolverOptimizationProblemType int
+
 func _swig_getSolver_GLOP_LINEAR_PROGRAMMING_Solver() (_swig_ret Operations_researchMPSolverOptimizationProblemType) {
 	var swig_r Operations_researchMPSolverOptimizationProblemType
 	swig_r = (Operations_researchMPSolverOptimizationProblemType)(C._wrap_GLOP_LINEAR_PROGRAMMING_Solver_ortools_b6bd11fe39dd864f())
@@ -258,6 +259,7 @@ func _swig_getSolver_GLOP_LINEAR_PROGRAMMING_Solver() (_swig_ret Operations_rese
 }
 
 var SolverGLOP_LINEAR_PROGRAMMING Operations_researchMPSolverOptimizationProblemType = _swig_getSolver_GLOP_LINEAR_PROGRAMMING_Solver()
+
 func _swig_getSolver_BOP_INTEGER_PROGRAMMING_Solver() (_swig_ret Operations_researchMPSolverOptimizationProblemType) {
 	var swig_r Operations_researchMPSolverOptimizationProblemType
 	swig_r = (Operations_researchMPSolverOptimizationProblemType)(C._wrap_BOP_INTEGER_PROGRAMMING_Solver_ortools_b6bd11fe39dd864f())
@@ -265,6 +267,7 @@ func _swig_getSolver_BOP_INTEGER_PROGRAMMING_Solver() (_swig_ret Operations_rese
 }
 
 var SolverBOP_INTEGER_PROGRAMMING Operations_researchMPSolverOptimizationProblemType = _swig_getSolver_BOP_INTEGER_PROGRAMMING_Solver()
+
 func _swig_getSolver_SAT_INTEGER_PROGRAMMING_Solver() (_swig_ret Operations_researchMPSolverOptimizationProblemType) {
 	var swig_r Operations_researchMPSolverOptimizationProblemType
 	swig_r = (Operations_researchMPSolverOptimizationProblemType)(C._wrap_SAT_INTEGER_PROGRAMMING_Solver_ortools_b6bd11fe39dd864f())
@@ -272,6 +275,7 @@ func _swig_getSolver_SAT_INTEGER_PROGRAMMING_Solver() (_swig_ret Operations_rese
 }
 
 var SolverSAT_INTEGER_PROGRAMMING Operations_researchMPSolverOptimizationProblemType = _swig_getSolver_SAT_INTEGER_PROGRAMMING_Solver()
+
 func NewSolver(arg1 string, arg2 Operations_researchMPSolverOptimizationProblemType) (_swig_ret Solver) {
 	var swig_r Solver
 	_swig_i_0 := arg1
@@ -466,6 +470,7 @@ func (arg1 SwigcptrSolver) Objective() (_swig_ret Objective) {
 }
 
 type Operations_researchMPSolverResultStatus int
+
 func _swig_getSolver_OPTIMAL_Solver() (_swig_ret Operations_researchMPSolverResultStatus) {
 	var swig_r Operations_researchMPSolverResultStatus
 	swig_r = (Operations_researchMPSolverResultStatus)(C._wrap_OPTIMAL_Solver_ortools_b6bd11fe39dd864f())
@@ -473,6 +478,7 @@ func _swig_getSolver_OPTIMAL_Solver() (_swig_ret Operations_researchMPSolverResu
 }
 
 var SolverOPTIMAL Operations_researchMPSolverResultStatus = _swig_getSolver_OPTIMAL_Solver()
+
 func _swig_getSolver_FEASIBLE_Solver() (_swig_ret Operations_researchMPSolverResultStatus) {
 	var swig_r Operations_researchMPSolverResultStatus
 	swig_r = (Operations_researchMPSolverResultStatus)(C._wrap_FEASIBLE_Solver_ortools_b6bd11fe39dd864f())
@@ -480,6 +486,7 @@ func _swig_getSolver_FEASIBLE_Solver() (_swig_ret Operations_researchMPSolverRes
 }
 
 var SolverFEASIBLE Operations_researchMPSolverResultStatus = _swig_getSolver_FEASIBLE_Solver()
+
 func _swig_getSolver_INFEASIBLE_Solver() (_swig_ret Operations_researchMPSolverResultStatus) {
 	var swig_r Operations_researchMPSolverResultStatus
 	swig_r = (Operations_researchMPSolverResultStatus)(C._wrap_INFEASIBLE_Solver_ortools_b6bd11fe39dd864f())
@@ -487,6 +494,7 @@ func _swig_getSolver_INFEASIBLE_Solver() (_swig_ret Operations_researchMPSolverR
 }
 
 var SolverINFEASIBLE Operations_researchMPSolverResultStatus = _swig_getSolver_INFEASIBLE_Solver()
+
 func _swig_getSolver_UNBOUNDED_Solver() (_swig_ret Operations_researchMPSolverResultStatus) {
 	var swig_r Operations_researchMPSolverResultStatus
 	swig_r = (Operations_researchMPSolverResultStatus)(C._wrap_UNBOUNDED_Solver_ortools_b6bd11fe39dd864f())
@@ -494,6 +502,7 @@ func _swig_getSolver_UNBOUNDED_Solver() (_swig_ret Operations_researchMPSolverRe
 }
 
 var SolverUNBOUNDED Operations_researchMPSolverResultStatus = _swig_getSolver_UNBOUNDED_Solver()
+
 func _swig_getSolver_ABNORMAL_Solver() (_swig_ret Operations_researchMPSolverResultStatus) {
 	var swig_r Operations_researchMPSolverResultStatus
 	swig_r = (Operations_researchMPSolverResultStatus)(C._wrap_ABNORMAL_Solver_ortools_b6bd11fe39dd864f())
@@ -501,6 +510,7 @@ func _swig_getSolver_ABNORMAL_Solver() (_swig_ret Operations_researchMPSolverRes
 }
 
 var SolverABNORMAL Operations_researchMPSolverResultStatus = _swig_getSolver_ABNORMAL_Solver()
+
 func _swig_getSolver_NOT_SOLVED_Solver() (_swig_ret Operations_researchMPSolverResultStatus) {
 	var swig_r Operations_researchMPSolverResultStatus
 	swig_r = (Operations_researchMPSolverResultStatus)(C._wrap_NOT_SOLVED_Solver_ortools_b6bd11fe39dd864f())
@@ -508,6 +518,7 @@ func _swig_getSolver_NOT_SOLVED_Solver() (_swig_ret Operations_researchMPSolverR
 }
 
 var SolverNOT_SOLVED Operations_researchMPSolverResultStatus = _swig_getSolver_NOT_SOLVED_Solver()
+
 func (arg1 SwigcptrSolver) Solve__SWIG_0() (_swig_ret Operations_researchMPSolverResultStatus) {
 	var swig_r Operations_researchMPSolverResultStatus
 	_swig_i_0 := arg1
@@ -615,6 +626,7 @@ func (arg1 SwigcptrSolver) SetSolverSpecificParametersAsString(arg2 string) (_sw
 }
 
 type Operations_researchMPSolverBasisStatus int
+
 func _swig_getSolver_FREE_Solver() (_swig_ret Operations_researchMPSolverBasisStatus) {
 	var swig_r Operations_researchMPSolverBasisStatus
 	swig_r = (Operations_researchMPSolverBasisStatus)(C._wrap_FREE_Solver_ortools_b6bd11fe39dd864f())
@@ -622,6 +634,7 @@ func _swig_getSolver_FREE_Solver() (_swig_ret Operations_researchMPSolverBasisSt
 }
 
 var SolverFREE Operations_researchMPSolverBasisStatus = _swig_getSolver_FREE_Solver()
+
 func _swig_getSolver_AT_LOWER_BOUND_Solver() (_swig_ret Operations_researchMPSolverBasisStatus) {
 	var swig_r Operations_researchMPSolverBasisStatus
 	swig_r = (Operations_researchMPSolverBasisStatus)(C._wrap_AT_LOWER_BOUND_Solver_ortools_b6bd11fe39dd864f())
@@ -629,6 +642,7 @@ func _swig_getSolver_AT_LOWER_BOUND_Solver() (_swig_ret Operations_researchMPSol
 }
 
 var SolverAT_LOWER_BOUND Operations_researchMPSolverBasisStatus = _swig_getSolver_AT_LOWER_BOUND_Solver()
+
 func _swig_getSolver_AT_UPPER_BOUND_Solver() (_swig_ret Operations_researchMPSolverBasisStatus) {
 	var swig_r Operations_researchMPSolverBasisStatus
 	swig_r = (Operations_researchMPSolverBasisStatus)(C._wrap_AT_UPPER_BOUND_Solver_ortools_b6bd11fe39dd864f())
@@ -636,6 +650,7 @@ func _swig_getSolver_AT_UPPER_BOUND_Solver() (_swig_ret Operations_researchMPSol
 }
 
 var SolverAT_UPPER_BOUND Operations_researchMPSolverBasisStatus = _swig_getSolver_AT_UPPER_BOUND_Solver()
+
 func _swig_getSolver_FIXED_VALUE_Solver() (_swig_ret Operations_researchMPSolverBasisStatus) {
 	var swig_r Operations_researchMPSolverBasisStatus
 	swig_r = (Operations_researchMPSolverBasisStatus)(C._wrap_FIXED_VALUE_Solver_ortools_b6bd11fe39dd864f())
@@ -643,6 +658,7 @@ func _swig_getSolver_FIXED_VALUE_Solver() (_swig_ret Operations_researchMPSolver
 }
 
 var SolverFIXED_VALUE Operations_researchMPSolverBasisStatus = _swig_getSolver_FIXED_VALUE_Solver()
+
 func _swig_getSolver_BASIC_Solver() (_swig_ret Operations_researchMPSolverBasisStatus) {
 	var swig_r Operations_researchMPSolverBasisStatus
 	swig_r = (Operations_researchMPSolverBasisStatus)(C._wrap_BASIC_Solver_ortools_b6bd11fe39dd864f())
@@ -650,6 +666,7 @@ func _swig_getSolver_BASIC_Solver() (_swig_ret Operations_researchMPSolverBasisS
 }
 
 var SolverBASIC Operations_researchMPSolverBasisStatus = _swig_getSolver_BASIC_Solver()
+
 func SolverInfinity() (_swig_ret float64) {
 	var swig_r float64
 	swig_r = (float64)(C._wrap_Solver_infinity_ortools_b6bd11fe39dd864f())
@@ -714,7 +731,7 @@ func (arg1 SwigcptrSolver) LoadModelFromProto(arg2 Operations_research_MPModelPr
 	swig_r_p := C._wrap_Solver_LoadModelFromProto_ortools_b6bd11fe39dd864f(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
- swig_r_1 = swigCopyString(swig_r) 
+	swig_r_1 = swigCopyString(swig_r)
 	return swig_r_1
 }
 
@@ -725,7 +742,7 @@ func (arg1 SwigcptrSolver) ExportModelAsLpFormat(arg2 bool) (_swig_ret string) {
 	swig_r_p := C._wrap_Solver_ExportModelAsLpFormat_ortools_b6bd11fe39dd864f(C.uintptr_t(_swig_i_0), C._Bool(_swig_i_1))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
- swig_r_1 = swigCopyString(swig_r) 
+	swig_r_1 = swigCopyString(swig_r)
 	return swig_r_1
 }
 
@@ -737,7 +754,7 @@ func (arg1 SwigcptrSolver) ExportModelAsMpsFormat(arg2 bool, arg3 bool) (_swig_r
 	swig_r_p := C._wrap_Solver_ExportModelAsMpsFormat_ortools_b6bd11fe39dd864f(C.uintptr_t(_swig_i_0), C._Bool(_swig_i_1), C._Bool(_swig_i_2))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
- swig_r_1 = swigCopyString(swig_r) 
+	swig_r_1 = swigCopyString(swig_r)
 	return swig_r_1
 }
 
@@ -933,7 +950,7 @@ func (arg1 SwigcptrVariable) Name() (_swig_ret string) {
 	swig_r_p := C._wrap_Variable_name_ortools_b6bd11fe39dd864f(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
- swig_r_1 = swigCopyString(swig_r) 
+	swig_r_1 = swigCopyString(swig_r)
 	return swig_r_1
 }
 
@@ -1005,7 +1022,7 @@ func (arg1 SwigcptrVariable) X__str__() (_swig_ret string) {
 	swig_r_p := C._wrap_Variable___str___ortools_b6bd11fe39dd864f(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
- swig_r_1 = swigCopyString(swig_r) 
+	swig_r_1 = swigCopyString(swig_r)
 	return swig_r_1
 }
 
@@ -1015,7 +1032,7 @@ func (arg1 SwigcptrVariable) X__repr__() (_swig_ret string) {
 	swig_r_p := C._wrap_Variable___repr___ortools_b6bd11fe39dd864f(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
- swig_r_1 = swigCopyString(swig_r) 
+	swig_r_1 = swigCopyString(swig_r)
 	return swig_r_1
 }
 
@@ -1086,7 +1103,7 @@ func (arg1 SwigcptrConstraint) Name() (_swig_ret string) {
 	swig_r_p := C._wrap_Constraint_name_ortools_b6bd11fe39dd864f(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
- swig_r_1 = swigCopyString(swig_r) 
+	swig_r_1 = swigCopyString(swig_r)
 	return swig_r_1
 }
 
@@ -1211,6 +1228,7 @@ func (p SwigcptrMPSolverParameters) SwigIsMPSolverParameters() {
 }
 
 type Operations_researchMPSolverParametersDoubleParam int
+
 func _swig_getMPSolverParameters_RELATIVE_MIP_GAP_MPSolverParameters() (_swig_ret Operations_researchMPSolverParametersDoubleParam) {
 	var swig_r Operations_researchMPSolverParametersDoubleParam
 	swig_r = (Operations_researchMPSolverParametersDoubleParam)(C._wrap_RELATIVE_MIP_GAP_MPSolverParameters_ortools_b6bd11fe39dd864f())
@@ -1218,6 +1236,7 @@ func _swig_getMPSolverParameters_RELATIVE_MIP_GAP_MPSolverParameters() (_swig_re
 }
 
 var MPSolverParametersRELATIVE_MIP_GAP Operations_researchMPSolverParametersDoubleParam = _swig_getMPSolverParameters_RELATIVE_MIP_GAP_MPSolverParameters()
+
 func _swig_getMPSolverParameters_PRIMAL_TOLERANCE_MPSolverParameters() (_swig_ret Operations_researchMPSolverParametersDoubleParam) {
 	var swig_r Operations_researchMPSolverParametersDoubleParam
 	swig_r = (Operations_researchMPSolverParametersDoubleParam)(C._wrap_PRIMAL_TOLERANCE_MPSolverParameters_ortools_b6bd11fe39dd864f())
@@ -1225,6 +1244,7 @@ func _swig_getMPSolverParameters_PRIMAL_TOLERANCE_MPSolverParameters() (_swig_re
 }
 
 var MPSolverParametersPRIMAL_TOLERANCE Operations_researchMPSolverParametersDoubleParam = _swig_getMPSolverParameters_PRIMAL_TOLERANCE_MPSolverParameters()
+
 func _swig_getMPSolverParameters_DUAL_TOLERANCE_MPSolverParameters() (_swig_ret Operations_researchMPSolverParametersDoubleParam) {
 	var swig_r Operations_researchMPSolverParametersDoubleParam
 	swig_r = (Operations_researchMPSolverParametersDoubleParam)(C._wrap_DUAL_TOLERANCE_MPSolverParameters_ortools_b6bd11fe39dd864f())
@@ -1232,7 +1252,9 @@ func _swig_getMPSolverParameters_DUAL_TOLERANCE_MPSolverParameters() (_swig_ret 
 }
 
 var MPSolverParametersDUAL_TOLERANCE Operations_researchMPSolverParametersDoubleParam = _swig_getMPSolverParameters_DUAL_TOLERANCE_MPSolverParameters()
+
 type Operations_researchMPSolverParametersIntegerParam int
+
 func _swig_getMPSolverParameters_PRESOLVE_MPSolverParameters() (_swig_ret Operations_researchMPSolverParametersIntegerParam) {
 	var swig_r Operations_researchMPSolverParametersIntegerParam
 	swig_r = (Operations_researchMPSolverParametersIntegerParam)(C._wrap_PRESOLVE_MPSolverParameters_ortools_b6bd11fe39dd864f())
@@ -1240,6 +1262,7 @@ func _swig_getMPSolverParameters_PRESOLVE_MPSolverParameters() (_swig_ret Operat
 }
 
 var MPSolverParametersPRESOLVE Operations_researchMPSolverParametersIntegerParam = _swig_getMPSolverParameters_PRESOLVE_MPSolverParameters()
+
 func _swig_getMPSolverParameters_LP_ALGORITHM_MPSolverParameters() (_swig_ret Operations_researchMPSolverParametersIntegerParam) {
 	var swig_r Operations_researchMPSolverParametersIntegerParam
 	swig_r = (Operations_researchMPSolverParametersIntegerParam)(C._wrap_LP_ALGORITHM_MPSolverParameters_ortools_b6bd11fe39dd864f())
@@ -1247,6 +1270,7 @@ func _swig_getMPSolverParameters_LP_ALGORITHM_MPSolverParameters() (_swig_ret Op
 }
 
 var MPSolverParametersLP_ALGORITHM Operations_researchMPSolverParametersIntegerParam = _swig_getMPSolverParameters_LP_ALGORITHM_MPSolverParameters()
+
 func _swig_getMPSolverParameters_INCREMENTALITY_MPSolverParameters() (_swig_ret Operations_researchMPSolverParametersIntegerParam) {
 	var swig_r Operations_researchMPSolverParametersIntegerParam
 	swig_r = (Operations_researchMPSolverParametersIntegerParam)(C._wrap_INCREMENTALITY_MPSolverParameters_ortools_b6bd11fe39dd864f())
@@ -1254,6 +1278,7 @@ func _swig_getMPSolverParameters_INCREMENTALITY_MPSolverParameters() (_swig_ret 
 }
 
 var MPSolverParametersINCREMENTALITY Operations_researchMPSolverParametersIntegerParam = _swig_getMPSolverParameters_INCREMENTALITY_MPSolverParameters()
+
 func _swig_getMPSolverParameters_SCALING_MPSolverParameters() (_swig_ret Operations_researchMPSolverParametersIntegerParam) {
 	var swig_r Operations_researchMPSolverParametersIntegerParam
 	swig_r = (Operations_researchMPSolverParametersIntegerParam)(C._wrap_SCALING_MPSolverParameters_ortools_b6bd11fe39dd864f())
@@ -1261,7 +1286,9 @@ func _swig_getMPSolverParameters_SCALING_MPSolverParameters() (_swig_ret Operati
 }
 
 var MPSolverParametersSCALING Operations_researchMPSolverParametersIntegerParam = _swig_getMPSolverParameters_SCALING_MPSolverParameters()
+
 type Operations_researchMPSolverParametersPresolveValues int
+
 func _swig_getMPSolverParameters_PRESOLVE_OFF_MPSolverParameters() (_swig_ret Operations_researchMPSolverParametersPresolveValues) {
 	var swig_r Operations_researchMPSolverParametersPresolveValues
 	swig_r = (Operations_researchMPSolverParametersPresolveValues)(C._wrap_PRESOLVE_OFF_MPSolverParameters_ortools_b6bd11fe39dd864f())
@@ -1269,6 +1296,7 @@ func _swig_getMPSolverParameters_PRESOLVE_OFF_MPSolverParameters() (_swig_ret Op
 }
 
 var MPSolverParametersPRESOLVE_OFF Operations_researchMPSolverParametersPresolveValues = _swig_getMPSolverParameters_PRESOLVE_OFF_MPSolverParameters()
+
 func _swig_getMPSolverParameters_PRESOLVE_ON_MPSolverParameters() (_swig_ret Operations_researchMPSolverParametersPresolveValues) {
 	var swig_r Operations_researchMPSolverParametersPresolveValues
 	swig_r = (Operations_researchMPSolverParametersPresolveValues)(C._wrap_PRESOLVE_ON_MPSolverParameters_ortools_b6bd11fe39dd864f())
@@ -1276,7 +1304,9 @@ func _swig_getMPSolverParameters_PRESOLVE_ON_MPSolverParameters() (_swig_ret Ope
 }
 
 var MPSolverParametersPRESOLVE_ON Operations_researchMPSolverParametersPresolveValues = _swig_getMPSolverParameters_PRESOLVE_ON_MPSolverParameters()
+
 type Operations_researchMPSolverParametersLpAlgorithmValues int
+
 func _swig_getMPSolverParameters_DUAL_MPSolverParameters() (_swig_ret Operations_researchMPSolverParametersLpAlgorithmValues) {
 	var swig_r Operations_researchMPSolverParametersLpAlgorithmValues
 	swig_r = (Operations_researchMPSolverParametersLpAlgorithmValues)(C._wrap_DUAL_MPSolverParameters_ortools_b6bd11fe39dd864f())
@@ -1284,6 +1314,7 @@ func _swig_getMPSolverParameters_DUAL_MPSolverParameters() (_swig_ret Operations
 }
 
 var MPSolverParametersDUAL Operations_researchMPSolverParametersLpAlgorithmValues = _swig_getMPSolverParameters_DUAL_MPSolverParameters()
+
 func _swig_getMPSolverParameters_PRIMAL_MPSolverParameters() (_swig_ret Operations_researchMPSolverParametersLpAlgorithmValues) {
 	var swig_r Operations_researchMPSolverParametersLpAlgorithmValues
 	swig_r = (Operations_researchMPSolverParametersLpAlgorithmValues)(C._wrap_PRIMAL_MPSolverParameters_ortools_b6bd11fe39dd864f())
@@ -1291,6 +1322,7 @@ func _swig_getMPSolverParameters_PRIMAL_MPSolverParameters() (_swig_ret Operatio
 }
 
 var MPSolverParametersPRIMAL Operations_researchMPSolverParametersLpAlgorithmValues = _swig_getMPSolverParameters_PRIMAL_MPSolverParameters()
+
 func _swig_getMPSolverParameters_BARRIER_MPSolverParameters() (_swig_ret Operations_researchMPSolverParametersLpAlgorithmValues) {
 	var swig_r Operations_researchMPSolverParametersLpAlgorithmValues
 	swig_r = (Operations_researchMPSolverParametersLpAlgorithmValues)(C._wrap_BARRIER_MPSolverParameters_ortools_b6bd11fe39dd864f())
@@ -1298,7 +1330,9 @@ func _swig_getMPSolverParameters_BARRIER_MPSolverParameters() (_swig_ret Operati
 }
 
 var MPSolverParametersBARRIER Operations_researchMPSolverParametersLpAlgorithmValues = _swig_getMPSolverParameters_BARRIER_MPSolverParameters()
+
 type Operations_researchMPSolverParametersIncrementalityValues int
+
 func _swig_getMPSolverParameters_INCREMENTALITY_OFF_MPSolverParameters() (_swig_ret Operations_researchMPSolverParametersIncrementalityValues) {
 	var swig_r Operations_researchMPSolverParametersIncrementalityValues
 	swig_r = (Operations_researchMPSolverParametersIncrementalityValues)(C._wrap_INCREMENTALITY_OFF_MPSolverParameters_ortools_b6bd11fe39dd864f())
@@ -1306,6 +1340,7 @@ func _swig_getMPSolverParameters_INCREMENTALITY_OFF_MPSolverParameters() (_swig_
 }
 
 var MPSolverParametersINCREMENTALITY_OFF Operations_researchMPSolverParametersIncrementalityValues = _swig_getMPSolverParameters_INCREMENTALITY_OFF_MPSolverParameters()
+
 func _swig_getMPSolverParameters_INCREMENTALITY_ON_MPSolverParameters() (_swig_ret Operations_researchMPSolverParametersIncrementalityValues) {
 	var swig_r Operations_researchMPSolverParametersIncrementalityValues
 	swig_r = (Operations_researchMPSolverParametersIncrementalityValues)(C._wrap_INCREMENTALITY_ON_MPSolverParameters_ortools_b6bd11fe39dd864f())
@@ -1313,7 +1348,9 @@ func _swig_getMPSolverParameters_INCREMENTALITY_ON_MPSolverParameters() (_swig_r
 }
 
 var MPSolverParametersINCREMENTALITY_ON Operations_researchMPSolverParametersIncrementalityValues = _swig_getMPSolverParameters_INCREMENTALITY_ON_MPSolverParameters()
+
 type Operations_researchMPSolverParametersScalingValues int
+
 func _swig_getMPSolverParameters_SCALING_OFF_MPSolverParameters() (_swig_ret Operations_researchMPSolverParametersScalingValues) {
 	var swig_r Operations_researchMPSolverParametersScalingValues
 	swig_r = (Operations_researchMPSolverParametersScalingValues)(C._wrap_SCALING_OFF_MPSolverParameters_ortools_b6bd11fe39dd864f())
@@ -1321,6 +1358,7 @@ func _swig_getMPSolverParameters_SCALING_OFF_MPSolverParameters() (_swig_ret Ope
 }
 
 var MPSolverParametersSCALING_OFF Operations_researchMPSolverParametersScalingValues = _swig_getMPSolverParameters_SCALING_OFF_MPSolverParameters()
+
 func _swig_getMPSolverParameters_SCALING_ON_MPSolverParameters() (_swig_ret Operations_researchMPSolverParametersScalingValues) {
 	var swig_r Operations_researchMPSolverParametersScalingValues
 	swig_r = (Operations_researchMPSolverParametersScalingValues)(C._wrap_SCALING_ON_MPSolverParameters_ortools_b6bd11fe39dd864f())
@@ -1328,6 +1366,7 @@ func _swig_getMPSolverParameters_SCALING_ON_MPSolverParameters() (_swig_ret Oper
 }
 
 var MPSolverParametersSCALING_ON Operations_researchMPSolverParametersScalingValues = _swig_getMPSolverParameters_SCALING_ON_MPSolverParameters()
+
 func GetMPSolverParametersKDefaultRelativeMipGap() (_swig_ret float64) {
 	var swig_r float64
 	swig_r = (float64)(C._wrap_MPSolverParameters_kDefaultRelativeMipGap_get_ortools_b6bd11fe39dd864f())
@@ -1440,7 +1479,7 @@ func ExportModelAsLpFormat__SWIG_0(arg1 Operations_research_MPModelProto, arg2 M
 	swig_r_p := C._wrap_ExportModelAsLpFormat__SWIG_0_ortools_b6bd11fe39dd864f(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
- swig_r_1 = swigCopyString(swig_r) 
+	swig_r_1 = swigCopyString(swig_r)
 	return swig_r_1
 }
 
@@ -1450,7 +1489,7 @@ func ExportModelAsLpFormat__SWIG_1(arg1 Operations_research_MPModelProto) (_swig
 	swig_r_p := C._wrap_ExportModelAsLpFormat__SWIG_1_ortools_b6bd11fe39dd864f(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
- swig_r_1 = swigCopyString(swig_r) 
+	swig_r_1 = swigCopyString(swig_r)
 	return swig_r_1
 }
 
@@ -1472,7 +1511,7 @@ func ExportModelAsMpsFormat__SWIG_0(arg1 Operations_research_MPModelProto, arg2 
 	swig_r_p := C._wrap_ExportModelAsMpsFormat__SWIG_0_ortools_b6bd11fe39dd864f(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
- swig_r_1 = swigCopyString(swig_r) 
+	swig_r_1 = swigCopyString(swig_r)
 	return swig_r_1
 }
 
@@ -1482,7 +1521,7 @@ func ExportModelAsMpsFormat__SWIG_1(arg1 Operations_research_MPModelProto) (_swi
 	swig_r_p := C._wrap_ExportModelAsMpsFormat__SWIG_1_ortools_b6bd11fe39dd864f(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
- swig_r_1 = swigCopyString(swig_r) 
+	swig_r_1 = swigCopyString(swig_r)
 	return swig_r_1
 }
 
@@ -1503,64 +1542,69 @@ func FindErrorInModelProto(arg1 Operations_research_MPModelProto) (_swig_ret str
 	swig_r_p := C._wrap_FindErrorInModelProto_ortools_b6bd11fe39dd864f(C.uintptr_t(_swig_i_0))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 string
- swig_r_1 = swigCopyString(swig_r) 
+	swig_r_1 = swigCopyString(swig_r)
 	return swig_r_1
 }
 
-
 type SwigcptrOperations_research_MPModelRequest uintptr
 type Operations_research_MPModelRequest interface {
-	Swigcptr() uintptr;
+	Swigcptr() uintptr
 }
+
 func (p SwigcptrOperations_research_MPModelRequest) Swigcptr() uintptr {
 	return uintptr(p)
 }
 
 type SwigcptrUtil_Status uintptr
 type Util_Status interface {
-	Swigcptr() uintptr;
+	Swigcptr() uintptr
 }
+
 func (p SwigcptrUtil_Status) Swigcptr() uintptr {
 	return uintptr(p)
 }
 
 type SwigcptrOperations_research_MPModelProto uintptr
 type Operations_research_MPModelProto interface {
-	Swigcptr() uintptr;
+	Swigcptr() uintptr
 }
+
 func (p SwigcptrOperations_research_MPModelProto) Swigcptr() uintptr {
 	return uintptr(p)
 }
 
 type SwigcptrStd_vector_Sl_operations_research_MPConstraint_Sm__Sg_ uintptr
 type Std_vector_Sl_operations_research_MPConstraint_Sm__Sg_ interface {
-	Swigcptr() uintptr;
+	Swigcptr() uintptr
 }
+
 func (p SwigcptrStd_vector_Sl_operations_research_MPConstraint_Sm__Sg_) Swigcptr() uintptr {
 	return uintptr(p)
 }
 
 type SwigcptrStd_vector_Sl_double_Sg_ uintptr
 type Std_vector_Sl_double_Sg_ interface {
-	Swigcptr() uintptr;
+	Swigcptr() uintptr
 }
+
 func (p SwigcptrStd_vector_Sl_double_Sg_) Swigcptr() uintptr {
 	return uintptr(p)
 }
 
 type SwigcptrStd_vector_Sl_operations_research_MPVariable_Sm__Sg_ uintptr
 type Std_vector_Sl_operations_research_MPVariable_Sm__Sg_ interface {
-	Swigcptr() uintptr;
+	Swigcptr() uintptr
 }
+
 func (p SwigcptrStd_vector_Sl_operations_research_MPVariable_Sm__Sg_) Swigcptr() uintptr {
 	return uintptr(p)
 }
 
 type SwigcptrOperations_research_MPSolutionResponse uintptr
 type Operations_research_MPSolutionResponse interface {
-	Swigcptr() uintptr;
+	Swigcptr() uintptr
 }
+
 func (p SwigcptrOperations_research_MPSolutionResponse) Swigcptr() uintptr {
 	return uintptr(p)
 }
-
