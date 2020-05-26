@@ -15,6 +15,7 @@ git_repository(
     remote = "https://github.com/gonzojive/or-tools.git"
 )
 
+# TODO(reddaly): Migrate to rules_cc: https://github.com/bazelbuild/rules_cc
 git_repository(
     name = "com_github_gflags_gflags",
     commit = "e171aa2",  # release v2.2.2

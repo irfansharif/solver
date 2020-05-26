@@ -1,4 +1,4 @@
-module github.com/gonzojive/ortoolsgo
+module github.com/gonzojive/or-tools-go/ortools
 
 go 1.14
 

@@ -1,6 +1,7 @@
-package ortoolsswig
+package ortools
 
 import (
+	"math"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -31,23 +32,23 @@ func TestNewSolver(t *testing.T) {
 
 // TestSolver is based on https://developers.google.com/optimization/lp/glop.
 func TestSolver(t *testing.T) {
-	solver := NewSolver("LinearProgrammingExample", SolverGLOP_LINEAR_PROGRAMMING)
-	x := solver.NumVar(0, SolverInfinity(), "x")
-	y := solver.NumVar(0, SolverInfinity(), "y")
+	solver := NewSolver("LinearProgrammingExample", LinearProgramming)
+	x := solver.NewVar(0, math.Inf(1), false, "x")
+	y := solver.NewVar(0, math.Inf(1), false, "y")
 
 	// Constraint 0: x + 2y <= 14.
-	constraint0 := solver.Constraint(-SolverInfinity(), float64(14))
-	//constraint0 := solver.Constraint()
+	constraint0 := solver.NewConstraintBounded(math.Inf(-1), float64(14), "c0")
+	//constraint0 := solver.NewConstraintBounded()
 	constraint0.SetCoefficient(x, 1)
 	constraint0.SetCoefficient(y, 2)
 
 	// Constraint 1: 3x - y >= 0.
-	constraint1 := solver.Constraint(0.0, SolverInfinity())
+	constraint1 := solver.NewConstraintBounded(0.0, math.Inf(1), "c1")
 	constraint1.SetCoefficient(x, 3)
 	constraint1.SetCoefficient(y, -1)
 
 	// Constraint 2: x - y <= 2.
-	constraint2 := solver.Constraint(-SolverInfinity(), 2.0)
+	constraint2 := solver.NewConstraintBounded(math.Inf(-1), 2.0, "c2")
 	constraint2.SetCoefficient(x, 1)
 	constraint2.SetCoefficient(y, -1)
 

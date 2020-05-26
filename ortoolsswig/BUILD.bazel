@@ -5,26 +5,23 @@ go_library(
     srcs = [
         "linear_solver_go_wrap.cc",
         "ortoolsswig.go",
+        "ortoolsswig_doc.go",
     ],
     cdeps = [
         ":ortools_dependencies",
-        "@ortools//ortools/base",  #keep
-        "@ortools//ortools/linear_solver",  #keep
-        "@ortools//ortools/linear_solver:linear_solver_cc_proto",  #keep
     ],
     cgo = True,
-    importpath = "github.com/gonzojive/ortoolsgo",
+    importpath = "github.com/gonzojive/or-tools-go/ortools/ortoolsswig",
     visibility = ["//visibility:public"],
-    # @ortools//examples/cpp:linear_programming
 )
 
 cc_library(
     name = "ortools_dependencies",
     srcs = [],
     deps = [
-        "@ortools//ortools/base",  #keep
-        "@ortools//ortools/linear_solver",  #keep
-        "@ortools//ortools/linear_solver:linear_solver_cc_proto",  #keep
+        "@ortools//ortools/base",
+        "@ortools//ortools/linear_solver",
+        "@ortools//ortools/linear_solver:linear_solver_cc_proto",
     ],
     hdrs = [
         "@ortools//ortools/linear_solver:model_exporter_swig_helper.h",
