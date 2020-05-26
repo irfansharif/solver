@@ -135,6 +135,16 @@ func (o *Objective) SetCoefficient(v *Variable, coeff float64) {
 	o.o.SetCoefficient(v.v, coeff)
 }
 
+// Value returns the objective value of the best solution found so far. It is
+// the optimal objective value if the problem has been solved to optimality.
+// Note: the objective value may be slightly different than what you could
+// compute yourself using \c MPVariable::solution_value(); please use the
+// --verify_solution flag to gain confidence about the numerical stability of
+// your solution.
+func (o *Objective) Value() float64 {
+	return o.o.Value()
+}
+
 // Constraint is used for setting linear programming bounds.
 type Constraint struct {
 	c ortoolsswig.Constraint
