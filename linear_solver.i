@@ -55,34 +55,34 @@ class MPSolutionResponse;
 #include "ortools/linear_solver/model_validator.h"
 %}
 
-%pythoncode %{
-import numbers
-from ortools.linear_solver.linear_solver_natural_api import OFFSET_KEY
-from ortools.linear_solver.linear_solver_natural_api import inf
-from ortools.linear_solver.linear_solver_natural_api import LinearExpr
-from ortools.linear_solver.linear_solver_natural_api import ProductCst
-from ortools.linear_solver.linear_solver_natural_api import Sum
-from ortools.linear_solver.linear_solver_natural_api import SumArray
-from ortools.linear_solver.linear_solver_natural_api import SumCst
-from ortools.linear_solver.linear_solver_natural_api import LinearConstraint
-from ortools.linear_solver.linear_solver_natural_api import VariableExpr
+// %pythoncode %{
+// import numbers
+// from ortools.linear_solver.linear_solver_natural_api import OFFSET_KEY
+// from ortools.linear_solver.linear_solver_natural_api import inf
+// from ortools.linear_solver.linear_solver_natural_api import LinearExpr
+// from ortools.linear_solver.linear_solver_natural_api import ProductCst
+// from ortools.linear_solver.linear_solver_natural_api import Sum
+// from ortools.linear_solver.linear_solver_natural_api import SumArray
+// from ortools.linear_solver.linear_solver_natural_api import SumCst
+// from ortools.linear_solver.linear_solver_natural_api import LinearConstraint
+// from ortools.linear_solver.linear_solver_natural_api import VariableExpr
 
-# Remove the documentation of some functions.
-# See https://pdoc3.github.io/pdoc/doc/pdoc/#overriding-docstrings-with-
-__pdoc__ = {}
-__pdoc__['Solver_infinity'] = False
-__pdoc__['Solver_Infinity'] = False
-__pdoc__['Solver_SolveWithProto'] = False
-__pdoc__['Solver_SupportsProblemType'] = False
-__pdoc__['setup_variable_operator'] = False
-__pdoc__['Constraint.thisown'] = False
-__pdoc__['Constraint.thisown'] = False
-__pdoc__['MPSolverParameters.thisown'] = False
-__pdoc__['ModelExportOptions.thisown'] = False
-__pdoc__['Objective.thisown'] = False
-__pdoc__['Solver.thisown'] = False
-__pdoc__['Variable.thisown'] = False
-%}  // %pythoncode
+// # Remove the documentation of some functions.
+// # See https://pdoc3.github.io/pdoc/doc/pdoc/#overriding-docstrings-with-
+// __pdoc__ = {}
+// __pdoc__['Solver_infinity'] = False
+// __pdoc__['Solver_Infinity'] = False
+// __pdoc__['Solver_SolveWithProto'] = False
+// __pdoc__['Solver_SupportsProblemType'] = False
+// __pdoc__['setup_variable_operator'] = False
+// __pdoc__['Constraint.thisown'] = False
+// __pdoc__['Constraint.thisown'] = False
+// __pdoc__['MPSolverParameters.thisown'] = False
+// __pdoc__['ModelExportOptions.thisown'] = False
+// __pdoc__['Objective.thisown'] = False
+// __pdoc__['Solver.thisown'] = False
+// __pdoc__['Variable.thisown'] = False
+// %}  // %pythoncode
 
 %extend operations_research::MPVariable {
   std::string __str__() {
@@ -92,10 +92,10 @@ __pdoc__['Variable.thisown'] = False
     return $self->name();
   }
 
-  %pythoncode {
-  def __getattr__(self, name):
-    return getattr(VariableExpr(self), name)
-  }  // %pythoncode
+  // %pythoncode {
+  // def __getattr__(self, name):
+  //   return getattr(VariableExpr(self), name)
+  // }  // %pythoncode
 }
 
 %extend operations_research::MPSolver {
@@ -153,47 +153,47 @@ __pdoc__['Variable.thisown'] = False
     return $self->SetNumThreads(num_theads).ok();
   }
 
-  %pythoncode {
-  def Add(self, constraint, name=''):
-    if isinstance(constraint, bool):
-      if constraint:
-        return self.RowConstraint(0, 0, name)
-      else:
-        return self.RowConstraint(1, 1, name)
-    else:
-      return constraint.Extract(self, name)
+  // %pythoncode {
+  // def Add(self, constraint, name=''):
+  //   if isinstance(constraint, bool):
+  //     if constraint:
+  //       return self.RowConstraint(0, 0, name)
+  //     else:
+  //       return self.RowConstraint(1, 1, name)
+  //   else:
+  //     return constraint.Extract(self, name)
 
-  def Sum(self, expr_array):
-    result = SumArray(expr_array)
-    return result
+  // def Sum(self, expr_array):
+  //   result = SumArray(expr_array)
+  //   return result
 
-  def RowConstraint(self, *args):
-    return self.Constraint(*args)
+  // def RowConstraint(self, *args):
+  //   return self.Constraint(*args)
 
-  def Minimize(self, expr):
-    objective = self.Objective()
-    objective.Clear()
-    objective.SetMinimization()
-    if isinstance(expr, numbers.Number):
-        objective.SetOffset(expr)
-    else:
-        coeffs = expr.GetCoeffs()
-        objective.SetOffset(coeffs.pop(OFFSET_KEY, 0.0))
-        for v, c, in list(coeffs.items()):
-          objective.SetCoefficient(v, float(c))
+  // def Minimize(self, expr):
+  //   objective = self.Objective()
+  //   objective.Clear()
+  //   objective.SetMinimization()
+  //   if isinstance(expr, numbers.Number):
+  //       objective.SetOffset(expr)
+  //   else:
+  //       coeffs = expr.GetCoeffs()
+  //       objective.SetOffset(coeffs.pop(OFFSET_KEY, 0.0))
+  //       for v, c, in list(coeffs.items()):
+  //         objective.SetCoefficient(v, float(c))
 
-  def Maximize(self, expr):
-    objective = self.Objective()
-    objective.Clear()
-    objective.SetMaximization()
-    if isinstance(expr, numbers.Number):
-        objective.SetOffset(expr)
-    else:
-        coeffs = expr.GetCoeffs()
-        objective.SetOffset(coeffs.pop(OFFSET_KEY, 0.0))
-        for v, c, in list(coeffs.items()):
-          objective.SetCoefficient(v, float(c))
-  }  // %pythoncode
+  // def Maximize(self, expr):
+  //   objective = self.Objective()
+  //   objective.Clear()
+  //   objective.SetMaximization()
+  //   if isinstance(expr, numbers.Number):
+  //       objective.SetOffset(expr)
+  //   else:
+  //       coeffs = expr.GetCoeffs()
+  //       objective.SetOffset(coeffs.pop(OFFSET_KEY, 0.0))
+  //       for v, c, in list(coeffs.items()):
+  //         objective.SetCoefficient(v, float(c))
+  // }  // %pythoncode
 
 // Catch runtime exceptions in class methods
 %exception operations_research::MPSolver {
@@ -466,11 +466,3 @@ namespace operations_research {
 }  // namespace operations_research
 
 %unignoreall
-
-%pythoncode {
-def setup_variable_operator(opname):
-  setattr(Variable, opname,
-          lambda self, *args: getattr(VariableExpr(self), opname)(*args))
-for opname in LinearExpr.OVERRIDDEN_OPERATOR_METHODS:
-  setup_variable_operator(opname)
-}  // %pythoncode
