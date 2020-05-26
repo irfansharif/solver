@@ -131,3 +131,10 @@ go_repository(
     sum = "h1:/exdXoGamhu5ONeUJH0deniYLWYvQwW66yvlfiiKTu0=",
     version = "v0.4.1",
 )
+
+go_repository(
+    name = "org_golang_x_xerrors",
+    importpath = "golang.org/x/xerrors",
+    sum = "h1:E7g+9GITq07hpfrRu66IVDexMakfv52eLZ2CXBWiKr4=",
+    version = "v0.0.0-20191204190536-9bdfabe68543",
+)

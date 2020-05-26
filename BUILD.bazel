@@ -12,15 +12,15 @@ go_library(
         "linear_solver_go_wrap.cc",
         "ortools.go",
     ],
-    cgo = True,
-    importpath = "github.com/gonzojive/ortoolsgo",
-    visibility = ["//visibility:public"],
     cdeps = [
         ":ortools_dependencies",
         "@ortools//ortools/base",  #keep
         "@ortools//ortools/linear_solver",  #keep
         "@ortools//ortools/linear_solver:linear_solver_cc_proto",  #keep
     ],
+    cgo = True,
+    importpath = "github.com/gonzojive/ortoolsgo",
+    visibility = ["//visibility:public"],
     # @ortools//examples/cpp:linear_programming
 )
 
@@ -34,12 +34,15 @@ cc_library(
     ],
     hdrs = [
         "@ortools//ortools/linear_solver:model_exporter_swig_helper.h",
-    ]
+    ],
 )
 
 go_test(
     name = "go_default_test",
     srcs = ["ortools_test.go"],
     embed = [":go_default_library"],
-    deps = ["@com_github_google_go_cmp//cmp:go_default_library"],
+    deps = [
+        "@com_github_google_go_cmp//cmp:go_default_library",
+        "@com_github_google_go_cmp//cmp/cmpopts:go_default_library",
+    ],
 )

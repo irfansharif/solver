@@ -286,6 +286,13 @@ class MPSolutionResponse;
 %unignore operations_research::MPSolver::UNBOUNDED;  // No unit test
 %unignore operations_research::MPSolver::ABNORMAL;
 %unignore operations_research::MPSolver::NOT_SOLVED;  // No unit test
+%rename (SolverStatus) operations_research::MPSolver::ResultStatus;
+%rename (StatusOptimal) operations_research::MPSolver::OPTIMAL;
+%rename (StatusFeasible) operations_research::MPSolver::FEASIBLE;  // No unit test
+%rename (StatusInfeasible) operations_research::MPSolver::INFEASIBLE;
+%rename (StatusUnbounded) operations_research::MPSolver::UNBOUNDED;  // No unit test
+%rename (StatusAbnormal) operations_research::MPSolver::ABNORMAL;
+%rename (StatusNotSolved) operations_research::MPSolver::NOT_SOLVED;  // No unit test
 
 // Expose the MPSolver's basic API, with some renames.
 %rename (Objective) operations_research::MPSolver::MutableObjective;
