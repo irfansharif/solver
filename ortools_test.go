@@ -33,6 +33,7 @@ func TestNewSolver(t *testing.T) {
 // TestSolver is based on https://developers.google.com/optimization/lp/glop.
 func TestSolver(t *testing.T) {
 	solver := NewSolver("LinearProgrammingExample", LinearProgramming)
+	defer solver.Close()
 	x := solver.NewVar(0, math.Inf(1), false, "x")
 	y := solver.NewVar(0, math.Inf(1), false, "y")
 
