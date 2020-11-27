@@ -18,8 +18,16 @@ For now, some generated files are checked in. They can be regenerated using this
 command:
 
 ```shell
-swig -go -cgo -c++ -intgosize 64 \
-  -I/home/red/lib/or-tools \
+swig -v -go -cgo -c++ -intgosize 64 \
+  -I/home/red/git/or-tools \
+  -I/home/red/git/abseil-cpp \
   -o linear_solver_go_wrap.cc \
-  -module ortools linear_solver.i
+  -module ortoolsswig \
+  linear_solver.i
 ```
+
+It will be necessary to clone absl and or-tools:
+
+https://github.com/abseil/abseil-cpp.git
+
+https://github.com/google/or-tools.git

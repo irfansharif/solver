@@ -35,6 +35,15 @@
 %include "std_string.i"
 %include "stdint.i"
 
+//%include "absl/base/options.h"
+//%include "absl/base/config.h"
+%include "absl/base/attributes.h"
+//include "absl/container/inlined_vector.h"
+//%include "absl/status/internal/status_internal.h"
+//%include "absl/strings/cord.h"
+//%include "absl/types/optional.h"
+//%include "absl/status/status.h"
+
 //%include "ortools/util/python/proto.i"
 
 //%import "ortools/util/python/vector.i"
@@ -49,10 +58,14 @@ class MPSolutionResponse;
 }  // namespace operations_research
 
 %{
+#include "absl/status/status.h"
+//#include "ortools/glop/status.h"
 #include "ortools/linear_solver/linear_solver.h"
 #include "ortools/linear_solver/model_exporter.h"
 #include "ortools/linear_solver/model_exporter_swig_helper.h"
 #include "ortools/linear_solver/model_validator.h"
+
+typedef ::absl::Status Status;
 %}
 
 // %pythoncode %{

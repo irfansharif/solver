@@ -11,6 +11,7 @@ go_library(
         ":ortools_dependencies",
     ],
     cgo = True,
+    cxxopts = [],
     importpath = "github.com/gonzojive/or-tools-go/ortools/ortoolsswig",
     visibility = ["//visibility:public"],
 )
@@ -19,6 +20,10 @@ cc_library(
     name = "ortools_dependencies",
     srcs = [],
     deps = [
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings",
+        "@com_google_absl//absl/synchronization",
+        "@com_google_absl//absl/types:optional",
         "@ortools//ortools/base",
         "@ortools//ortools/linear_solver",
         "@ortools//ortools/linear_solver:linear_solver_cc_proto",
@@ -26,6 +31,7 @@ cc_library(
     hdrs = [
         "@ortools//ortools/linear_solver:model_exporter_swig_helper.h",
     ],
+    copts = [],
 )
 
 go_test(
