@@ -2,11 +2,11 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_repository")
 
 # TODO(irfansharif): Update to latest or-tools. Some of these dependencies
-# (like glog/gflags will no longer be needed).
+# (like glog/gflags) will no longer be needed.
 
 git_repository(
     name = "ortools",
-    commit = "8d19323faf51f2f004e4de6c1b32a74001fbc7c1", #tag v8.0
+    commit = "8d19323faf51f2f004e4de6c1b32a74001fbc7c1",  #tag v8.0
     remote = "https://github.com/google/or-tools.git",
 )
 
@@ -24,11 +24,11 @@ git_repository(
 
 http_archive(
     name = "bazel_skylib",
+    sha256 = "1c531376ac7e5a180e0237938a2536de0c54d93f5c278634818e0efc952dd56c",
     urls = [
         "https://github.com/bazelbuild/bazel-skylib/releases/download/1.0.3/bazel-skylib-1.0.3.tar.gz",
         "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/1.0.3/bazel-skylib-1.0.3.tar.gz",
     ],
-    sha256 = "1c531376ac7e5a180e0237938a2536de0c54d93f5c278634818e0efc952dd56c",
 )
 
 git_repository(
@@ -45,14 +45,14 @@ git_repository(
 
 git_repository(
     name = "com_google_absl",
-    commit = "b56cbdd", # release 20200923
+    commit = "b56cbdd",  # release 20200923
     remote = "https://github.com/abseil/abseil-cpp.git",
 )
 
 http_archive(
-  name = "rules_cc",
-  urls = ["https://github.com/bazelbuild/rules_cc/archive/262ebec3c2296296526740db4aefce68c80de7fa.zip"],
-  strip_prefix = "rules_cc-262ebec3c2296296526740db4aefce68c80de7fa",
+    name = "rules_cc",
+    strip_prefix = "rules_cc-262ebec3c2296296526740db4aefce68c80de7fa",
+    urls = ["https://github.com/bazelbuild/rules_cc/archive/262ebec3c2296296526740db4aefce68c80de7fa.zip"],
 )
 
 load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
@@ -77,7 +77,7 @@ http_archive(
 http_archive(
     name = "scip",
     build_file = "@ortools//bazel:scip.BUILD",
-    patches = [ "@ortools//bazel:scip.patch" ],
+    patches = ["@ortools//bazel:scip.patch"],
     sha256 = "033bf240298d3a1c92e8ddb7b452190e0af15df2dad7d24d0572f10ae8eec5aa",
     url = "https://github.com/google/or-tools/releases/download/v7.7/scip-7.0.1.tgz",
 )
@@ -101,38 +101,18 @@ http_archive(
     ],
 )
 
-# Go stuff
 http_archive(
     name = "io_bazel_rules_go",
-    sha256 = "207fad3e6689135c5d8713e5a17ba9d1290238f47b9ba545b63d9303406209c6",
+    sha256 = "8e968b5fcea1d2d64071872b12737bbb5514524ee5f0a4f54f5920266c261acb",
     urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/v0.24.7/rules_go-v0.24.7.tar.gz",
-        "https://github.com/bazelbuild/rules_go/releases/download/v0.24.7/rules_go-v0.24.7.tar.gz",
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_go/releases/download/v0.28.0/rules_go-v0.28.0.zip",
+        "https://github.com/bazelbuild/rules_go/releases/download/v0.28.0/rules_go-v0.28.0.zip",
     ],
 )
-
-http_archive(
-    name = "bazel_gazelle",
-    sha256 = "d8c45ee70ec39a57e7a05e5027c32b1576cc7f16d9dd37135b0eddde45cf1b10",
-    urls = [
-        "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/bazel-gazelle/releases/download/v0.20.0/bazel-gazelle-v0.20.0.tar.gz",
-        "https://github.com/bazelbuild/bazel-gazelle/releases/download/v0.20.0/bazel-gazelle-v0.20.0.tar.gz",
-    ],
-)
-
-load("@io_bazel_rules_go//go:deps.bzl", "go_rules_dependencies", "go_register_toolchains")
-
-go_rules_dependencies()
-
-go_register_toolchains()
-
-load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
-
-gazelle_dependencies()
 
 http_archive(
     name = "swig",
-    build_file = "//third_party:swig.BUILD",
+    build_file = "//c-deps/external:swig.BUILD",
     sha256 = "58a475dbbd4a4d7075e5fe86d4e54c9edde39847cdb96a3053d87cb64a23a453",
     strip_prefix = "swig-3.0.8",
     urls = [
@@ -144,7 +124,7 @@ http_archive(
 
 http_archive(
     name = "pcre",
-    build_file = "//third_party:pcre.BUILD",
+    build_file = "//c-deps/external:pcre.BUILD",
     sha256 = "69acbc2fbdefb955d42a4c606dfde800c2885711d2979e356c0636efde9ec3b5",
     strip_prefix = "pcre-8.42",
     urls = [
@@ -153,15 +133,33 @@ http_archive(
     ],
 )
 
+git_repository(
+    name = "bazel_gazelle",
+    commit = "d038863ba2e096792c6bb6afca31f6514f1aeecd",
+    remote = "https://github.com/bazelbuild/bazel-gazelle",
+)
+
+load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
+
+go_rules_dependencies()
+
+go_register_toolchains(go_version = "1.16.5")
+
+load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
+
+gazelle_dependencies()
+
 go_repository(
     name = "com_github_google_go_cmp",
+    build_file_proto_mode = "disable_global",
     importpath = "github.com/google/go-cmp",
-    sum = "h1:/exdXoGamhu5ONeUJH0deniYLWYvQwW66yvlfiiKTu0=",
-    version = "v0.4.1",
+    sum = "h1:BKbKCqvP6I+rmFHt06ZmyQtvB8xAkWdhFyr0ZUNZcxQ=",
+    version = "v0.5.6",
 )
 
 go_repository(
     name = "org_golang_x_xerrors",
+    build_file_proto_mode = "disable_global",
     importpath = "golang.org/x/xerrors",
     sum = "h1:E7g+9GITq07hpfrRu66IVDexMakfv52eLZ2CXBWiKr4=",
     version = "v0.0.0-20191204190536-9bdfabe68543",

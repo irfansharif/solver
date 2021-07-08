@@ -1,0 +1,44 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+cc_library(
+    name = "ortools_dependencies",
+    srcs = [],
+    hdrs = [
+        "@ortools//ortools/linear_solver:model_exporter_swig_helper.h",
+    ],
+    copts = [],
+    deps = [
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings",
+        "@com_google_absl//absl/synchronization",
+        "@com_google_absl//absl/types:optional",
+        "@ortools//ortools/base",
+        "@ortools//ortools/linear_solver",
+        "@ortools//ortools/linear_solver:linear_solver_cc_proto",
+    ],
+)
+
+go_library(
+    name = "swig",
+    srcs = [
+        "linear_solver_go_wrap.cc",
+        "swig.go",
+        "swig_doc.go",
+    ],
+    cdeps = [
+        ":ortools_dependencies",
+    ],
+    cgo = True,
+    importpath = "github.com/irfansharif/or-tools/internal/swig",
+    visibility = ["//:__subpackages__"],
+)
+
+go_test(
+    name = "swig_test",
+    srcs = ["swig_test.go"],
+    embed = [":swig"],
+    deps = [
+        "@com_github_google_go_cmp//cmp",
+        "@com_github_google_go_cmp//cmp/cmpopts",
+    ],
+)

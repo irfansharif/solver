@@ -1,33 +1,45 @@
-## OR tools for golang
+OR-Tools for Go
+---
 
-This project contains a cgo-based API for using Google's Operations Research
-tools. Code is generated in the `ortoolsswig` folder, but the generated code is
-ugly, so most people will want to use the `ortoolsgo` package, which is written
-on top of the swig bindings.
+This project contains a cgo-based API for using Google's [Operations Research
+Tools](https://developers.google.com/optimization/). The Go/C++ binding code is
+generated using [SWIG](http://www.swig.org), and can be found under
+`internal/swig`. SWIG generated code is ugly and difficult to work with, which
+is why the package is internal; a sanitized API is exposed via the
+top-level package.
 
-The library compiles with bazel. For example, the tests can be run with this
-command:
+Due to the C++ dependencies, the library is compiled/tested using
+[Bazel](https://bazel.build). 
 
-```shell
-ibazel test //ortoolsswig:go_default_test
+```sh
+# supported bazel version >= 4.0.0
+bazel build //:or-tools
+bazel test //:all --test_output=all \
+  --cache_test_results=no \
+  --test_arg='-test.v' \
+  --test_filter='TestNew.*'
+bazel run //:gazelle # to update the BUILD.bazel files
 ```
 
 ### Regenerating the SWIG bindings
 
-For now, some generated files are checked in. They can be regenerated using this
-command:
+The generated files are checked in. They can be regenerated using the
+following:
 
-```shell
+```sh
+# ensure that the submodules are initialized:
+#   git submodule update --init --recursive
+#
+# supported swig version == 4.0.2
 swig -v -go -cgo -c++ -intgosize 64 \
-  -I/home/red/git/or-tools \
-  -I/home/red/git/abseil-cpp \
-  -o linear_solver_go_wrap.cc \
-  -module ortoolsswig \
-  linear_solver.i
+  -Ic-deps/or-tools \
+  -Ic-deps/abseil-cpp \
+  -o internal/swig/linear_solver_go_wrap.cc \
+  -module swig \
+  internal/swig/linear_solver.i
 ```
 
-It will be necessary to clone absl and or-tools:
+---
 
-https://github.com/abseil/abseil-cpp.git
-
-https://github.com/google/or-tools.git
+NB: This repo was originally forked from
+[gonzojive/or-tools-go](https://github.com/gonzojive/or-tools-go).

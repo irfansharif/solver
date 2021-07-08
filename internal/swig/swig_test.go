@@ -1,4 +1,4 @@
-package ortoolsswig
+package swig
 
 import (
 	"testing"

@@ -1,0 +1,6 @@
+[submodule "c-deps/or-tools"]
+	path = c-deps/or-tools
+	url = git@github.com:google/or-tools.git
+[submodule "c-deps/abseil-cpp"]
+	path = c-deps/abseil-cpp
+	url = git@github.com:abseil/abseil-cpp.git

@@ -1,5 +1,5 @@
-module github.com/gonzojive/or-tools-go/ortools
+module github.com/irfansharif/or-tools
 
-go 1.14
+go 1.16
 
-require github.com/google/go-cmp v0.4.1
+require github.com/google/go-cmp v0.5.6

@@ -1,25 +1,27 @@
 load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 load("@bazel_gazelle//:def.bzl", "gazelle")
 
-# gazelle:prefix github.com/gonzojive/or-tools-go/ortools
-# gazelle:exclude node_modules
-# gazelle:exclude bazel-out
-gazelle(name = "gazelle")
+# gazelle:exclude c-deps/or-tools
+# gazelle:exclude c-deps/abseil-cpp
+gazelle(
+    name = "gazelle",
+    prefix = "github.com/irfansharif/or-tools",
+)
 
 go_library(
-    name = "go_default_library",
+    name = "or-tools",
     srcs = ["ortools.go"],
-    importpath = "github.com/gonzojive/or-tools-go/ortools",
+    importpath = "github.com/irfansharif/or-tools",
     visibility = ["//visibility:public"],
-    deps = ["//ortoolsswig:go_default_library"],
+    deps = ["//internal/swig"],
 )
 
 go_test(
-    name = "go_default_test",
+    name = "or-tools_test",
     srcs = ["ortools_test.go"],
-    embed = [":go_default_library"],
+    embed = [":or-tools"],
     deps = [
-        "@com_github_google_go_cmp//cmp:go_default_library",
-        "@com_github_google_go_cmp//cmp/cmpopts:go_default_library",
+        "@com_github_google_go_cmp//cmp",
+        "@com_github_google_go_cmp//cmp/cmpopts",
     ],
 )
