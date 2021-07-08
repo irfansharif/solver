@@ -1,9 +1,3 @@
-# From https://github.com/orrsella/bazel-example/blob/master/.gitignore
-bazel
-bazel-bazel-test
-bazel-bin
-bazel-genfiles
-bazel-out
-bazel-ortoolsgo
-bazel-or-tools-go
-bazel-testlogs
+bazel-*
+.bazel
+.bazelversion

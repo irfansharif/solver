@@ -1,19 +1,14 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_repository")
 
-# local_repository(
-#     name = "ortools",
-#     path = "/home/red/git/or-tools-fork",
-# )
+# TODO(irfansharif): Update to latest or-tools. Some of these dependencies
+# (like glog/gflags will no longer be needed).
 
 git_repository(
     name = "ortools",
     commit = "8d19323faf51f2f004e4de6c1b32a74001fbc7c1", #tag v8.0
     remote = "https://github.com/google/or-tools.git",
 )
-
-# TODO(reddaly): Migrate to rules_cc: https://github.com/bazelbuild/rules_cc
-
 
 git_repository(
     name = "com_github_gflags_gflags",
@@ -71,7 +66,6 @@ http_archive(
     strip_prefix = "googletest-release-1.8.0/googletest",
     url = "https://github.com/google/googletest/archive/release-1.8.0.zip",
 )
-
 
 http_archive(
     name = "glpk",
@@ -135,12 +129,6 @@ go_register_toolchains()
 load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
 
 gazelle_dependencies()
-
-# git_repository(
-#     name = "com_github_swig_swig",
-#     commit = "8b572399d72f3d812165e0975498c930ae822a4f",
-#     remote = "https://github.com/swig/swig.git",
-# )
 
 http_archive(
     name = "swig",
