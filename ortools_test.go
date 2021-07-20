@@ -39,7 +39,6 @@ func TestSolver(t *testing.T) {
 
 	// Constraint 0: x + 2y <= 14.
 	constraint0 := solver.NewConstraintBounded(math.Inf(-1), float64(14), "c0")
-	//constraint0 := solver.NewConstraintBounded()
 	constraint0.SetCoefficient(x, 1)
 	constraint0.SetCoefficient(y, 2)
 
@@ -63,7 +62,7 @@ func TestSolver(t *testing.T) {
 	t.Logf("solver status: %v", status)
 
 	opt := 3*x.SolutionValue() + 4*y.SolutionValue()
-	t.Logf("optimizal solution: 3 * %v + 4 * %v = %v", x.SolutionValue(), y.SolutionValue(), opt)
+	t.Logf("optimal solution: 3 * %v + 4 * %v = %v", x.SolutionValue(), y.SolutionValue(), opt)
 
 	if got, want := solver.NumVariables(), 2; got != want {
 		t.Errorf("got %d variables, want %d", got, want)

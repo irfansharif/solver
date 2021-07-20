@@ -35,18 +35,9 @@
 %include "std_string.i"
 %include "stdint.i"
 
-//%include "absl/base/options.h"
-//%include "absl/base/config.h"
+// XXX: Does this do anything?
 %include "absl/base/attributes.h"
-//include "absl/container/inlined_vector.h"
-//%include "absl/status/internal/status_internal.h"
-//%include "absl/strings/cord.h"
-//%include "absl/types/optional.h"
-//%include "absl/status/status.h"
 
-//%include "ortools/util/python/proto.i"
-
-//%import "ortools/util/python/vector.i"
 
 // We need to forward-declare the proto here, so that the PROTO_* macros
 // involving them work correctly. The order matters very much: this declaration
@@ -59,7 +50,6 @@ class MPSolutionResponse;
 
 %{
 #include "absl/status/status.h"
-//#include "ortools/glop/status.h"
 #include "ortools/linear_solver/linear_solver.h"
 #include "ortools/linear_solver/model_exporter.h"
 #include "ortools/linear_solver/model_exporter_swig_helper.h"
@@ -68,34 +58,6 @@ class MPSolutionResponse;
 typedef ::absl::Status Status;
 %}
 
-// %pythoncode %{
-// import numbers
-// from ortools.linear_solver.linear_solver_natural_api import OFFSET_KEY
-// from ortools.linear_solver.linear_solver_natural_api import inf
-// from ortools.linear_solver.linear_solver_natural_api import LinearExpr
-// from ortools.linear_solver.linear_solver_natural_api import ProductCst
-// from ortools.linear_solver.linear_solver_natural_api import Sum
-// from ortools.linear_solver.linear_solver_natural_api import SumArray
-// from ortools.linear_solver.linear_solver_natural_api import SumCst
-// from ortools.linear_solver.linear_solver_natural_api import LinearConstraint
-// from ortools.linear_solver.linear_solver_natural_api import VariableExpr
-
-// # Remove the documentation of some functions.
-// # See https://pdoc3.github.io/pdoc/doc/pdoc/#overriding-docstrings-with-
-// __pdoc__ = {}
-// __pdoc__['Solver_infinity'] = False
-// __pdoc__['Solver_Infinity'] = False
-// __pdoc__['Solver_SolveWithProto'] = False
-// __pdoc__['Solver_SupportsProblemType'] = False
-// __pdoc__['setup_variable_operator'] = False
-// __pdoc__['Constraint.thisown'] = False
-// __pdoc__['Constraint.thisown'] = False
-// __pdoc__['MPSolverParameters.thisown'] = False
-// __pdoc__['ModelExportOptions.thisown'] = False
-// __pdoc__['Objective.thisown'] = False
-// __pdoc__['Solver.thisown'] = False
-// __pdoc__['Variable.thisown'] = False
-// %}  // %pythoncode
 
 %extend operations_research::MPVariable {
   std::string __str__() {
@@ -104,11 +66,6 @@ typedef ::absl::Status Status;
   std::string __repr__() {
     return $self->name();
   }
-
-  // %pythoncode {
-  // def __getattr__(self, name):
-  //   return getattr(VariableExpr(self), name)
-  // }  // %pythoncode
 }
 
 %extend operations_research::MPSolver {
@@ -120,6 +77,7 @@ typedef ::absl::Status Status;
     return error_message;
   }
 
+  // Change the API of ExportModelAsLpFormat() to simply return the model.
   std::string ExportModelAsLpFormat(bool obfuscated) {
     operations_research::MPModelExportOptions options;
     options.obfuscate = obfuscated;
@@ -128,6 +86,7 @@ typedef ::absl::Status Status;
     return ExportModelAsLpFormat(model, options).value_or("");
   }
 
+  // Change the API of ExportModelAsMpsFormat() to simply return the model.
   std::string ExportModelAsMpsFormat(bool fixed_format, bool obfuscated) {
     operations_research::MPModelExportOptions options;
     options.obfuscate = obfuscated;
@@ -166,47 +125,6 @@ typedef ::absl::Status Status;
     return $self->SetNumThreads(num_theads).ok();
   }
 
-  // %pythoncode {
-  // def Add(self, constraint, name=''):
-  //   if isinstance(constraint, bool):
-  //     if constraint:
-  //       return self.RowConstraint(0, 0, name)
-  //     else:
-  //       return self.RowConstraint(1, 1, name)
-  //   else:
-  //     return constraint.Extract(self, name)
-
-  // def Sum(self, expr_array):
-  //   result = SumArray(expr_array)
-  //   return result
-
-  // def RowConstraint(self, *args):
-  //   return self.Constraint(*args)
-
-  // def Minimize(self, expr):
-  //   objective = self.Objective()
-  //   objective.Clear()
-  //   objective.SetMinimization()
-  //   if isinstance(expr, numbers.Number):
-  //       objective.SetOffset(expr)
-  //   else:
-  //       coeffs = expr.GetCoeffs()
-  //       objective.SetOffset(coeffs.pop(OFFSET_KEY, 0.0))
-  //       for v, c, in list(coeffs.items()):
-  //         objective.SetCoefficient(v, float(c))
-
-  // def Maximize(self, expr):
-  //   objective = self.Objective()
-  //   objective.Clear()
-  //   objective.SetMaximization()
-  //   if isinstance(expr, numbers.Number):
-  //       objective.SetOffset(expr)
-  //   else:
-  //       coeffs = expr.GetCoeffs()
-  //       objective.SetOffset(coeffs.pop(OFFSET_KEY, 0.0))
-  //       for v, c, in list(coeffs.items()):
-  //         objective.SetCoefficient(v, float(c))
-  // }  // %pythoncode
 
 // Catch runtime exceptions in class methods
 %exception operations_research::MPSolver {
@@ -246,20 +164,9 @@ typedef ::absl::Status Status;
   double Offset() const { return $self->offset();}
 }  // extend operations_research::MPObjective
 
-// PY_PROTO_TYPEMAP(ortools.linear_solver.linear_solver_pb2,
-//                  MPModelProto,
-//                  operations_research::MPModelProto);
 
-// PY_PROTO_TYPEMAP(ortools.linear_solver.linear_solver_pb2,
-//                  MPSolutionResponse,
-//                  operations_research::MPSolutionResponse);
 
-// // Actual conversions. This also includes the conversion to std::vector<Class>.
-// PY_CONVERT_HELPER_PTR(MPConstraint);
-// PY_CONVERT(MPConstraint);
 
-// PY_CONVERT_HELPER_PTR(MPVariable);
-// PY_CONVERT(MPVariable);
 
 %ignoreall
 

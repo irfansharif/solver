@@ -34,9 +34,9 @@ following:
 swig -v -go -cgo -c++ -intgosize 64 \
   -Ic-deps/or-tools \
   -Ic-deps/abseil-cpp \
-  -o internal/swig/linear_solver_go_wrap.cc \
-  -module swig \
-  internal/swig/linear_solver.i
+  -o internal/linearsolver/linear_solver_go_wrap.cc \
+  -module linearsolver \
+  internal/linearsolver/linear_solver.i
 ```
 
 ---

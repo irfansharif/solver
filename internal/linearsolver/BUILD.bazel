@@ -19,24 +19,22 @@ cc_library(
 )
 
 go_library(
-    name = "swig",
+    name = "linearsolver",
     srcs = [
+        "doc.go",
         "linear_solver_go_wrap.cc",
-        "swig.go",
-        "swig_doc.go",
+        "linearsolver.go",
     ],
-    cdeps = [
-        ":ortools_dependencies",
-    ],
+    cdeps = [ ":ortools_dependencies", ],
     cgo = True,
-    importpath = "github.com/irfansharif/or-tools/internal/swig",
+    importpath = "github.com/irfansharif/or-tools/internal/linearsolver",
     visibility = ["//:__subpackages__"],
 )
 
 go_test(
-    name = "swig_test",
-    srcs = ["swig_test.go"],
-    embed = [":swig"],
+    name = "linearsolver_test",
+    srcs = ["linearsolver_test.go"],
+    embed = [":linearsolver"],
     deps = [
         "@com_github_google_go_cmp//cmp",
         "@com_github_google_go_cmp//cmp/cmpopts",

@@ -1,4 +1,4 @@
-package swig
+package linearsolver
 
 import (
 	"testing"

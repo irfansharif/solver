@@ -13,7 +13,7 @@ go_library(
     srcs = ["ortools.go"],
     importpath = "github.com/irfansharif/or-tools",
     visibility = ["//visibility:public"],
-    deps = ["//internal/swig"],
+    deps = ["//internal/linearsolver"],
 )
 
 go_test(

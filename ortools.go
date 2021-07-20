@@ -1,15 +1,13 @@
-// Package ortools is a go library for Google's Operations Research tools.
-//
-// Currently bindings are only provided for the linear solver.
+// Package ortools is a Go library for Google's Operations Research tools.
 package ortools
 
 import (
 	"fmt"
 
-	ortoolsswig "github.com/irfansharif/or-tools/internal/swig"
+	ortoolsswig "github.com/irfansharif/or-tools/internal/linearsolver"
 )
 
-// ProblemType is a type of OptimizationProblemType supported by the OR Tools library.
+// ProblemType is a type of problem supported by OR Tools.
 type ProblemType string
 
 // swigEnum returns the SWIG version of the enum.
@@ -18,11 +16,10 @@ func (pt ProblemType) swigEnum() ortoolsswig.Operations_researchMPSolverOptimiza
 	case LinearProgramming:
 		return ortoolsswig.SolverGLOP_LINEAR_PROGRAMMING
 	default:
-		return 0
+	    panic("unknown problem type")
 	}
 }
 
-// ProblemType definitions
 const (
 	LinearProgramming ProblemType = "LinearProgrammingProblemType"
 )
@@ -36,9 +33,9 @@ type Solver struct {
 }
 
 // NewSolver returns a new solver.
-func NewSolver(name string, problemType ProblemType) *Solver {
+func NewSolver(name string, pt ProblemType) *Solver {
 	return &Solver{
-		ortoolsswig.NewSolver(name, problemType.swigEnum()),
+		ortoolsswig.NewSolver(name, pt.swigEnum()),
 	}
 }
 
@@ -89,7 +86,7 @@ func (s *Solver) Solve() error {
 	case ortoolsswig.SolverStatusOptimal:
 		return nil
 	case ortoolsswig.SolverStatusAbnormal:
-		return fmt.Errorf("solver returned abnormal status code; this could be a numerical problem in the formulation or some other problem")
+		return fmt.Errorf("abnormal status: this could be a numerical problem in the formulation or some other problem")
 	case ortoolsswig.SolverStatusFeasible:
 	case ortoolsswig.SolverStatusInfeasible:
 	case ortoolsswig.SolverStatusNotSolved:
@@ -113,7 +110,7 @@ func (v *Variable) SolutionValue() float64 {
 	return v.v.SolutionValue()
 }
 
-// Objective is the objective function to be optmized.
+// Objective is the objective function to be optimized.
 type Objective struct {
 	o ortoolsswig.Objective
 }
