@@ -16,7 +16,7 @@ func (pt ProblemType) swigEnum() ortoolsswig.Operations_researchMPSolverOptimiza
 	case LinearProgramming:
 		return ortoolsswig.SolverGLOP_LINEAR_PROGRAMMING
 	default:
-	    panic("unknown problem type")
+		panic("unknown problem type")
 	}
 }
 

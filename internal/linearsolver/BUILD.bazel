@@ -1,5 +1,28 @@
 load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
+go_library(
+    name = "linearsolver",
+    srcs = [
+        "doc.go",
+        "linearsolver.go",
+        "linearsolver_wrapper.cc",
+    ],
+    cdeps = [":ortools_dependencies"],
+    cgo = True,
+    importpath = "github.com/irfansharif/or-tools/internal/linearsolver",
+    visibility = ["//:__subpackages__"],
+)
+
+go_test(
+    name = "linearsolver_test",
+    srcs = ["linearsolver_test.go"],
+    embed = [":linearsolver"],
+    deps = [
+        "@com_github_google_go_cmp//cmp",
+        "@com_github_google_go_cmp//cmp/cmpopts",
+    ],
+)
+
 cc_library(
     name = "ortools_dependencies",
     srcs = [],
@@ -15,28 +38,5 @@ cc_library(
         "@ortools//ortools/base",
         "@ortools//ortools/linear_solver",
         "@ortools//ortools/linear_solver:linear_solver_cc_proto",
-    ],
-)
-
-go_library(
-    name = "linearsolver",
-    srcs = [
-        "doc.go",
-        "linear_solver_go_wrap.cc",
-        "linearsolver.go",
-    ],
-    cdeps = [ ":ortools_dependencies", ],
-    cgo = True,
-    importpath = "github.com/irfansharif/or-tools/internal/linearsolver",
-    visibility = ["//:__subpackages__"],
-)
-
-go_test(
-    name = "linearsolver_test",
-    srcs = ["linearsolver_test.go"],
-    embed = [":linearsolver"],
-    deps = [
-        "@com_github_google_go_cmp//cmp",
-        "@com_github_google_go_cmp//cmp/cmpopts",
     ],
 )

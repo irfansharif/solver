@@ -13,22 +13,6 @@ var (
 	}
 )
 
-func TestNewSolver(t *testing.T) {
-	tests := []struct {
-		name      string
-		got, want interface{}
-	}{
-		{"test 1", "a", "a"},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if diff := cmp.Diff(tt.want, tt.got); diff != "" {
-				t.Errorf("unexpected diff (-want, +got):\n%s", diff)
-			}
-		})
-	}
-}
-
 // TestSolver is based on https://developers.google.com/optimization/lp/glop.
 func TestSolver(t *testing.T) {
 	solver := NewSolver("LinearProgrammingExample", SolverGLOP_LINEAR_PROGRAMMING)

@@ -11,33 +11,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// This .i file exposes the linear programming and integer programming
-//
-// The python API is enriched by custom code defined here, making it
-// extremely intuitive, like:
-//   solver = pywraplp.Solver(
-//       'Example Solver', pywraplp.Solver.GLOP_LINEAR_PROGRAMMING)
-//   x1 = solver.NumVar(0.0, 1.0, 'x1')
-//   x2 = solver.NumVar(-3.0, 2.0, 'x2')
-//   c1 = solver.Add(2 * x1 - 3.2 * x2 + 1 <= 2.5)
-//   solver.Maximize(10 * x1 + 6 * x2)
-//
-// USAGE EXAMPLES:
-// - examples/python/linear_programming.py
-// - ./pywraplp_test.py
-//
-// TODO(user): test all the APIs that are currently marked as 'untested'.
-
-// This file originally linear_solver/python/linear_solver.i
+// This .i file exposes the linear and integer programming APIs. It was adapted
+// from ortools/linear_solver/python/linear_solver.i.
 
 %include "ortools/base/base.i"
 
 %include "std_string.i"
 %include "stdint.i"
 
-// XXX: Does this do anything?
 %include "absl/base/attributes.h"
-
 
 // We need to forward-declare the proto here, so that the PROTO_* macros
 // involving them work correctly. The order matters very much: this declaration

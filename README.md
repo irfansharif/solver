@@ -9,7 +9,7 @@ is why the package is internal; a sanitized API is exposed via the
 top-level package.
 
 Due to the C++ dependencies, the library is compiled/tested using
-[Bazel](https://bazel.build). 
+[Bazel](https://bazel.build).
 
 ```sh
 # supported bazel version >= 4.0.0
@@ -18,7 +18,10 @@ bazel test //:all --test_output=all \
   --cache_test_results=no \
   --test_arg='-test.v' \
   --test_filter='TestNew.*'
-bazel run //:gazelle # to update the BUILD.bazel files
+bazel test internal/...:all :all
+
+# to update the BUILD.bazel files
+bazel run //:gazelle
 ```
 
 ### Regenerating the SWIG bindings
@@ -31,15 +34,41 @@ following:
 #   git submodule update --init --recursive
 #
 # supported swig version == 4.0.2
+# supported protoc version == 3.13.0
+# supported protoc-gen-go version == 1.27.1
+
+# to generate to C++/Go wrapper files
 swig -v -go -cgo -c++ -intgosize 64 \
   -Ic-deps/or-tools \
   -Ic-deps/abseil-cpp \
-  -o internal/linearsolver/linear_solver_go_wrap.cc \
+  -o internal/linearsolver/linearsolver_wrapper.cc \
   -module linearsolver \
-  internal/linearsolver/linear_solver.i
+  internal/linearsolver/linearsolver.i
+
+swig -v -go -cgo -c++ -intgosize 64 \
+  -Ic-deps/or-tools \
+  -Ic-deps/abseil-cpp \
+  -o internal/cpsatsolver/cpsatsolver_wrapper.cc \
+  -module cpsatsolver \
+  internal/cpsatsolver/cpsatsolver.i
+
+# to generate the protobuf files
+protoc --proto_path=internal/cpsatsolver/pb \
+  --go_out=internal/cpsatsolver/pb \
+  --go_opt=Mcp_model.proto=github.com/irfansharif/or-tools/internal/cpsatsolver/pb \
+  --go_opt=Msat_parameters.proto=github.com/irfansharif/or-tools/internal/cpsatsolver/pb \
+  --go_opt=paths=source_relative \
+  cp_model.proto sat_parameters.proto
+```
+
+```sh
+# to run `gofmt` against everything
+gofmt -s -w .
 ```
 
 ---
 
 NB: This repo was originally forked from
-[gonzojive/or-tools-go](https://github.com/gonzojive/or-tools-go).
+[gonzojive/or-tools-go](https://github.com/gonzojive/or-tools-go). Bits of it
+were cribbed from
+[AirspaceTechnologies/or-tools](https://github.com/AirspaceTechnologies/or-tools).

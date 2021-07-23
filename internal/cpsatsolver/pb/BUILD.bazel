@@ -1,0 +1,26 @@
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
+
+proto_library(
+    name = "operations_research_sat_proto",
+    srcs = [
+        "cp_model.proto",
+        "sat_parameters.proto",
+    ],
+    visibility = ["//:__subpackages__"],
+)
+
+go_proto_library(
+    name = "operations_research_sat_go_proto",
+    importpath = "github.com/irfansharif/or-tools/internal/cpsatsolver/pb",
+    proto = ":operations_research_sat_proto",
+    visibility = ["//:__subpackages__"],
+)
+
+go_library(
+    name = "pb",
+    embed = [":operations_research_sat_go_proto"],
+    importpath = "github.com/irfansharif/or-tools/internal/cpsatsolver/pb",
+    visibility = ["//:__subpackages__"],
+)
