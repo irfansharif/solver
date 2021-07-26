@@ -1,0 +1,42 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.16.5'
+      - uses: bazelbuild/setup-bazelisk@v1
+
+      - name: Run Go version
+        run: go version
+
+      - name: Check gofmt
+        run: if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then exit 1; fi
+
+      - name: Run bazel version
+        run: bazel --version
+
+      - name: Check gazelle
+        run: |
+          bazel run :gazelle
+          git diff --exit-code
+
+      - name: Run bazel build
+        run: |
+          bazel build internal/...
+          bazel build :all
+
+      - name: Run bazel test
+        run: |
+          bazel test internal/...
+          bazel test :all

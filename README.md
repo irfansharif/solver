@@ -18,7 +18,7 @@ bazel test //:all --test_output=all \
   --cache_test_results=no \
   --test_arg='-test.v' \
   --test_filter='TestNew.*'
-bazel test internal/...:all :all
+bazel test :all internal/...
 
 # to update the BUILD.bazel files
 bazel run //:gazelle
