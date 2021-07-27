@@ -12,9 +12,21 @@
 // implied. See the License for the specific language governing
 // permissions and limitations under the License.
 
-// Package linearsolver is where the raw SWIG bindings to the OR-Tools linear
-// solver live.
-//
-// Rather than working with these bindings directly, consider adding
-// functionality to the higher level or-tools/linearsolver package instead.
-package linearsolver
+package cpsatsolver
+
+import (
+	"github.com/irfansharif/or-tools/internal/cpsatsolver/pb"
+)
+
+type IntVar struct {
+	proto *pb.IntegerVariableProto
+}
+
+func newIntVar(domain *Domain, name string) *IntVar {
+	return &IntVar{
+		proto: &pb.IntegerVariableProto{
+			Name:   name,
+			Domain: domain.ToListForm(),
+		},
+	}
+}

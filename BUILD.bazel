@@ -1,4 +1,3 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 load("@bazel_gazelle//:def.bzl", "gazelle")
 
 # gazelle:exclude c-deps/or-tools
@@ -6,22 +5,4 @@ load("@bazel_gazelle//:def.bzl", "gazelle")
 gazelle(
     name = "gazelle",
     prefix = "github.com/irfansharif/or-tools",
-)
-
-go_library(
-    name = "or-tools",
-    srcs = ["ortools.go"],
-    importpath = "github.com/irfansharif/or-tools",
-    visibility = ["//visibility:public"],
-    deps = ["//internal/linearsolver"],
-)
-
-go_test(
-    name = "or-tools_test",
-    srcs = ["ortools_test.go"],
-    embed = [":or-tools"],
-    deps = [
-        "@com_github_google_go_cmp//cmp",
-        "@com_github_google_go_cmp//cmp/cmpopts",
-    ],
 )
