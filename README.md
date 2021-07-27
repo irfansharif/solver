@@ -13,15 +13,16 @@ Due to the C++ dependencies, the library is compiled/tested using
 
 ```sh
 # supported bazel version >= 4.0.0
-bazel build //:or-tools
-bazel test //:all --test_output=all \
+bazel build cpsatsolver/... linearsolver...
+bazel test cpsatsolver:all --test_output=all \
   --cache_test_results=no \
   --test_arg='-test.v' \
-  --test_filter='TestNew.*'
-bazel test :all internal/...
+  --test_filter='TestIntVar.*'
+bazel test linearsolver/...
 
 # to update the BUILD.bazel files
 bazel run //:gazelle
+bazel run //:gazelle -- update-repos -from_file=go.mod -prune=true
 ```
 
 ### Regenerating the SWIG bindings

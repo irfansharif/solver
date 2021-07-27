@@ -12,9 +12,16 @@
 // implied. See the License for the specific language governing
 // permissions and limitations under the License.
 
-// Package linearsolver is where the raw SWIG bindings to the OR-Tools linear
-// solver live.
-//
-// Rather than working with these bindings directly, consider adding
-// functionality to the higher level or-tools/linearsolver package instead.
-package linearsolver
+package cpsatsolver
+
+type Domain struct {
+	lb, ub int64
+}
+
+func NewDomain(lb, ub int64) *Domain {
+	return &Domain{lb, ub}
+}
+
+func (d *Domain) ToListForm() []int64 {
+	return []int64{d.lb, d.ub}
+}

@@ -1,0 +1,25 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "cpsatsolver",
+    srcs = [
+        "constraint.go",
+        "domain.go",
+        "intvar.go",
+        "model.go",
+        "solver.go",
+    ],
+    importpath = "github.com/irfansharif/or-tools/cpsatsolver",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//internal/cpsatsolver",
+        "//internal/cpsatsolver/pb",
+    ],
+)
+
+go_test(
+    name = "cpsatsolver_test",
+    srcs = ["cpsatsolver_test.go"],
+    embed = [":cpsatsolver"],
+    deps = ["@com_github_stretchr_testify//require"],
+)

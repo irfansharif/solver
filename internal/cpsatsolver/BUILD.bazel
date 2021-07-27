@@ -6,6 +6,7 @@ go_library(
         "cpsatsolver.go",
         "cpsatsolver_wrapper.cc",
         "cpsatsolver_wrapper.h",
+        "doc.go",
     ],
     cdeps = [":ortools-cpsat"],
     cgo = True,

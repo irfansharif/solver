@@ -1,27 +1,25 @@
-// Package ortools is a Go library for Google's Operations Research tools.
-package ortools
+// Copyright 2021 Irfan Sharif.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+// implied. See the License for the specific language governing
+// permissions and limitations under the License.
+
+// Package linearsolver is a Go wrapper library for the linear solver included
+// as part of Google's Operations Research tools.
+package linearsolver
 
 import (
 	"fmt"
 
-	ortoolsswig "github.com/irfansharif/or-tools/internal/linearsolver"
-)
-
-// ProblemType is a type of problem supported by OR Tools.
-type ProblemType string
-
-// swigEnum returns the SWIG version of the enum.
-func (pt ProblemType) swigEnum() ortoolsswig.Operations_researchMPSolverOptimizationProblemType {
-	switch pt {
-	case LinearProgramming:
-		return ortoolsswig.SolverGLOP_LINEAR_PROGRAMMING
-	default:
-		panic("unknown problem type")
-	}
-}
-
-const (
-	LinearProgramming ProblemType = "LinearProgrammingProblemType"
+	swig "github.com/irfansharif/or-tools/internal/linearsolver"
 )
 
 // Solver is the main type though which users build and solve problems.
@@ -29,19 +27,19 @@ const (
 // This is based on
 // https://developers.google.com/optimization/reference/linear_solver/linear_solver/MPSolver.
 type Solver struct {
-	s ortoolsswig.Solver
+	s swig.Solver
 }
 
-// NewSolver returns a new solver.
-func NewSolver(name string, pt ProblemType) *Solver {
+// New returns a new solver.
+func New(name string, pt ProblemType) *Solver {
 	return &Solver{
-		ortoolsswig.NewSolver(name, pt.swigEnum()),
+		s: swig.NewSolver(name, pt.asOptimizationProblemType()),
 	}
 }
 
-// Close closes the solver. This must be called after NewSolver().
+// Close closes the solver. This must be called after New().
 func (s *Solver) Close() error {
-	ortoolsswig.DeleteSolver(s.s)
+	swig.DeleteSolver(s.s)
 	return nil
 }
 
@@ -83,14 +81,14 @@ func (s *Solver) NumConstraints() int {
 func (s *Solver) Solve() error {
 	code := s.s.Solve()
 	switch code {
-	case ortoolsswig.SolverStatusOptimal:
+	case swig.SolverStatusOptimal:
 		return nil
-	case ortoolsswig.SolverStatusAbnormal:
+	case swig.SolverStatusAbnormal:
 		return fmt.Errorf("abnormal status: this could be a numerical problem in the formulation or some other problem")
-	case ortoolsswig.SolverStatusFeasible:
-	case ortoolsswig.SolverStatusInfeasible:
-	case ortoolsswig.SolverStatusNotSolved:
-	case ortoolsswig.SolverStatusUnbounded:
+	case swig.SolverStatusFeasible:
+	case swig.SolverStatusInfeasible:
+	case swig.SolverStatusNotSolved:
+	case swig.SolverStatusUnbounded:
 	default:
 	}
 	return fmt.Errorf("unhandled status code %v", code)
@@ -98,7 +96,7 @@ func (s *Solver) Solve() error {
 
 // Variable is a variable to be optimized by the solver.
 type Variable struct {
-	v ortoolsswig.Variable
+	v swig.Variable
 }
 
 // SolutionValue returns the value of the variable in the current solution.
@@ -112,7 +110,7 @@ func (v *Variable) SolutionValue() float64 {
 
 // Objective is the objective function to be optimized.
 type Objective struct {
-	o ortoolsswig.Objective
+	o swig.Objective
 }
 
 // SetMaximization sets the optimization direction to maximize.
@@ -144,7 +142,7 @@ func (o *Objective) Value() float64 {
 
 // Constraint is used for setting linear programming bounds.
 type Constraint struct {
-	c ortoolsswig.Constraint
+	c swig.Constraint
 }
 
 // SetCoefficient sets the coefficient of the variable on the constraint.
@@ -153,4 +151,21 @@ type Constraint struct {
 // crashes in non-opt mode.
 func (c *Constraint) SetCoefficient(v *Variable, coeff float64) {
 	c.c.SetCoefficient(v.v, coeff)
+}
+
+// ProblemType is a type of problem supported by the OR Tools linear solver.
+type ProblemType int
+
+const (
+	GLOPLinearProgramming ProblemType = iota
+)
+
+// asOptimizationProblemType returns the SWIG version of the enum.
+func (pt ProblemType) asOptimizationProblemType() swig.Operations_researchMPSolverOptimizationProblemType {
+	switch pt {
+	case GLOPLinearProgramming:
+		return swig.SolverGLOP_LINEAR_PROGRAMMING
+	default:
+		panic("unknown problem type")
+	}
 }

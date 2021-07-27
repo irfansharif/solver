@@ -12,9 +12,9 @@
 // implied. See the License for the specific language governing
 // permissions and limitations under the License.
 
-// Package linearsolver is where the raw SWIG bindings to the OR-Tools linear
+// Package cpsatsolver is where the raw SWIG bindings to the OR-Tools CP-SAT
 // solver live.
 //
 // Rather than working with these bindings directly, consider adding
-// functionality to the higher level or-tools/linearsolver package instead.
-package linearsolver
+// functionality to the higher level or-tools/cpsatsolver package instead.
+package cpsatsolver
