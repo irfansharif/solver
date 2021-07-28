@@ -54,11 +54,11 @@ func (m *Model) NewConstant(c int64) *IntVar {
 	return m.NewIntVarFromDomain(NewDomain(c, c), fmt.Sprintf("%d", c))
 }
 
-func (m *Model) AllDifferent(vs ...*IntVar) {
+func (m *Model) AddAllDifferent(vs ...*IntVar) {
 	c := newConstraint()
 	var vars []int32
 	for _, v := range vs {
-		vars = append(vars, int32(m.intVarIndexes[v]))
+		vars = append(vars, int32(m.intVarIndex(v)))
 	}
 	c.proto.Constraint = &swigpb.ConstraintProto_AllDiff{
 		AllDiff: &swigpb.AllDifferentConstraintProto{
@@ -68,12 +68,54 @@ func (m *Model) AllDifferent(vs ...*IntVar) {
 	m.addConstraint(c)
 }
 
+func (m *Model) AddAllowedAssignment(vs []*IntVar, assignments ...[]int64) {
+	_ = m.addAssignmentInternal(vs, assignments...)
+	return
+}
+
+func (m *Model) AddForbiddenAssignment(vs []*IntVar, assignments ...[]int64) {
+	c := m.addAssignmentInternal(vs, assignments...)
+	c.proto.Constraint.(*swigpb.ConstraintProto_Table).Table.Negated = true
+	return
+}
+
+func (m *Model) addAssignmentInternal(vs []*IntVar, assignments ...[]int64) *constraint {
+	c := newConstraint()
+	var vars []int32
+	for _, v := range vs {
+		vars = append(vars, int32(m.intVarIndex(v)))
+	}
+	var values []int64
+	for _, assignment := range assignments {
+		if len(assignment) != len(vs) {
+			panic("mismatched assignment and int vars length")
+		}
+		values = append(values, assignment...)
+	}
+	c.proto.Constraint = &swigpb.ConstraintProto_Table{
+		Table: &swigpb.TableConstraintProto{
+			Vars:   vars,
+			Values: values,
+		},
+	}
+	m.addConstraint(c)
+	return c
+}
+
 func (m *Model) addIntVar(intVar *IntVar) {
 	m.proto.Variables = append(m.proto.Variables, intVar.proto)
 	m.intVarIndexes[intVar] = len(m.proto.Variables) - 1
 }
 
+func (m *Model) intVarIndex(intVar *IntVar) int {
+	return m.intVarIndexes[intVar]
+}
+
 func (m *Model) addConstraint(constraint *constraint) {
 	m.proto.Constraints = append(m.proto.Constraints, constraint.proto)
 	m.constraintIndexes[constraint] = len(m.proto.Constraints) - 1
+}
+
+func (m *Model) constraintIndex(constraint *constraint) int {
+	return m.constraintIndexes[constraint]
 }

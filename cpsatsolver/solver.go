@@ -47,3 +47,7 @@ type Response struct {
 func (r *Response) Optimal() bool {
 	return r.proto.Status == pb.CpSolverStatus_OPTIMAL
 }
+
+func (r *Response) Infeasible() bool {
+	return r.proto.Status == pb.CpSolverStatus_INFEASIBLE
+}
