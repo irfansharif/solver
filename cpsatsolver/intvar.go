@@ -18,12 +18,12 @@ import (
 	"github.com/irfansharif/or-tools/internal/cpsatsolver/pb"
 )
 
-type IntVar struct {
+type intVar struct {
 	proto *pb.IntegerVariableProto
 }
 
-func newIntVar(domain *Domain, name string) *IntVar {
-	return &IntVar{
+func newIntVar(domain *domain, name string) *intVar {
+	return &intVar{
 		proto: &pb.IntegerVariableProto{
 			Name:   name,
 			Domain: domain.ToListForm(),

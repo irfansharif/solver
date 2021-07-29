@@ -21,33 +21,41 @@ import (
 
 type Solver struct {
 	model    *Model
-	response *Response
+	response Response
 }
 
-func NewSolver(model *Model) *Solver {
+func NewSolver(m *Model) *Solver {
 	return &Solver{
-		model: model,
+		model: m,
 	}
 }
 
-func (s *Solver) Solve() *Response {
-	response := swig.SatHelperSolve(*s.model.proto)
-	s.response = &Response{&response}
+func (s *Solver) Solve() Response {
+	proto := swig.SatHelperSolve(*s.model.proto)
+	s.response = Response{&proto}
 	return s.response
 }
 
-func (s *Solver) Value(v *IntVar) int64 {
-	return s.response.proto.GetSolution()[s.model.intVarIndexes[v]]
+func (s *Solver) Value(iv IntVar) int64 {
+	return s.response.proto.GetSolution()[s.model.intVarIdxMap[iv]]
+}
+
+func (s *Solver) LiteralValue(l Literal) bool {
+	return s.Value(l) == 1
 }
 
 type Response struct {
 	proto *pb.CpSolverResponse
 }
 
-func (r *Response) Optimal() bool {
+func (r Response) Optimal() bool {
 	return r.proto.Status == pb.CpSolverStatus_OPTIMAL
 }
 
-func (r *Response) Infeasible() bool {
+func (r Response) Infeasible() bool {
 	return r.proto.Status == pb.CpSolverStatus_INFEASIBLE
+}
+
+func (r Response) Feasible() bool {
+	return r.proto.Status == pb.CpSolverStatus_FEASIBLE
 }

@@ -56,7 +56,7 @@ func TestAllowedAssignments(t *testing.T) {
 		{1, 2, 1},
 		{2, 1, 0},
 	}
-	model.AddAllowedAssignment([]*IntVar{x, y, z}, assignments...)
+	model.AddAllowedAssignments([]IntVar{x, y, z}, assignments)
 	solver := NewSolver(model)
 
 	require.True(t, solver.Solve().Optimal(), "expected solver to find solution")
@@ -75,7 +75,7 @@ func TestForbiddenAssignments(t *testing.T) {
 		{1, 2},
 		{2, 1},
 	}
-	model.AddForbiddenAssignment([]*IntVar{x, y}, forbiddenAssignments...)
+	model.AddForbiddenAssignments([]IntVar{x, y}, forbiddenAssignments)
 	solver := NewSolver(model)
 
 	require.True(t, solver.Solve().Optimal(), "expected solver to find solution")
@@ -92,9 +92,102 @@ func TestConflictingAssignments(t *testing.T) {
 		{1, 2},
 		{2, 1},
 	}
-	model.AddForbiddenAssignment([]*IntVar{x, y}, assignments...)
-	model.AddAllowedAssignment([]*IntVar{x, y}, assignments...)
+	model.AddForbiddenAssignments([]IntVar{x, y}, assignments)
+	model.AddAllowedAssignments([]IntVar{x, y}, assignments)
 
 	solver := NewSolver(model)
 	require.True(t, solver.Solve().Infeasible(), "didn't expect solver to find solution")
+}
+
+func TestBooleanConstraints(t *testing.T) {
+	model := NewModel()
+
+	a := model.NewLiteral("a")
+	b := model.NewLiteral("b")
+	c := model.NewLiteral("c")
+	d := model.NewLiteral("d")
+	e := model.NewLiteral("e")
+	f := model.NewLiteral("f")
+
+	model.AddBoolAnd(a, b) // a && b
+	model.AddBoolOr(c, d)  // c || d
+	model.AddBoolXor(e, f) // e != f
+
+	solver := NewSolver(model)
+	require.True(t, solver.Solve().Optimal(), "expected solver to find solution")
+
+	{
+		a := solver.LiteralValue(a)
+		b := solver.LiteralValue(b)
+		c := solver.LiteralValue(c)
+		d := solver.LiteralValue(d)
+		e := solver.LiteralValue(e)
+		f := solver.LiteralValue(f)
+
+		require.True(t, a && b)
+		require.True(t, c || d)
+		require.True(t, e != f)
+	}
+}
+
+func TestAllowedBooleanAssignments(t *testing.T) {
+	model := NewModel()
+
+	a := model.NewLiteral("a")
+	b := model.NewLiteral("b")
+
+	assignments := [][]bool{
+		{true, false},
+		{false, true},
+	}
+	model.AddAllowedLiteralAssignments([]Literal{a, b}, assignments)
+
+	solver := NewSolver(model)
+	require.True(t, solver.Solve().Optimal(), "expected solver to find solution")
+
+	{
+		a := solver.LiteralValue(a)
+		b := solver.LiteralValue(b)
+
+		require.True(t, a != b)
+	}
+}
+
+func TestForbiddenBooleanAssignments(t *testing.T) {
+	model := NewModel()
+
+	a := model.NewLiteral("a")
+	b := model.NewLiteral("b")
+
+	forbiddenAssignments := [][]bool{
+		{true, false},
+		{false, true},
+	}
+	model.AddForbiddenLiteralAssignments([]Literal{a, b}, forbiddenAssignments)
+
+	solver := NewSolver(model)
+	require.True(t, solver.Solve().Optimal(), "expected solver to find solution")
+
+	{
+		a := solver.LiteralValue(a)
+		b := solver.LiteralValue(b)
+
+		require.True(t, a == b)
+	}
+}
+
+func TestElement(t *testing.T) {
+	model := NewModel()
+	var array []IntVar
+	index := model.NewIntVar(0, 10, "index")
+	target := model.NewIntVar(10, 100, "target")
+
+	for i := 0; i <= 10; i += 1 {
+		array = append(array, model.NewConstant(int64(i*10)))
+	}
+
+	model.AddElement(target, index, array...)
+	solver := NewSolver(model)
+	require.True(t, solver.Solve().Optimal(), "expected solver to find solution")
+	require.True(t, solver.Value(target) == 10*solver.Value(index))
 }

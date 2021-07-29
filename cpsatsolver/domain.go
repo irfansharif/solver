@@ -14,14 +14,14 @@
 
 package cpsatsolver
 
-type Domain struct {
+type domain struct {
 	lb, ub int64
 }
 
-func NewDomain(lb, ub int64) *Domain {
-	return &Domain{lb, ub}
+func NewDomain(lb, ub int64) Domain {
+	return &domain{lb, ub}
 }
 
-func (d *Domain) ToListForm() []int64 {
+func (d *domain) ToListForm() []int64 {
 	return []int64{d.lb, d.ub}
 }
