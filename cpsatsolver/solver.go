@@ -32,16 +32,42 @@ func NewSolver(m *Model) *Solver {
 
 func (s *Solver) Solve() Response {
 	proto := swig.SatHelperSolve(*s.model.proto)
-	s.response = Response{&proto}
+	s.response = Response{proto: &proto}
 	return s.response
 }
 
 func (s *Solver) Value(iv IntVar) int64 {
-	return s.response.proto.GetSolution()[s.model.intVarIdxMap[iv]]
+	return s.response.proto.GetSolution()[s.model.intVarToIdx[iv]]
 }
 
-func (s *Solver) LiteralValue(l Literal) bool {
+func (s *Solver) BooleanValue(l Literal) bool {
 	return s.Value(l) == 1
+}
+
+func (s *Solver) ObjectiveValue() float64 {
+	return s.response.proto.GetObjectiveValue()
+}
+
+type callback struct {
+	fn           func(Response)
+	solver       *Solver
+	swigCallback swig.SolutionCallback
+}
+
+func (p *callback) OnSolutionCallback() {
+	proto := p.swigCallback.Response()
+	response := Response{proto: &proto}
+	p.fn(response)
+}
+
+func (s *Solver) SolveWithCallback(fn func(r Response)) {
+	cb := &callback{fn: fn, solver: s}
+	cb.swigCallback = swig.NewDirectorSolutionCallback(cb)
+
+	enumerate := true
+	params := pb.SatParameters{EnumerateAllSolutions: &enumerate}
+	swig.SatHelperSolveWithParametersAndSolutionCallback(*s.model.proto, params, cb.swigCallback)
+	swig.DeleteDirectorSolutionCallback(cb.swigCallback)
 }
 
 type Response struct {

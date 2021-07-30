@@ -1,6 +1,7 @@
 package cpsatsolver
 
 import (
+	"math"
 	"reflect"
 	"testing"
 
@@ -109,20 +110,20 @@ func TestBooleanConstraints(t *testing.T) {
 	e := model.NewLiteral("e")
 	f := model.NewLiteral("f")
 
-	model.AddBoolAnd(a, b) // a && b
-	model.AddBoolOr(c, d)  // c || d
-	model.AddBoolXor(e, f) // e != f
+	model.AddBooleanAnd(a, b) // a && b
+	model.AddBooleanOr(c, d)  // c || d
+	model.AddBooleanXor(e, f) // e != f
 
 	solver := NewSolver(model)
 	require.True(t, solver.Solve().Optimal(), "expected solver to find solution")
 
 	{
-		a := solver.LiteralValue(a)
-		b := solver.LiteralValue(b)
-		c := solver.LiteralValue(c)
-		d := solver.LiteralValue(d)
-		e := solver.LiteralValue(e)
-		f := solver.LiteralValue(f)
+		a := solver.BooleanValue(a)
+		b := solver.BooleanValue(b)
+		c := solver.BooleanValue(c)
+		d := solver.BooleanValue(d)
+		e := solver.BooleanValue(e)
+		f := solver.BooleanValue(f)
 
 		require.True(t, a && b)
 		require.True(t, c || d)
@@ -146,8 +147,8 @@ func TestAllowedBooleanAssignments(t *testing.T) {
 	require.True(t, solver.Solve().Optimal(), "expected solver to find solution")
 
 	{
-		a := solver.LiteralValue(a)
-		b := solver.LiteralValue(b)
+		a := solver.BooleanValue(a)
+		b := solver.BooleanValue(b)
 
 		require.True(t, a != b)
 	}
@@ -169,10 +170,51 @@ func TestForbiddenBooleanAssignments(t *testing.T) {
 	require.True(t, solver.Solve().Optimal(), "expected solver to find solution")
 
 	{
-		a := solver.LiteralValue(a)
-		b := solver.LiteralValue(b)
+		a := solver.BooleanValue(a)
+		b := solver.BooleanValue(b)
 
 		require.True(t, a == b)
+	}
+}
+
+// TestLinearExprMaximization is based on
+// https://developers.google.com/optimization/lp/glop.
+func TestLinearExprMaximization(t *testing.T) {
+	model := NewModel()
+	x := model.NewIntVar(0, 100, "x")
+	y := model.NewIntVar(0, 100, "y")
+
+	// Constraint 0: x + 2y <= 14.
+	model.AddLinearConstraint(
+		NewLinearExpr([]IntVar{x, y}, []int64{1, 2}, 0),
+		NewDomain(math.MinInt64, 14),
+	)
+
+	// Constraint 1: 3x - y >= 0.
+	model.AddLinearConstraint(
+		NewLinearExpr([]IntVar{x, y}, []int64{3, -1}, 0),
+		NewDomain(0, math.MaxInt64),
+	)
+
+	// Constraint 2: x - y <= 2.
+	model.AddLinearConstraint(
+		NewLinearExpr([]IntVar{x, y}, []int64{1, -1}, 0),
+		NewDomain(0, 2),
+	)
+
+	// Objective function: 3x + 4y.
+	model.Maximize(NewLinearExpr([]IntVar{x, y}, []int64{3, 4}, 0))
+
+	solver := NewSolver(model)
+	require.True(t, solver.Solve().Optimal(), "expected solver to find solution")
+
+	{
+		x := solver.Value(x)
+		y := solver.Value(y)
+
+		require.Equal(t, int64(6), x)
+		require.Equal(t, int64(4), y)
+		require.Equal(t, float64(34), solver.ObjectiveValue())
 	}
 }
 
@@ -190,4 +232,18 @@ func TestElement(t *testing.T) {
 	solver := NewSolver(model)
 	require.True(t, solver.Solve().Optimal(), "expected solver to find solution")
 	require.True(t, solver.Value(target) == 10*solver.Value(index))
+}
+
+func TestIterateThroughSolutions(t *testing.T) {
+	model := NewModel()
+
+	var numVals int64 = 3
+	_ = model.NewIntVar(1, numVals, "x")
+	solver := NewSolver(model)
+	count := int64(0)
+	solver.SolveWithCallback(func(Response) {
+		count += 1
+	})
+
+	require.Equal(t, numVals, count)
 }

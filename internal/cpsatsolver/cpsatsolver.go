@@ -83,81 +83,82 @@ extern void _wrap_delete_SatHelper_cpsatsolver_4abce969d05f7e66(uintptr_t arg1);
 */
 import "C"
 
-import "unsafe"
-import _ "runtime/cgo"
-import "sync"
-import "fmt"
-import "github.com/golang/protobuf/proto"
-import "github.com/irfansharif/or-tools/internal/cpsatsolver/pb"
+import (
+	"fmt"
+	_ "runtime/cgo"
+	"sync"
+	"unsafe"
 
+	"github.com/golang/protobuf/proto"
+	"github.com/irfansharif/or-tools/internal/cpsatsolver/pb"
+)
 
 type _ unsafe.Pointer
-
-
 
 var Swig_escape_always_false bool
 var Swig_escape_val interface{}
 
-
 type _swig_fnptr *byte
 type _swig_memberptr *byte
 
-
 type _ sync.Mutex
 
+type swig_goslice struct {
+	arr uintptr
+	n   int
+	c   int
+}
 
-type swig_goslice struct { arr uintptr; n int; c int }
 func swigCopyIntSlice(intSlice *[]int) []int {
-    newSlice := make([]int, len(*intSlice))
-    for i := range newSlice {
-        newSlice[i] = (*intSlice)[i]
-    }
-    p := *(*swig_goslice)(unsafe.Pointer(intSlice))
-    Swig_free(p.arr)
-    return newSlice
+	newSlice := make([]int, len(*intSlice))
+	for i := range newSlice {
+		newSlice[i] = (*intSlice)[i]
+	}
+	p := *(*swig_goslice)(unsafe.Pointer(intSlice))
+	Swig_free(p.arr)
+	return newSlice
 }
 
-
-func swigCopyintSlice (s *[] int ) [] int {
-    newSlice := make([] int, len(*s))
-    for i := range newSlice {
-        newSlice[i] = (*s)[i]
-    }
-    p := *(*swig_goslice)(unsafe.Pointer(s))
-    Swig_free(p.arr)
-    return newSlice
+func swigCopyintSlice(s *[]int) []int {
+	newSlice := make([]int, len(*s))
+	for i := range newSlice {
+		newSlice[i] = (*s)[i]
+	}
+	p := *(*swig_goslice)(unsafe.Pointer(s))
+	Swig_free(p.arr)
+	return newSlice
 }
-
 
 type intSliceWithPointer struct {
-    slice [] int
-    ptr uintptr
+	slice []int
+	ptr   uintptr
 }
 
-
-func swigCopyint64_tSlice (s *[] int64 ) [] int64 {
-    newSlice := make([] int64, len(*s))
-    for i := range newSlice {
-        newSlice[i] = (*s)[i]
-    }
-    p := *(*swig_goslice)(unsafe.Pointer(s))
-    Swig_free(p.arr)
-    return newSlice
+func swigCopyint64_tSlice(s *[]int64) []int64 {
+	newSlice := make([]int64, len(*s))
+	for i := range newSlice {
+		newSlice[i] = (*s)[i]
+	}
+	p := *(*swig_goslice)(unsafe.Pointer(s))
+	Swig_free(p.arr)
+	return newSlice
 }
-
 
 type int64_tSliceWithPointer struct {
-    slice [] int64
-    ptr uintptr
+	slice []int64
+	ptr   uintptr
 }
 
+type swig_gostring struct {
+	p uintptr
+	n int
+}
 
-type swig_gostring struct { p uintptr; n int }
 func swigCopyString(s string) string {
-  p := *(*swig_gostring)(unsafe.Pointer(&s))
-  r := string((*[0x7fffffff]byte)(unsafe.Pointer(p.p))[:p.n])
-  Swig_free(p.p)
-  return r
+	p := *(*swig_gostring)(unsafe.Pointer(&s))
+	r := string((*[0x7fffffff]byte)(unsafe.Pointer(p.p))[:p.n])
+	Swig_free(p.p)
+	return r
 }
 
 func Swig_free(arg1 uintptr) {
@@ -336,16 +337,16 @@ func (arg1 SwigcptrSolutionCallback) Response() (_swig_ret pb.CpSolverResponse) 
 	swig_r_p := C._wrap_SolutionCallback_Response_cpsatsolver_4abce969d05f7e66(C.uintptr_t(_swig_i_0))
 	swig_r = *(*[]byte)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 pb.CpSolverResponse
-{
-  // go
-  if err := proto.Unmarshal(swig_r, &swig_r_1); err != nil {
-    panic(fmt.Sprintf("Unable to parse pb.CpSolverResponse protocol message: %v", err))
-  }
+	{
+		// go
+		if err := proto.Unmarshal(swig_r, &swig_r_1); err != nil {
+			panic(fmt.Sprintf("Unable to parse pb.CpSolverResponse protocol message: %v", err))
+		}
 
-  // free dynamic mem
-  p := *(*swig_goslice)(unsafe.Pointer(&swig_r))
-  Swig_free(p.arr)
-}
+		// free dynamic mem
+		p := *(*swig_goslice)(unsafe.Pointer(&swig_r))
+		Swig_free(p.arr)
+	}
 	return swig_r_1
 }
 
@@ -389,53 +390,53 @@ func (p SwigcptrSatHelper) SwigIsSatHelper() {
 func SatHelperSolve(arg1 pb.CpModelProto) (_swig_ret pb.CpSolverResponse) {
 	var swig_r []byte
 	var _swig_i_0 []byte
-{
-  // go
-  bytes, err := proto.Marshal(&arg1)
-  if err != nil {
-    panic(fmt.Sprintf("Unable to convert input to []byte: %v", err))
-  }
-  _swig_i_0 = bytes
-}
+	{
+		// go
+		bytes, err := proto.Marshal(&arg1)
+		if err != nil {
+			panic(fmt.Sprintf("Unable to convert input to []byte: %v", err))
+		}
+		_swig_i_0 = bytes
+	}
 	swig_r_p := C._wrap_SatHelper_Solve_cpsatsolver_4abce969d05f7e66(*(*C.swig_type_9)(unsafe.Pointer(&_swig_i_0)))
 	swig_r = *(*[]byte)(unsafe.Pointer(&swig_r_p))
 	if Swig_escape_always_false {
 		Swig_escape_val = _swig_i_0
 	}
 	var swig_r_1 pb.CpSolverResponse
-{
-  // go
-  if err := proto.Unmarshal(swig_r, &swig_r_1); err != nil {
-    panic(fmt.Sprintf("Unable to parse pb.CpSolverResponse protocol message: %v", err))
-  }
+	{
+		// go
+		if err := proto.Unmarshal(swig_r, &swig_r_1); err != nil {
+			panic(fmt.Sprintf("Unable to parse pb.CpSolverResponse protocol message: %v", err))
+		}
 
-  // free dynamic mem
-  p := *(*swig_goslice)(unsafe.Pointer(&swig_r))
-  Swig_free(p.arr)
-}
+		// free dynamic mem
+		p := *(*swig_goslice)(unsafe.Pointer(&swig_r))
+		Swig_free(p.arr)
+	}
 	return swig_r_1
 }
 
 func SatHelperSolveWithParameters(arg1 pb.CpModelProto, arg2 pb.SatParameters) (_swig_ret pb.CpSolverResponse) {
 	var swig_r []byte
 	var _swig_i_0 []byte
-{
-  // go
-  bytes, err := proto.Marshal(&arg1)
-  if err != nil {
-    panic(fmt.Sprintf("Unable to convert input to []byte: %v", err))
-  }
-  _swig_i_0 = bytes
-}
+	{
+		// go
+		bytes, err := proto.Marshal(&arg1)
+		if err != nil {
+			panic(fmt.Sprintf("Unable to convert input to []byte: %v", err))
+		}
+		_swig_i_0 = bytes
+	}
 	var _swig_i_1 []byte
-{
-  // go
-  bytes, err := proto.Marshal(&arg2)
-  if err != nil {
-    panic(fmt.Sprintf("Unable to convert input to []byte: %v", err))
-  }
-  _swig_i_1 = bytes
-}
+	{
+		// go
+		bytes, err := proto.Marshal(&arg2)
+		if err != nil {
+			panic(fmt.Sprintf("Unable to convert input to []byte: %v", err))
+		}
+		_swig_i_1 = bytes
+	}
 	swig_r_p := C._wrap_SatHelper_SolveWithParameters_cpsatsolver_4abce969d05f7e66(*(*C.swig_type_11)(unsafe.Pointer(&_swig_i_0)), *(*C.swig_type_12)(unsafe.Pointer(&_swig_i_1)))
 	swig_r = *(*[]byte)(unsafe.Pointer(&swig_r_p))
 	if Swig_escape_always_false {
@@ -445,39 +446,39 @@ func SatHelperSolveWithParameters(arg1 pb.CpModelProto, arg2 pb.SatParameters) (
 		Swig_escape_val = _swig_i_1
 	}
 	var swig_r_1 pb.CpSolverResponse
-{
-  // go
-  if err := proto.Unmarshal(swig_r, &swig_r_1); err != nil {
-    panic(fmt.Sprintf("Unable to parse pb.CpSolverResponse protocol message: %v", err))
-  }
+	{
+		// go
+		if err := proto.Unmarshal(swig_r, &swig_r_1); err != nil {
+			panic(fmt.Sprintf("Unable to parse pb.CpSolverResponse protocol message: %v", err))
+		}
 
-  // free dynamic mem
-  p := *(*swig_goslice)(unsafe.Pointer(&swig_r))
-  Swig_free(p.arr)
-}
+		// free dynamic mem
+		p := *(*swig_goslice)(unsafe.Pointer(&swig_r))
+		Swig_free(p.arr)
+	}
 	return swig_r_1
 }
 
 func SatHelperSolveWithParametersAndSolutionCallback(arg1 pb.CpModelProto, arg2 pb.SatParameters, arg3 SolutionCallback) (_swig_ret pb.CpSolverResponse) {
 	var swig_r []byte
 	var _swig_i_0 []byte
-{
-  // go
-  bytes, err := proto.Marshal(&arg1)
-  if err != nil {
-    panic(fmt.Sprintf("Unable to convert input to []byte: %v", err))
-  }
-  _swig_i_0 = bytes
-}
+	{
+		// go
+		bytes, err := proto.Marshal(&arg1)
+		if err != nil {
+			panic(fmt.Sprintf("Unable to convert input to []byte: %v", err))
+		}
+		_swig_i_0 = bytes
+	}
 	var _swig_i_1 []byte
-{
-  // go
-  bytes, err := proto.Marshal(&arg2)
-  if err != nil {
-    panic(fmt.Sprintf("Unable to convert input to []byte: %v", err))
-  }
-  _swig_i_1 = bytes
-}
+	{
+		// go
+		bytes, err := proto.Marshal(&arg2)
+		if err != nil {
+			panic(fmt.Sprintf("Unable to convert input to []byte: %v", err))
+		}
+		_swig_i_1 = bytes
+	}
 	_swig_i_2 := arg3.Swigcptr()
 	swig_r_p := C._wrap_SatHelper_SolveWithParametersAndSolutionCallback_cpsatsolver_4abce969d05f7e66(*(*C.swig_type_14)(unsafe.Pointer(&_swig_i_0)), *(*C.swig_type_15)(unsafe.Pointer(&_swig_i_1)), C.uintptr_t(_swig_i_2))
 	swig_r = *(*[]byte)(unsafe.Pointer(&swig_r_p))
@@ -488,93 +489,93 @@ func SatHelperSolveWithParametersAndSolutionCallback(arg1 pb.CpModelProto, arg2 
 		Swig_escape_val = _swig_i_1
 	}
 	var swig_r_1 pb.CpSolverResponse
-{
-  // go
-  if err := proto.Unmarshal(swig_r, &swig_r_1); err != nil {
-    panic(fmt.Sprintf("Unable to parse pb.CpSolverResponse protocol message: %v", err))
-  }
+	{
+		// go
+		if err := proto.Unmarshal(swig_r, &swig_r_1); err != nil {
+			panic(fmt.Sprintf("Unable to parse pb.CpSolverResponse protocol message: %v", err))
+		}
 
-  // free dynamic mem
-  p := *(*swig_goslice)(unsafe.Pointer(&swig_r))
-  Swig_free(p.arr)
-}
+		// free dynamic mem
+		p := *(*swig_goslice)(unsafe.Pointer(&swig_r))
+		Swig_free(p.arr)
+	}
 	return swig_r_1
 }
 
 func SatHelperModelStats(arg1 pb.CpModelProto) (_swig_ret string) {
 	var swig_r string
 	var _swig_i_0 []byte
-{
-  // go
-  bytes, err := proto.Marshal(&arg1)
-  if err != nil {
-    panic(fmt.Sprintf("Unable to convert input to []byte: %v", err))
-  }
-  _swig_i_0 = bytes
-}
+	{
+		// go
+		bytes, err := proto.Marshal(&arg1)
+		if err != nil {
+			panic(fmt.Sprintf("Unable to convert input to []byte: %v", err))
+		}
+		_swig_i_0 = bytes
+	}
 	swig_r_p := C._wrap_SatHelper_ModelStats_cpsatsolver_4abce969d05f7e66(*(*C.swig_type_17)(unsafe.Pointer(&_swig_i_0)))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	if Swig_escape_always_false {
 		Swig_escape_val = _swig_i_0
 	}
 	var swig_r_1 string
- swig_r_1 = swigCopyString(swig_r) 
+	swig_r_1 = swigCopyString(swig_r)
 	return swig_r_1
 }
 
 func SatHelperSolverResponseStats(arg1 pb.CpSolverResponse) (_swig_ret string) {
 	var swig_r string
 	var _swig_i_0 []byte
-{
-  // go
-  bytes, err := proto.Marshal(&arg1)
-  if err != nil {
-    panic(fmt.Sprintf("Unable to convert input to []byte: %v", err))
-  }
-  _swig_i_0 = bytes
-}
+	{
+		// go
+		bytes, err := proto.Marshal(&arg1)
+		if err != nil {
+			panic(fmt.Sprintf("Unable to convert input to []byte: %v", err))
+		}
+		_swig_i_0 = bytes
+	}
 	swig_r_p := C._wrap_SatHelper_SolverResponseStats_cpsatsolver_4abce969d05f7e66(*(*C.swig_type_19)(unsafe.Pointer(&_swig_i_0)))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	if Swig_escape_always_false {
 		Swig_escape_val = _swig_i_0
 	}
 	var swig_r_1 string
- swig_r_1 = swigCopyString(swig_r) 
+	swig_r_1 = swigCopyString(swig_r)
 	return swig_r_1
 }
 
 func SatHelperValidateModel(arg1 pb.CpModelProto) (_swig_ret string) {
 	var swig_r string
 	var _swig_i_0 []byte
-{
-  // go
-  bytes, err := proto.Marshal(&arg1)
-  if err != nil {
-    panic(fmt.Sprintf("Unable to convert input to []byte: %v", err))
-  }
-  _swig_i_0 = bytes
-}
+	{
+		// go
+		bytes, err := proto.Marshal(&arg1)
+		if err != nil {
+			panic(fmt.Sprintf("Unable to convert input to []byte: %v", err))
+		}
+		_swig_i_0 = bytes
+	}
 	swig_r_p := C._wrap_SatHelper_ValidateModel_cpsatsolver_4abce969d05f7e66(*(*C.swig_type_21)(unsafe.Pointer(&_swig_i_0)))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	if Swig_escape_always_false {
 		Swig_escape_val = _swig_i_0
 	}
 	var swig_r_1 string
- swig_r_1 = swigCopyString(swig_r) 
+	swig_r_1 = swigCopyString(swig_r)
 	return swig_r_1
 }
 
 func SatHelperVariableDomain(arg1 pb.IntegerVariableProto) (_swig_ret Operations_research_Domain) {
 	var swig_r Operations_research_Domain
 	var _swig_i_0 []byte
-{
-  // go
-  bytes, err := proto.Marshal(&arg1)
-  if err != nil {
-    panic(fmt.Sprintf("Unable to convert input to []byte: %v", err))
-  }
-  _swig_i_0 = bytes
-}
+	{
+		// go
+		bytes, err := proto.Marshal(&arg1)
+		if err != nil {
+			panic(fmt.Sprintf("Unable to convert input to []byte: %v", err))
+		}
+		_swig_i_0 = bytes
+	}
 	swig_r = (Operations_research_Domain)(SwigcptrOperations_research_Domain(C._wrap_SatHelper_VariableDomain_cpsatsolver_4abce969d05f7e66(*(*C.swig_type_22)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = _swig_i_0
@@ -598,16 +599,14 @@ type SatHelper interface {
 	SwigIsSatHelper()
 }
 
-
 type SwigcptrOperations_research_Domain uintptr
 type Operations_research_Domain interface {
-	Swigcptr() uintptr;
+	Swigcptr() uintptr
 }
+
 func (p SwigcptrOperations_research_Domain) Swigcptr() uintptr {
 	return uintptr(p)
 }
-
-
 
 var swigDirectorTrack struct {
 	sync.Mutex
@@ -649,5 +648,3 @@ func swigDirectorDelete(c int) {
 	}
 	delete(swigDirectorTrack.m, c)
 }
-
-

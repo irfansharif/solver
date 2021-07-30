@@ -6,6 +6,7 @@ go_library(
         "constraint.go",
         "domain.go",
         "intvar.go",
+        "linearexpr.go",
         "model.go",
         "solver.go",
     ],

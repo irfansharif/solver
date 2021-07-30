@@ -26,7 +26,7 @@ func newIntVar(domain *domain, name string) *intVar {
 	return &intVar{
 		proto: &pb.IntegerVariableProto{
 			Name:   name,
-			Domain: domain.ToListForm(),
+			Domain: domain.list(0),
 		},
 	}
 }

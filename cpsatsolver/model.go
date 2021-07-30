@@ -23,16 +23,16 @@ import (
 )
 
 type Model struct {
-	proto            *swigpb.CpModelProto
-	intVarIdxMap     map[*intVar]int
-	constraintIdxMap map[*constraint]int
+	proto           *swigpb.CpModelProto
+	intVarToIdx     map[*intVar]int
+	constraintToIdx map[*constraint]int
 }
 
 func NewModel() *Model {
 	return &Model{
-		proto:            &swigpb.CpModelProto{},
-		intVarIdxMap:     make(map[*intVar]int),
-		constraintIdxMap: make(map[*constraint]int),
+		proto:           &swigpb.CpModelProto{},
+		intVarToIdx:     make(map[*intVar]int),
+		constraintToIdx: make(map[*constraint]int),
 	}
 }
 
@@ -58,9 +58,9 @@ func (m *Model) NewConstant(c int64) IntVar {
 	return m.NewIntVarFromDomain(NewDomain(c, c), fmt.Sprintf("%d", c))
 }
 
-func (m *Model) AddBoolOr(ls ...Literal) {
+func (m *Model) AddBooleanOr(ls ...Literal) {
 	c := newConstraint()
-	literals := m.intVarIndexes(ls...)
+	literals := m.getIntVarIndexes(ls...)
 	c.proto.Constraint = &swigpb.ConstraintProto_BoolOr{
 		BoolOr: &swigpb.BoolArgumentProto{
 			Literals: literals,
@@ -69,9 +69,9 @@ func (m *Model) AddBoolOr(ls ...Literal) {
 	m.addConstraint(c)
 }
 
-func (m *Model) AddBoolAnd(ls ...Literal) {
+func (m *Model) AddBooleanAnd(ls ...Literal) {
 	c := newConstraint()
-	literals := m.intVarIndexes(ls...)
+	literals := m.getIntVarIndexes(ls...)
 	c.proto.Constraint = &swigpb.ConstraintProto_BoolAnd{
 		BoolAnd: &swigpb.BoolArgumentProto{
 			Literals: literals,
@@ -80,11 +80,22 @@ func (m *Model) AddBoolAnd(ls ...Literal) {
 	m.addConstraint(c)
 }
 
-func (m *Model) AddBoolXor(ls ...Literal) {
+func (m *Model) AddBooleanXor(ls ...Literal) {
 	c := newConstraint()
-	literals := m.intVarIndexes(ls...)
+	literals := m.getIntVarIndexes(ls...)
 	c.proto.Constraint = &swigpb.ConstraintProto_BoolXor{
 		BoolXor: &swigpb.BoolArgumentProto{
+			Literals: literals,
+		},
+	}
+	m.addConstraint(c)
+}
+
+func (m *Model) AddAtMostOne(ls ...Literal) {
+	c := newConstraint()
+	literals := m.getIntVarIndexes(ls...)
+	c.proto.Constraint = &swigpb.ConstraintProto_AtMostOne{
+		AtMostOne: &swigpb.BoolArgumentProto{
 			Literals: literals,
 		},
 	}
@@ -102,13 +113,13 @@ func (m *Model) AddForbiddenLiteralAssignments(ls []Literal, assignments [][]boo
 	return
 }
 
-func (m *Model) AddLiteralElement(target Literal, index IntVar, ls ...Literal) {
+func (m *Model) AddElementLiteral(target Literal, index IntVar, ls ...Literal) {
 	m.AddElement(target, index, ls...)
 }
 
 func (m *Model) AddAllDifferent(is ...IntVar) {
 	c := newConstraint()
-	vars := m.intVarIndexes(is...)
+	vars := m.getIntVarIndexes(is...)
 	c.proto.Constraint = &swigpb.ConstraintProto_AllDiff{
 		AllDiff: &swigpb.AllDifferentConstraintProto{
 			Vars: vars,
@@ -130,15 +141,121 @@ func (m *Model) AddForbiddenAssignments(is []IntVar, assignments [][]int64) {
 
 func (m *Model) AddElement(target, index IntVar, is ...IntVar) {
 	c := newConstraint()
-	vars := m.intVarIndexes(is...)
+	vars := m.getIntVarIndexes(is...)
 	c.proto.Constraint = &swigpb.ConstraintProto_Element{
 		Element: &swigpb.ElementConstraintProto{
-			Target: m.intVarIndex(target),
-			Index:  m.intVarIndex(index),
+			Target: m.getIntVarIndex(target),
+			Index:  m.getIntVarIndex(index),
 			Vars:   vars,
 		},
 	}
 	m.addConstraint(c)
+}
+
+func (m *Model) AddDivision(target, numerator, denominator IntVar) {
+	c := newConstraint()
+	c.proto.Constraint = &swigpb.ConstraintProto_IntDiv{
+		IntDiv: &swigpb.IntegerArgumentProto{
+			Target: m.getIntVarIndex(target),
+			Vars:   m.getIntVarIndexes(numerator, denominator),
+		},
+	}
+	m.addConstraint(c)
+}
+
+func (m *Model) AddModulo(target, dividend, divisor IntVar) {
+	c := newConstraint()
+	c.proto.Constraint = &swigpb.ConstraintProto_IntMod{
+		IntMod: &swigpb.IntegerArgumentProto{
+			Target: m.getIntVarIndex(target),
+			Vars:   m.getIntVarIndexes(dividend, divisor),
+		},
+	}
+	m.addConstraint(c)
+}
+
+func (m *Model) AddMaximum(target IntVar, is ...IntVar) {
+	c := newConstraint()
+	c.proto.Constraint = &swigpb.ConstraintProto_IntMax{
+		IntMax: &swigpb.IntegerArgumentProto{
+			Target: m.getIntVarIndex(target),
+			Vars:   m.getIntVarIndexes(is...),
+		},
+	}
+	m.addConstraint(c)
+}
+
+func (m *Model) AddMinimum(target IntVar, is ...IntVar) {
+	c := newConstraint()
+	c.proto.Constraint = &swigpb.ConstraintProto_IntMin{
+		IntMin: &swigpb.IntegerArgumentProto{
+			Target: m.getIntVarIndex(target),
+			Vars:   m.getIntVarIndexes(is...),
+		},
+	}
+	m.addConstraint(c)
+}
+
+func (m *Model) AddProduct(target IntVar, is ...IntVar) {
+	c := newConstraint()
+	c.proto.Constraint = &swigpb.ConstraintProto_IntProd{
+		IntProd: &swigpb.IntegerArgumentProto{
+			Target: m.getIntVarIndex(target),
+			Vars:   m.getIntVarIndexes(is...),
+		},
+	}
+	m.addConstraint(c)
+}
+
+func (m *Model) AddLinearConstraint(expr LinearExpr, domain Domain) {
+	c := newConstraint()
+	c.proto.Constraint = &swigpb.ConstraintProto_Linear{
+		Linear: &swigpb.LinearConstraintProto{
+			Vars:   m.getIntVarIndexes(expr.vars...),
+			Coeffs: expr.coeffs,
+			Domain: domain.list(expr.offset),
+		},
+	}
+	m.addConstraint(c)
+}
+
+func (m *Model) AddLinearMaximum(target LinearExpr, ls ...LinearExpr) {
+	c := newConstraint()
+	c.proto.Constraint = &swigpb.ConstraintProto_LinMax{
+		LinMax: &swigpb.LinearArgumentProto{
+			Target: m.asLinearExprProto(target),
+			Exprs:  m.asLinearExprProtos(ls...),
+		},
+	}
+	m.addConstraint(c)
+}
+
+func (m *Model) AddLinearMinimum(target LinearExpr, ls ...LinearExpr) {
+	c := newConstraint()
+	c.proto.Constraint = &swigpb.ConstraintProto_LinMax{
+		LinMax: &swigpb.LinearArgumentProto{
+			Target: m.asLinearExprProto(target),
+			Exprs:  m.asLinearExprProtos(ls...),
+		},
+	}
+	m.addConstraint(c)
+}
+
+func (m *Model) Minimize(expr LinearExpr) {
+	m.proto.Objective = &swigpb.CpObjectiveProto{
+		Vars:   m.getIntVarIndexes(expr.vars...),
+		Coeffs: expr.coeffs,
+		Offset: float64(expr.offset),
+	}
+}
+
+func (m *Model) Maximize(expr LinearExpr) {
+	m.Minimize(expr)
+	for i, coeff := range m.proto.GetObjective().GetCoeffs() {
+		m.proto.GetObjective().GetCoeffs()[i] = -coeff
+	}
+	m.proto.GetObjective().ScalingFactor = -1
+	m.proto.GetObjective().Offset = -m.proto.GetObjective().GetOffset()
 }
 
 func (m *Model) addLiteralAssignmentsInternal(ls []Literal, assignments [][]bool) *constraint {
@@ -160,7 +277,7 @@ func (m *Model) addLiteralAssignmentsInternal(ls []Literal, assignments [][]bool
 
 func (m *Model) addAssignmentsInternal(is []IntVar, assignments [][]int64) *constraint {
 	c := newConstraint()
-	vars := m.intVarIndexes(is...)
+	vars := m.getIntVarIndexes(is...)
 	var values []int64
 	for _, assignment := range assignments {
 		if len(assignment) != len(is) {
@@ -178,30 +295,46 @@ func (m *Model) addAssignmentsInternal(is []IntVar, assignments [][]int64) *cons
 	return c
 }
 
+func (m *Model) asLinearExprProtos(exprs ...LinearExpr) []*swigpb.LinearExpressionProto {
+	var ls []*swigpb.LinearExpressionProto
+	for _, expr := range exprs {
+		ls = append(ls, m.asLinearExprProto(expr))
+	}
+	return ls
+}
+
+func (m *Model) asLinearExprProto(expr LinearExpr) *swigpb.LinearExpressionProto {
+	return &swigpb.LinearExpressionProto{
+		Vars:   m.getIntVarIndexes(expr.vars...),
+		Coeffs: expr.coeffs,
+		Offset: expr.offset,
+	}
+}
+
 func (m *Model) addIntVar(iv IntVar) {
 	idx := len(m.proto.GetVariables())
 	m.proto.Variables = append(m.proto.Variables, iv.proto)
-	m.intVarIdxMap[iv] = idx
+	m.intVarToIdx[iv] = idx
 }
 
-func (m *Model) intVarIndexes(is ...IntVar) []int32 {
+func (m *Model) getIntVarIndexes(is ...IntVar) []int32 {
 	var vars []int32
 	for _, iv := range is {
-		vars = append(vars, m.intVarIndex(iv))
+		vars = append(vars, m.getIntVarIndex(iv))
 	}
 	return vars
 }
 
-func (m *Model) intVarIndex(iv IntVar) int32 {
-	return int32(m.intVarIdxMap[iv])
+func (m *Model) getIntVarIndex(iv IntVar) int32 {
+	return int32(m.intVarToIdx[iv])
 }
 
 func (m *Model) addConstraint(c *constraint) {
 	idx := len(m.proto.GetConstraints())
 	m.proto.Constraints = append(m.proto.Constraints, c.proto)
-	m.constraintIdxMap[c] = idx
+	m.constraintToIdx[c] = idx
 }
 
 func (m *Model) constraintIndex(c *constraint) int {
-	return m.constraintIdxMap[c]
+	return m.constraintToIdx[c]
 }
