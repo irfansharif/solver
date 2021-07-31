@@ -8,7 +8,7 @@ go_library(
         "intvar.go",
         "linearexpr.go",
         "model.go",
-        "solver.go",
+        "result.go",
     ],
     importpath = "github.com/irfansharif/or-tools/cpsatsolver",
     visibility = ["//visibility:public"],

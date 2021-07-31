@@ -18,15 +18,53 @@ import (
 	"github.com/irfansharif/or-tools/internal/cpsatsolver/pb"
 )
 
+type IntVar = *intVar
+
+type Literal = *intVar
+
 type intVar struct {
 	proto *pb.IntegerVariableProto
+	idx   int32
 }
 
-func newIntVar(domain *domain, name string) *intVar {
+func newIntVar(d *domain, idx int32, name string) *intVar {
 	return &intVar{
 		proto: &pb.IntegerVariableProto{
 			Name:   name,
-			Domain: domain.list(0),
+			Domain: d.list(0),
 		},
+		idx: idx,
 	}
+}
+
+func (i *intVar) index() int32 {
+	return i.idx
+}
+
+func (i *intVar) negated() bool {
+	return i.idx < 0
+}
+
+func (i *intVar) name() string {
+	return i.proto.Name
+}
+
+func (i *intVar) negation(name string) *intVar {
+	return &intVar{
+		proto: &pb.IntegerVariableProto{
+			Name:   name,
+			Domain: i.proto.Domain,
+		},
+		idx: -i.idx - 1,
+	}
+}
+
+type intVars []IntVar
+
+func (is intVars) indexes() []int32 {
+	var indexes []int32
+	for _, iv := range is {
+		indexes = append(indexes, iv.index())
+	}
+	return indexes
 }

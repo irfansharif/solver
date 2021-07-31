@@ -18,21 +18,44 @@ import (
 	"math"
 )
 
+// Domain represents n disjoint intervals, each of the form [min, max]:
+//
+// 		[min_0, max_0,  ..., min_{n-1}, max_{n-1}].
+//
+// Where:
+// - For all i < n   :      min_i <= max_i
+// - For all i < n-1 :  max_i + 1 < min_{i+1}.
+//
+// The most common example being just [min, max]. If min == max, then this is a
+// constant variable.
+//
+// NB: We check at validation that a variable domain is small enough so
+// that we don't run into integer overflow in our algorithms. Avoid having
+// "unbounded" variables like [0, math.MaxInt64], opting instead for tighter
+// domains.
+type Domain = *domain
+
 type domain struct {
-	lb, ub int64
+	intervals []int64
 }
 
-func NewDomain(lb, ub int64) Domain {
-	return &domain{lb, ub}
+// NewDomain instantiates a new domain using the given intervals.
+func NewDomain(lb, ub int64, ds ...int64) Domain {
+	if len(ds)%2 != 0 {
+		panic("malformed domain")
+	}
+	intervals := []int64{lb, ub}
+	intervals = append(intervals, ds...)
+	return &domain{intervals: intervals}
 }
 
-func (d *domain) list(offset int64) []int64 {
+func (d *domain) list(shift int64) []int64 {
 	var ls []int64
-	for _, v := range []int64{d.lb, d.ub} {
+	for _, v := range d.intervals {
 		if v == math.MaxInt64 {
 			ls = append(ls, v)
 		} else {
-			ls = append(ls, v-offset)
+			ls = append(ls, v-shift)
 		}
 	}
 
