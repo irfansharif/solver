@@ -41,10 +41,10 @@ func (m *Model) NewLiteral(name string) Literal {
 	return m.NewIntVarFromDomain(NewDomain(0, 1), name)
 }
 
-// NewLiteralNegation adds a new literal to the model, one that's a negation of
+// NewNegation adds a new literal to the model, one that's a negation of
 // the given one. It uses a more efficient encoding than two literals with a
-// constraint xor-ed them together.
-func (m *Model) NewLiteralNegation(l Literal, name string) Literal {
+// model constraint xor-ing them together.
+func (m *Model) NewNegation(l Literal, name string) Literal {
 	return l.negation(name)
 }
 

@@ -15,6 +15,8 @@
 package cpsatsolver
 
 import (
+	"fmt"
+
 	swigpb "github.com/irfansharif/or-tools/internal/cpsatsolver/pb"
 )
 
@@ -89,6 +91,11 @@ func NewBooleanXorConstraint(literals ...Literal) Constraint {
 			},
 		},
 	}
+}
+
+// NewImplicationConstraint ensures that the first literal implies the second.
+func NewImplicationConstraint(a, b Literal) Constraint {
+	return NewBooleanOrConstraint(a.negation(fmt.Sprintf("~%s", a.name())), b)
 }
 
 // NewAllowedLiteralAssignmentsConstraint forces the values of the n-tuple

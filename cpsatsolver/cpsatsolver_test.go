@@ -261,29 +261,27 @@ func TestIterateThroughSolutions(t *testing.T) {
 func TestNegation(t *testing.T) {
 	model := NewModel()
 
-	a := model.NewLiteral("a")
-	b := model.NewLiteralNegation(a, "-a")
+	A := model.NewLiteral("A")
+	notA := model.NewNegation(A, "~A")
 
-	model.AddConstraints(NewBooleanOrConstraint(a, b))
+	model.AddConstraints(NewBooleanOrConstraint(A, notA))
 	result := model.Solve()
 	require.True(t, result.Optimal(), "expected solver to find solution")
 
 	{
-		a := result.BooleanValue(a)
-		b := result.BooleanValue(b)
-
-		require.True(t, a || b)
-		require.True(t, a != b)
+		A, notA := result.BooleanValue(A), result.BooleanValue(notA)
+		require.True(t, A || notA)
+		require.True(t, A != notA)
 	}
 }
 
 func TestNegationInfeasible(t *testing.T) {
 	model := NewModel()
 
-	a := model.NewLiteral("a")
-	b := model.NewLiteralNegation(a, "-a")
+	A := model.NewLiteral("A")
+	notA := model.NewNegation(A, "~A")
 
-	model.AddConstraints(NewBooleanAndConstraint(a, b))
+	model.AddConstraints(NewBooleanAndConstraint(A, notA))
 	result := model.Solve()
 	require.True(t, result.Infeasible(), "expected solver to not find solution")
 }
