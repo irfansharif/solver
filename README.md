@@ -136,7 +136,7 @@ Because of the C++ dependencies, the library is compiled/tested using
 
 ```sh
 # supported bazel version >= 4.0.0
-bazel build cpsatsolver/... linearsolver...
+bazel build cpsatsolver/... linearsolver/...
 bazel test cpsatsolver:all --test_output=all \
   --cache_test_results=no \
   --test_arg='-test.v' \
