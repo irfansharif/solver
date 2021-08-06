@@ -26,6 +26,10 @@ import (
 // the model, {5, -7, 21} are coefficients for said variables, and -42 is the
 // offset.
 type LinearExpr interface {
+	// Parameters returns the variables, coefficients, and offset the linear
+	// expression is comprised of.
+	Parameters() (vars []IntVar, coeffs []int64, offset int64)
+
 	vars() []int32
 	offset() int64
 	coeffs() []int64
@@ -34,16 +38,20 @@ type LinearExpr interface {
 
 type linearExpr struct {
 	pb *swigpb.LinearExpressionProto
+
+	intVars []IntVar
 }
 
-func (l *linearExpr) proto() *swigpb.LinearExpressionProto {
-	return l.pb
+// Parameters is part of the LinearExpr interface.
+func (l *linearExpr) Parameters() (vars []IntVar, coeffs []int64, offset int64) {
+	return l.intVars, l.coeffs(), l.offset()
 }
 
 var _ LinearExpr = &linearExpr{}
 
 // Sum instantiates a new linear expression representing the sum of the given
-// variables.
+// variables. It's a shorthand for NewLinearExpr with no offset and coefficients
+// equal to one.
 func Sum(vars ...IntVar) LinearExpr {
 	var coeffs []int64
 	for range vars {
@@ -52,7 +60,7 @@ func Sum(vars ...IntVar) LinearExpr {
 	return NewLinearExpr(vars, coeffs, 0)
 }
 
-// TODO(irfansharif): Could instead construct a linear constraint iteratively,
+// TODO(irfansharif): We could instead construct a linear constraint bit-by-bit,
 // setting coefficient per int var, setting offset, etc.
 //
 // 	expr := NewLinearExpr(
@@ -60,7 +68,6 @@ func Sum(vars ...IntVar) LinearExpr {
 // 		WithOffset(),
 // 		WithCoeffs(),
 // 	)
-// 	expr := NewLinearExpr(vars...)
 // 	expr.SetCoefficient(v, 2)
 // 	expr.SetOffset(2)
 
@@ -69,6 +76,7 @@ func Sum(vars ...IntVar) LinearExpr {
 //   sum(coefficients[i] * vars[i]) + offset
 func NewLinearExpr(vars []IntVar, coeffs []int64, offset int64) LinearExpr {
 	return &linearExpr{
+		intVars: vars,
 		pb: &swigpb.LinearExpressionProto{
 			Vars:   intVars(vars).indexes(),
 			Coeffs: coeffs,
@@ -87,6 +95,10 @@ func (l *linearExpr) offset() int64 {
 
 func (l *linearExpr) coeffs() []int64 {
 	return l.pb.GetCoeffs()
+}
+
+func (l *linearExpr) proto() *swigpb.LinearExpressionProto {
+	return l.pb
 }
 
 type linearExprs []LinearExpr

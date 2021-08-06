@@ -24,7 +24,7 @@ import (
 	swigpb "github.com/irfansharif/or-tools/internal/cpsatsolver/pb"
 )
 
-// Model is a constraint programming problem.
+// Model is a constraint programming problem. It's not safe for concurrent use.
 type Model struct {
 	pb *swigpb.CpModelProto
 }
@@ -59,6 +59,15 @@ func (m *Model) NewIntVarFromDomain(d Domain, name string) IntVar {
 // NewConstant adds a new constant to the model.
 func (m *Model) NewConstant(c int64) IntVar {
 	return m.NewIntVarFromDomain(NewDomain(c, c), fmt.Sprintf("%d", c))
+}
+
+// NewInterval adds a new interval to the model, one that's defined using the
+// given start, end and size.
+func (m *Model) NewInterval(start, end, size IntVar) Interval {
+	idx := len(m.pb.GetConstraints())
+	itv := newInterval(start, end, size, int32(idx))
+	m.AddConstraints(itv)
+	return itv
 }
 
 // AddConstraints adds constraints to the model. When deciding on a solution,
@@ -97,6 +106,10 @@ func (m *Model) Validate() (ok bool, _ error) {
 	}
 
 	return false, errors.New(msg)
+}
+
+func (m *Model) String() string {
+	return m.pb.String()
 }
 
 // Solve attempts to satisfy the model's constraints, if any, by deciding values

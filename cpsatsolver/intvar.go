@@ -87,19 +87,9 @@ func (is intVars) indexes() []int32 {
 	return indexes
 }
 
-type lits []Literal
-
-func (ls lits) indexes() []int32 {
-	var indexes []int32
-	for _, l := range ls {
-		indexes = append(indexes, l.index())
-	}
-	return indexes
-}
-
-func (ls lits) intVars() intVars {
+func asIntVars(literals []Literal) intVars {
 	var res []IntVar
-	for _, l := range ls {
+	for _, l := range literals {
 		res = append(res, l.(IntVar))
 	}
 	return res

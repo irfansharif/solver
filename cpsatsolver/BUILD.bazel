@@ -5,6 +5,7 @@ go_library(
     srcs = [
         "constraint.go",
         "domain.go",
+        "interval.go",
         "intvar.go",
         "linearexpr.go",
         "model.go",

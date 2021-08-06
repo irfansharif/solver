@@ -1,8 +1,10 @@
 package cpsatsolver
 
 import (
+	"fmt"
 	"math"
 	"reflect"
+	"sort"
 	"strings"
 	"testing"
 
@@ -342,5 +344,58 @@ func TestExactlyKLiterals(t *testing.T) {
 		}
 
 		require.Equal(t, k, count)
+	}
+}
+
+func TestNonOverlappingIntervalsWithEnforcement(t *testing.T) {
+	model := NewModel()
+
+	lit := model.NewLiteral("a")
+	model.AddConstraints(NewBooleanAndConstraint(lit))
+
+	var intervals []Interval
+	for i := 0; i < 3; i++ {
+		start := model.NewIntVar(0, 10, fmt.Sprintf("start-%d", i))
+		end := model.NewIntVar(0, 10, fmt.Sprintf("end-%d", i))
+		size := model.NewIntVar(int64(i), 10, fmt.Sprintf("size-%d", i))
+
+		intervals = append(intervals,
+			model.NewInterval(start, end, size).OnlyEnforceIf(lit).(Interval))
+	}
+
+	model.AddConstraints(NewNonOverlappingConstraint(intervals...))
+	valid, err := model.Validate()
+	require.True(t, valid, err)
+
+	result := model.Solve()
+	require.True(t, result.Optimal(), "expected solver to find solution")
+
+	{
+		type span struct {
+			start, end, size int64
+		}
+		var spans []span
+
+		for _, interval := range intervals {
+			start, end, size := interval.Parameters()
+			sp := span{
+				start: result.Value(start),
+				end:   result.Value(end),
+				size:  result.Value(size),
+			}
+			spans = append(spans, sp)
+		}
+
+		sort.Slice(spans, func(i, j int) bool {
+			return spans[i].start < spans[j].end
+		})
+
+		var last int64
+		for _, sp := range spans {
+			require.True(t, sp.start <= sp.end)
+			require.True(t, sp.start+sp.size == sp.end)
+			require.True(t, last <= sp.start)
+			last = sp.end
+		}
 	}
 }
