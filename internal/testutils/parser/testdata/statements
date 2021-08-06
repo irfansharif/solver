@@ -1,0 +1,84 @@
+statement
+model.vars(a to e in [0, 5] ∪ [10,12])
+----
+model.vars(a, b, c, d, e in [0, 5] ∪ [10, 12])
+
+statement
+constrain.linear-exprs(2d - 4b + 6z, a - b in [0, 2]) if c, d
+----
+constrain.linear-exprs(2d - 4b + 6z, a - b in [0, 2]) if c, d
+
+statement
+constrain.assignments([x,y,z] ∉ [1,2,3] ∪ [3,10,21])
+----
+constrain.assignments([x, y, z] ∉ [1, 2, 3] ∪ [3, 10, 21])
+
+statement
+constrain.equality(2d - 4b + 6z == min(24d - 67z, 54j + 12i))
+----
+constrain.equality(2d - 4b + 6z == min(24d - 67z, 54j + 12i))
+
+statement
+constrain.equality(d == max(e, f, g))
+----
+constrain.equality(d == max(e, f, g))
+
+statement
+constrain.at-least-k(a, x to z | 2)
+----
+constrain.at-least-k(a, x, y, z | 2)
+
+statement
+constrain.element(a == [b,c,d][i])
+----
+constrain.element(a == [b, c, d][i])
+
+statement
+model.constants(c,e == 1)
+----
+model.constants(c, e == 1)
+
+statement
+constrain.binary-op(d / e == f)
+----
+constrain.binary-op(d / e == f)
+
+statement
+constrain.binary-op(d * e == f)
+----
+constrain.binary-op(d * e == f)
+
+statement
+constrain.binary-op(d % e == f)
+----
+constrain.binary-op(d % e == f)
+
+statement
+constrain.implication(d → b)
+----
+constrain.implication(d → b)
+
+statement
+model.minimize(Σ(j, f to g))
+----
+model.minimize(j + f + g)
+
+statement
+model.maximize(24j + 7i)
+----
+model.maximize(24j + 7i)
+
+statement
+model.intervals(i as [a,b|c], j as [d,e|f])
+----
+model.intervals(i as [a, b | c], j as [d, e | f])
+
+statement
+constrain.non-overlapping([i, j], [k, l], true)
+----
+constrain.non-overlapping([i, j], [k, l], true)
+
+statement
+constrain.cumulative(i:3, j:4 | 32)
+----
+constrain.cumulative(i: 3, j: 4 | 32)

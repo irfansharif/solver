@@ -1,0 +1,48 @@
+lex
+ident 1234
+----
+WORD "ident"
+DIGITS "1234"
+
+lex
++ - ! * / → % < > ∈ ∉ ∪ == !=
+----
+PLUS "+"
+MINUS "-"
+BANG "!"
+ASTERISK "*"
+SLASH "/"
+IMPL "→"
+MOD "%"
+LT "<"
+GT ">"
+EXISTS "∈"
+NEXISTS "∉"
+UNION "∪"
+EQ "=="
+NEQ "!="
+
+lex
+. : , | Σ ( ) [ ]
+----
+DOT "."
+COLON ":"
+COMMA ","
+PIPE "|"
+SUM "Σ"
+LPAREN "("
+RPAREN ")"
+LBRACKET "["
+RBRACKET "]"
+
+lex
+as if in max min to false true
+----
+AS "as"
+IF "if"
+IN "in"
+MAX "max"
+MIN "min"
+TO "to"
+BOOL "false"
+BOOL "true"

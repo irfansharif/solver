@@ -1,0 +1,69 @@
+sat
+model.name(m)
+model.vars(x to z in [0, 2])
+model.constants(a,b == 2)
+model.constants(c == 1)
+----
+
+sat
+constrain.all-different(x, y, z)
+constrain.all-same(x, a)
+constrain.all-same(y, c)
+----
+
+sat
+model.literals(d to f)
+constrain.boolean-and(d, e)
+constrain.boolean-and(f) if d, e
+----
+
+sat
+model.print()
+----
+model=m
+  variables (len = 3)
+    x ∈ [0,2]
+    y ∈ [0,2]
+    z ∈ [0,2]
+  constants (len = 5)
+    a == 2
+    b == 2
+    c == 1
+  literals (len = 3)
+    d
+    e
+    f
+  constraints (len = 5)
+    all-different: [x, y, z]
+    all-same: [x, a]
+    all-same: [y, c]
+    boolean-and: d, e
+    boolean-and: f iff (d, e)
+
+sat
+model.validate()
+----
+ok
+
+sat
+model.solve()
+result.optimal()
+----
+true
+
+sat
+result.values(a to c, x to z)
+----
+a = 2
+b = 2
+c = 1
+x = 2
+y = 1
+z = 0
+
+sat
+result.booleans(d to f)
+----
+d = true
+e = true
+f = true

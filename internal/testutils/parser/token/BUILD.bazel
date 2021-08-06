@@ -1,0 +1,11 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "token",
+    srcs = [
+        "token.go",
+        "type_string.go",
+    ],
+    importpath = "github.com/irfansharif/solver/internal/testutils/parser/token",
+    visibility = ["//:__subpackages__"],
+)

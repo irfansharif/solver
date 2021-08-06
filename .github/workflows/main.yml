@@ -26,15 +26,15 @@ jobs:
       - name: Run bazel version
         run: bazel --version
 
-      - name: Check gazelle
+      - name: Check bazel generated code # we're skipping over swig, proto, go:generate to keep CI teams low
         run: |
-          bazel run :gazelle
+          make bzl
           git diff --exit-code
 
-      - name: Run bazel build
+      - name: Compile artifacts
         run: |
-          bazel build internal/... cpsatsolver/... linearsolver/...
+          make build
 
-      - name: Run bazel test
+      - name: Run tests
         run: |
-          bazel test internal/... cpsatsolver/... linearsolver/...
+          make test

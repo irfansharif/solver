@@ -1,14 +1,13 @@
 OR-Tools for Go
 ---
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/irfansharif/or-tools.svg)](https://godocs.io/github.com/irfansharif/or-tools/cpsatsolver)
+[![Go Reference](https://pkg.go.dev/badge/github.com/irfansharif/solver.svg)](https://godocs.io/github.com/irfansharif/solver)
 
 
 This project contains a cgo-based API for using Google's [Operations Research
-Tools](https://developers.google.com/optimization/). It exposes high-level
-packages for the [CP-SAT
-Solver](https://developers.google.com/optimization/cp/cp_solver) and the [Glop
-Linear Solver](https://developers.google.com/optimization/lp/glop).
+Tools](https://developers.google.com/optimization/). It exposes a high-level
+package for the [CP-SAT
+Solver](https://developers.google.com/optimization/cp/cp_solver).
 
 ### Examples
 
@@ -126,68 +125,53 @@ For more, look through the package tests.
 
 ### Contributing
 
-The Go/C++ binding code is generated using [SWIG](http://www.swig.org), and can
-be found under `internal/swig`. SWIG generated code is ugly and difficult to
-work with, which is why the package is internal; a sanitized API is exposed via
-the top-level package.
+The Go/C++ binding code is generated using [SWIG](http://www.swig.org) and can
+be found under `internal/`. SWIG generated code is ugly and difficult to work
+with; a sanitized API is exposed via the top-level package.
 
 Because of the C++ dependencies, the library is compiled/tested using
 [Bazel](https://bazel.build).
 
-```sh
-# supported bazel version >= 4.0.0
-bazel build cpsatsolver/... linearsolver/...
-bazel test cpsatsolver:all --test_output=all \
-  --cache_test_results=no \
-  --test_arg='-test.v' \
-  --test_filter='Test.*'
-bazel test linearsolver/...
-
-# to update the BUILD.bazel files
-bazel run //:gazelle
-bazel run //:gazelle -- update-repos -from_file=go.mod -prune=true
 ```
-
-The generated files are checked in. They can be regenerated using the
-following:
-
-```sh
 # ensure that the submodules are initialized:
 #   git submodule update --init --recursive
 #
+# supported bazel version >= 4.0.0
 # supported swig version == 4.0.2
 # supported protoc version == 3.13.0
 # supported protoc-gen-go version == 1.27.1
 
-# to generate the C++/Go wrapper files
-swig -v -go -cgo -c++ -intgosize 64 \
-  -Ic-deps/or-tools \
-  -Ic-deps/abseil-cpp \
-  -o internal/linearsolver/linearsolver_wrapper.cc \
-  -module linearsolver \
-  internal/linearsolver/linearsolver.i
+$ make help
+Supported commands: build, test, generate, rewrite
 
-swig -v -go -cgo -c++ -intgosize 64 \
-  -Ic-deps/or-tools \
-  -Ic-deps/abseil-cpp \
-  -o internal/cpsatsolver/cpsatsolver_wrapper.cc \
-  -module cpsatsolver \
-  internal/cpsatsolver/cpsatsolver.i
+$ make generate
+--- generating go:generate files
+--- generating swig files
+--- generating proto files
+--- generating bazel files
+ok
 
-# to generate the protobuf files
-protoc --proto_path=internal/cpsatsolver/pb \
-  --go_out=internal/cpsatsolver/pb \
-  --go_opt=Mcp_model.proto=github.com/irfansharif/or-tools/internal/cpsatsolver/pb \
-  --go_opt=Msat_parameters.proto=github.com/irfansharif/or-tools/internal/cpsatsolver/pb \
-  --go_opt=paths=source_relative \
-  cp_model.proto sat_parameters.proto
+$ make build
+ok
+
+$ make test
+...
+INFO: Build completed successfully, 4 total actions
+
+# to update the testdata files
+$ make rewrite
+
+# to run specific tests
+$ bazel test :all internal/... --test_output=all \
+  --cache_test_results=no \
+  --test_arg='-test.v' \
+  --test_filter='Test.*'
 ```
 
----
+### Acknowledgements
 
-NB: This repo was originally forked from
-[gonzojive/or-tools-go](https://github.com/gonzojive/or-tools-go), which
-exposed the linear solver. Bits of it were cribbed from
-[AirspaceTechnologies/or-tools](https://github.com/AirspaceTechnologies/or-tools);
-they authored the SWIG interface files to generate code dealing with protobufs.
-The CP-SAT stuff was then mostly pattern matching.
+The SWIG interface files to work with protobufs was cribbed from
+[AirspaceTechnologies/or-tools](https://github.com/AirspaceTechnologies/or-tools).
+To structure this package as a stand-alone bazel target, I stole from
+[gonzojive/or-tools-go](https://github.com/gonzojive/or-tools-go). The CP-SAT
+stuff was then mostly pattern matching.

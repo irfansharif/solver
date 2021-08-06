@@ -1,3 +1,0 @@
-# For Abseil.
-# See https://chromium.googlesource.com/external/github.com/abseil/abseil-cpp/+/930fbec75b452af8bb8c796f5bb754e953e29cf5/FAQ.md#how-to-i-set-the-c_dialect-used-to-build-abseil
-build --cxxopt=-std=c++17 --experimental_convenience_symlinks=ignore

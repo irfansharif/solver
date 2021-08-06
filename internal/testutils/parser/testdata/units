@@ -1,0 +1,239 @@
+identifier
+name
+----
+name
+
+receiver
+name
+----
+name
+
+method
+non-overlapping
+----
+non-overlapping
+
+method
+solve
+----
+solve
+
+method
+non-overlapping-2D
+----
+non-overlapping-2D
+
+variable
+a
+----
+a
+
+variable
+abc
+----
+abc
+
+variable
+a to d
+----
+a to d
+
+variables
+a
+----
+a
+
+variables
+ab
+----
+ab
+
+variables
+a to c
+----
+a, b, c
+
+variables
+a, b, c to d
+----
+a, b, c, d
+
+enforcement
+if a
+----
+if a
+
+enforcement
+if a, b
+----
+if a, b
+
+enforcement
+if a, b to d, e
+----
+if a, b, c, d, e
+
+interval
+i as [s, e | sz]
+----
+i as [s, e | sz]
+
+intervals
+i as [s, e | sz], j as [a, b | c]
+----
+i as [s, e | sz], j as [a, b | c]
+
+number
+23
+----
+23
+
+number
+-42
+----
+-42
+
+numbers
+-3, 23, 32, -1
+----
+-3, 23, 32, -1
+
+boolean
+true
+----
+true
+
+boolean
+false
+----
+false
+
+booleans
+false, true, false, true
+----
+false, true, false, true
+
+domain
+[-2, 3]
+----
+[-2, 3]
+
+domains
+[-2, 3] ∪ [5, 6]
+----
+[-2, 3] ∪ [5, 6]
+
+linear-term
+2
+----
+2
+
+linear-term
+x
+----
+x
+
+linear-term
+1x
+----
+x
+
+linear-term
+4x
+----
+4x
+
+linear-expr
+4x + 24
+----
+4x + 24
+
+linear-expr
+-x + y 
+----
+-x + y
+
+linear-expr
+x + z + y
+----
+x + z + y
+
+linear-expr
+Σ(a, b to c, d)
+----
+a + b + c + d
+
+interval-demand
+x: 1
+----
+x: 1
+
+interval-demand
+abc: -21
+----
+abc: -21
+
+numbers-list
+[-2, 3, -5] ∪ [-7, 5, 6]
+----
+[-2, 3, -5] ∪ [-7, 5, 6]
+
+booleans-list
+[true, false, false] ∪ [false, true, true]
+----
+[true, false, false] ∪ [false, true, true]
+
+assignments-argument
+[a, b to d] ∈ [-2, 3, -5] ∪ [-7, 5, 6]
+----
+[a, b, c, d] ∈ [-2, 3, -5] ∪ [-7, 5, 6]
+
+binary-op-argument
+a / b == c
+----
+a / b == c
+
+binary-op-argument
+a → b == c
+----
+err: expected one of SLASH, MOD, or ASTERISK tokens, got "→" (IMPL)
+
+binary-op-argument
+a % b == c
+----
+a % b == c
+
+binary-op-argument
+a * b == c
+----
+a * b == c
+
+constants-argument
+a, b to d, e == 42
+----
+a, b, c, d, e == 42
+
+cumulative-argument
+a: 3, b: 7 | 12
+----
+a: 3, b: 7 | 12
+
+k-argument
+a, b, c | 12
+----
+a, b, c | 12
+
+domain-argument
+a, b to d in [0, 2] ∪ [5, 6]
+----
+a, b, c, d in [0, 2] ∪ [5, 6]
+
+domain-argument
+2d - 4b + 6z, a - b in [0, 2]
+----
+2d - 4b + 6z, a - b in [0, 2]
+
+element-argument
+t == [a to c, e to f][i]
+----
+t == [a, b, c, e, f][i]

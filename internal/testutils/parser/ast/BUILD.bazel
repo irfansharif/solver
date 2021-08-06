@@ -1,0 +1,13 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "ast",
+    srcs = [
+        "argument.go",
+        "ast.go",
+        "method.go",
+    ],
+    importpath = "github.com/irfansharif/solver/internal/testutils/parser/ast",
+    visibility = ["//:__subpackages__"],
+    deps = ["//:solver"],
+)

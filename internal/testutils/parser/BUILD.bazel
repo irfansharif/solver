@@ -1,0 +1,30 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "parser",
+    srcs = ["parser.go"],
+    importpath = "github.com/irfansharif/solver/internal/testutils/parser",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/testutils/parser/ast",
+        "//internal/testutils/parser/lexer",
+        "//internal/testutils/parser/token",
+    ],
+)
+
+go_test(
+    name = "parser_test",
+    srcs = ["parser_test.go"],
+    data = glob([
+        "testdata/**",
+        "grammar.ebnf",
+    ]),
+    embed = [":parser"],
+    deps = [
+        "//internal/testutils/bazel",
+        "//internal/testutils/parser/ast",
+        "@com_github_cockroachdb_datadriven//:datadriven",
+        "@com_github_stretchr_testify//require",
+        "@org_golang_x_exp//ebnf",
+    ],
+)

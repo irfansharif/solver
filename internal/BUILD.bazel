@@ -1,0 +1,42 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "internal",
+    srcs = [
+        "doc.go",
+        "internal.go",
+        "wrapper.cc",
+        "wrapper.h",
+    ],
+    cdeps = [":ortools-cpsat"],
+    cgo = True,
+    importpath = "github.com/irfansharif/solver/internal",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/pb",
+        "@com_github_golang_protobuf//proto:go_default_library",
+    ],
+)
+
+go_test(
+    name = "internal_test",
+    srcs = ["internal_test.go"],
+    embed = [":internal"],
+    deps = ["//internal/pb"],
+)
+
+cc_library(
+    name = "ortools-cpsat",
+    srcs = [],
+    hdrs = [
+        "@ortools//ortools/sat:swig_helper.h",
+    ],
+    copts = [],
+    deps = [
+        "@ortools//ortools/base",
+        "@ortools//ortools/sat:cp_model_cc_proto",
+        "@ortools//ortools/sat:cp_model_checker",
+        "@ortools//ortools/sat:cp_model_solver",
+        "@ortools//ortools/sat:sat_parameters_cc_proto",
+    ],
+)

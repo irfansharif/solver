@@ -1,0 +1,26 @@
+sat
+model.name(ex)
+model.literals(x,y,z)
+constrain.at-most-k(x to z| 2)
+model.print()
+----
+model=ex
+  literals (len = 3)
+    x
+    y
+    z
+  constraints (len = 1)
+    linear-constraint: x + y + z within [0,2]
+
+sat
+model.solve()
+result.optimal()
+----
+true
+
+sat
+result.booleans(x to z)
+----
+x = false
+y = false
+z = false

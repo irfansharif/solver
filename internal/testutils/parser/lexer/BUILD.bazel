@@ -1,0 +1,21 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "lexer",
+    srcs = ["lexer.go"],
+    importpath = "github.com/irfansharif/solver/internal/testutils/parser/lexer",
+    visibility = ["//:__subpackages__"],
+    deps = ["//internal/testutils/parser/token"],
+)
+
+go_test(
+    name = "lexer_test",
+    srcs = ["lexer_test.go"],
+    data = glob(["testdata/**"]),
+    deps = [
+        ":lexer",
+        "//internal/testutils/bazel",
+        "//internal/testutils/parser/token",
+        "@com_github_cockroachdb_datadriven//:datadriven",
+    ],
+)

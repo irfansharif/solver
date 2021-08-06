@@ -1,0 +1,440 @@
+lex
+model.name(m)
+----
+WORD "model"
+DOT "."
+WORD "name"
+LPAREN "("
+WORD "m"
+RPAREN ")"
+
+lex
+model.vars(x to z in [0, 2])
+----
+WORD "model"
+DOT "."
+WORD "vars"
+LPAREN "("
+WORD "x"
+TO "to"
+WORD "z"
+IN "in"
+LBRACKET "["
+DIGITS "0"
+COMMA ","
+DIGITS "2"
+RBRACKET "]"
+RPAREN ")"
+
+lex
+model.vars(x in [0,2] ∪ [3,4])
+----
+WORD "model"
+DOT "."
+WORD "vars"
+LPAREN "("
+WORD "x"
+IN "in"
+LBRACKET "["
+DIGITS "0"
+COMMA ","
+DIGITS "2"
+RBRACKET "]"
+UNION "∪"
+LBRACKET "["
+DIGITS "3"
+COMMA ","
+DIGITS "4"
+RBRACKET "]"
+RPAREN ")"
+
+lex
+constrain.linear-exprs(2d - 4b + 6z, a to b in [0, 2])
+----
+WORD "constrain"
+DOT "."
+WORD "linear"
+MINUS "-"
+WORD "exprs"
+LPAREN "("
+DIGITS "2"
+WORD "d"
+MINUS "-"
+DIGITS "4"
+WORD "b"
+PLUS "+"
+DIGITS "6"
+WORD "z"
+COMMA ","
+WORD "a"
+TO "to"
+WORD "b"
+IN "in"
+LBRACKET "["
+DIGITS "0"
+COMMA ","
+DIGITS "2"
+RBRACKET "]"
+RPAREN ")"
+
+lex
+constrain.all-different(x,y,z)
+----
+WORD "constrain"
+DOT "."
+WORD "all"
+MINUS "-"
+WORD "different"
+LPAREN "("
+WORD "x"
+COMMA ","
+WORD "y"
+COMMA ","
+WORD "z"
+RPAREN ")"
+
+
+lex
+model.maximize(24j + 7i)
+----
+WORD "model"
+DOT "."
+WORD "maximize"
+LPAREN "("
+DIGITS "24"
+WORD "j"
+PLUS "+"
+DIGITS "7"
+WORD "i"
+RPAREN ")"
+
+lex
+model.minimize(j + 7i)
+----
+WORD "model"
+DOT "."
+WORD "minimize"
+LPAREN "("
+WORD "j"
+PLUS "+"
+DIGITS "7"
+WORD "i"
+RPAREN ")"
+
+lex
+model.minimize(Σ(j, f to g))
+----
+WORD "model"
+DOT "."
+WORD "minimize"
+LPAREN "("
+SUM "Σ"
+LPAREN "("
+WORD "j"
+COMMA ","
+WORD "f"
+TO "to"
+WORD "g"
+RPAREN ")"
+RPAREN ")"
+
+lex
+model.solve()
+----
+WORD "model"
+DOT "."
+WORD "solve"
+LPAREN "("
+RPAREN ")"
+
+lex
+constrain.division(d / e == f)
+----
+WORD "constrain"
+DOT "."
+WORD "division"
+LPAREN "("
+WORD "d"
+SLASH "/"
+WORD "e"
+EQ "=="
+WORD "f"
+RPAREN ")"
+
+lex
+constrain.product(d * e == f)
+----
+WORD "constrain"
+DOT "."
+WORD "product"
+LPAREN "("
+WORD "d"
+ASTERISK "*"
+WORD "e"
+EQ "=="
+WORD "f"
+RPAREN ")"
+
+lex
+constrain.modulo(d % e == f)
+----
+WORD "constrain"
+DOT "."
+WORD "modulo"
+LPAREN "("
+WORD "d"
+MOD "%"
+WORD "e"
+EQ "=="
+WORD "f"
+RPAREN ")"
+
+lex
+constrain.implication(d → b)
+----
+WORD "constrain"
+DOT "."
+WORD "implication"
+LPAREN "("
+WORD "d"
+IMPL "→"
+WORD "b"
+RPAREN ")"
+
+lex
+model.constants(c,e == 1)
+----
+WORD "model"
+DOT "."
+WORD "constants"
+LPAREN "("
+WORD "c"
+COMMA ","
+WORD "e"
+EQ "=="
+DIGITS "1"
+RPAREN ")"
+
+lex
+constrain.equality(2d - 4b + 6z == min(24d - 67z, 54j + 12i))
+----
+WORD "constrain"
+DOT "."
+WORD "equality"
+LPAREN "("
+DIGITS "2"
+WORD "d"
+MINUS "-"
+DIGITS "4"
+WORD "b"
+PLUS "+"
+DIGITS "6"
+WORD "z"
+EQ "=="
+MIN "min"
+LPAREN "("
+DIGITS "24"
+WORD "d"
+MINUS "-"
+DIGITS "67"
+WORD "z"
+COMMA ","
+DIGITS "54"
+WORD "j"
+PLUS "+"
+DIGITS "12"
+WORD "i"
+RPAREN ")"
+RPAREN ")"
+
+lex
+constrain.equality(d == max(e, f, g))
+----
+WORD "constrain"
+DOT "."
+WORD "equality"
+LPAREN "("
+WORD "d"
+EQ "=="
+MAX "max"
+LPAREN "("
+WORD "e"
+COMMA ","
+WORD "f"
+COMMA ","
+WORD "g"
+RPAREN ")"
+RPAREN ")"
+
+lex
+constrain.assignments([x,y,z] ∉ [1,2,3] ∪ [3,10,21])
+----
+WORD "constrain"
+DOT "."
+WORD "assignments"
+LPAREN "("
+LBRACKET "["
+WORD "x"
+COMMA ","
+WORD "y"
+COMMA ","
+WORD "z"
+RBRACKET "]"
+NEXISTS "∉"
+LBRACKET "["
+DIGITS "1"
+COMMA ","
+DIGITS "2"
+COMMA ","
+DIGITS "3"
+RBRACKET "]"
+UNION "∪"
+LBRACKET "["
+DIGITS "3"
+COMMA ","
+DIGITS "10"
+COMMA ","
+DIGITS "21"
+RBRACKET "]"
+RPAREN ")"
+
+
+lex
+constrain.at-least-k(a,x to z|2)
+----
+WORD "constrain"
+DOT "."
+WORD "at"
+MINUS "-"
+WORD "least"
+MINUS "-"
+WORD "k"
+LPAREN "("
+WORD "a"
+COMMA ","
+WORD "x"
+TO "to"
+WORD "z"
+PIPE "|"
+DIGITS "2"
+RPAREN ")"
+
+lex
+result.element(a == [b,c,d][i])
+----
+WORD "result"
+DOT "."
+WORD "element"
+LPAREN "("
+WORD "a"
+EQ "=="
+LBRACKET "["
+WORD "b"
+COMMA ","
+WORD "c"
+COMMA ","
+WORD "d"
+RBRACKET "]"
+LBRACKET "["
+WORD "i"
+RBRACKET "]"
+RPAREN ")"
+
+lex
+model.intervals(i as [s,e|sz], j as [s,e|sz])
+----
+WORD "model"
+DOT "."
+WORD "intervals"
+LPAREN "("
+WORD "i"
+AS "as"
+LBRACKET "["
+WORD "s"
+COMMA ","
+WORD "e"
+PIPE "|"
+WORD "sz"
+RBRACKET "]"
+COMMA ","
+WORD "j"
+AS "as"
+LBRACKET "["
+WORD "s"
+COMMA ","
+WORD "e"
+PIPE "|"
+WORD "sz"
+RBRACKET "]"
+RPAREN ")"
+
+lex
+result.non-overlapping([s,e|sz], [s,e|sz])
+----
+WORD "result"
+DOT "."
+WORD "non"
+MINUS "-"
+WORD "overlapping"
+LPAREN "("
+LBRACKET "["
+WORD "s"
+COMMA ","
+WORD "e"
+PIPE "|"
+WORD "sz"
+RBRACKET "]"
+COMMA ","
+LBRACKET "["
+WORD "s"
+COMMA ","
+WORD "e"
+PIPE "|"
+WORD "sz"
+RBRACKET "]"
+RPAREN ")"
+
+lex
+result.non-overlapping-2D([i, j], [k, l], true)
+----
+WORD "result"
+DOT "."
+WORD "non"
+MINUS "-"
+WORD "overlapping"
+MINUS "-"
+DIGITS "2"
+WORD "D"
+LPAREN "("
+LBRACKET "["
+WORD "i"
+COMMA ","
+WORD "j"
+RBRACKET "]"
+COMMA ","
+LBRACKET "["
+WORD "k"
+COMMA ","
+WORD "l"
+RBRACKET "]"
+COMMA ","
+BOOL "true"
+RPAREN ")"
+
+lex
+result.cumulative(i:3, j:4 | 32)
+----
+WORD "result"
+DOT "."
+WORD "cumulative"
+LPAREN "("
+WORD "i"
+COLON ":"
+DIGITS "3"
+COMMA ","
+WORD "j"
+COLON ":"
+DIGITS "4"
+PIPE "|"
+DIGITS "32"
+RPAREN ")"

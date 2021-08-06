@@ -1,8 +1,50 @@
 load("@bazel_gazelle//:def.bzl", "gazelle")
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 # gazelle:exclude c-deps/or-tools
 # gazelle:exclude c-deps/abseil-cpp
+# gazelle:build_tags bazel
 gazelle(
     name = "gazelle",
-    prefix = "github.com/irfansharif/or-tools",
+    prefix = "github.com/irfansharif/solver",
+)
+
+go_library(
+    name = "solver",
+    srcs = [
+        "constraint.go",
+        "doc.go",
+        "domain.go",
+        "interval.go",
+        "intvar.go",
+        "linearexpr.go",
+        "model.go",
+        "result.go",
+    ],
+    importpath = "github.com/irfansharif/solver",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//internal",
+        "//internal/pb",
+        "@com_github_dustin_go_humanize//:go-humanize",
+    ],
+)
+
+go_test(
+    name = "solver_test",
+    srcs = [
+        "datadriven_test.go",
+        "domain_test.go",
+        "linearexpr_test.go",
+        "solver_test.go",
+    ],
+    data = glob(["testdata/**"]),
+    embed = [":solver"],
+    deps = [
+        "//internal/testutils",
+        "//internal/testutils/bazel",
+        "//internal/testutils/parser/ast",
+        "@com_github_cockroachdb_datadriven//:datadriven",
+        "@com_github_stretchr_testify//require",
+    ],
 )
