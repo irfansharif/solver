@@ -262,7 +262,7 @@ func TestNegation(t *testing.T) {
 	model := NewModel()
 
 	A := model.NewLiteral("A")
-	notA := model.NewNegation(A, "~A")
+	notA := A.Not()
 
 	model.AddConstraints(NewBooleanOrConstraint(A, notA))
 	result := model.Solve()
@@ -279,7 +279,7 @@ func TestNegationInfeasible(t *testing.T) {
 	model := NewModel()
 
 	A := model.NewLiteral("A")
-	notA := model.NewNegation(A, "~A")
+	notA := A.Not()
 
 	model.AddConstraints(NewBooleanAndConstraint(A, notA))
 	result := model.Solve()
@@ -295,4 +295,52 @@ func TestModelValidation(t *testing.T) {
 	require.False(t, ok)
 	require.True(t, strings.Contains(err.Error(),
 		"domain do not fall in [kint64min + 2, kint64max - 1]"))
+}
+
+func TestAllSame(t *testing.T) {
+	model := NewModel()
+
+	A := model.NewLiteral("A")
+	B := model.NewLiteral("B")
+	C := model.NewLiteral("C")
+
+	model.AddConstraints(NewAllSameConstraint(A, B, C))
+	t.Logf("model = %s", model.pb)
+	result := model.Solve()
+	require.True(t, result.Optimal(), "expected solver to find solution")
+
+	{
+		A, B, C := result.BooleanValue(A), result.BooleanValue(B), result.BooleanValue(C)
+		require.True(t, A == B && B == C)
+	}
+}
+
+func TestExactlyKLiterals(t *testing.T) {
+	model := NewModel()
+
+	A := model.NewLiteral("A")
+	B := model.NewLiteral("B")
+	C := model.NewLiteral("C")
+	D := model.NewLiteral("D")
+
+	const k = 2
+	model.AddConstraints(NewExactlyKConstraint(k, []Literal{A, B, C, D}...))
+	result := model.Solve()
+	require.True(t, result.Optimal(), "expected solver to find solution")
+
+	{
+		A := result.BooleanValue(A)
+		B := result.BooleanValue(B)
+		C := result.BooleanValue(C)
+		D := result.BooleanValue(D)
+
+		count := 0
+		for _, b := range []bool{A, B, C, D} {
+			if b {
+				count += 1
+			}
+		}
+
+		require.Equal(t, k, count)
+	}
 }

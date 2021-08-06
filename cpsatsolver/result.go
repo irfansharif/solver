@@ -20,7 +20,7 @@ import (
 
 // Result is what's returned after attempting to solve a model.
 type Result struct {
-	proto *pb.CpSolverResponse
+	pb *pb.CpSolverResponse
 }
 
 // Optimal is true iff a feasible solution has been found.
@@ -31,36 +31,36 @@ type Result struct {
 // case where we're iterating through all feasible solutions, this status will
 // only be Feasible().
 func (r Result) Optimal() bool {
-	return r.proto.Status == pb.CpSolverStatus_OPTIMAL
+	return r.pb.Status == pb.CpSolverStatus_OPTIMAL
 }
 
 // Infeasible is true iff the problem has been proven infeasible.
 func (r Result) Infeasible() bool {
-	return r.proto.Status == pb.CpSolverStatus_INFEASIBLE
+	return r.pb.Status == pb.CpSolverStatus_INFEASIBLE
 }
 
 // Feasible is true if a feasible solution has been found, and if we're
 // enumerating through all solutions (if asked). See comment for Optimal for
 // more details.
 func (r Result) Feasible() bool {
-	return r.proto.Status == pb.CpSolverStatus_FEASIBLE
+	return r.pb.Status == pb.CpSolverStatus_FEASIBLE
 }
 
 func (r Result) Invalid() bool {
-	return r.proto.Status == pb.CpSolverStatus_MODEL_INVALID
+	return r.pb.Status == pb.CpSolverStatus_MODEL_INVALID
 }
 
 // Value returns the decided value of the given IntVar. This is only valid to
 // use if the result is optimal or feasible.
 func (r Result) Value(iv IntVar) int64 {
-	return r.proto.GetSolution()[iv.index()]
+	return r.pb.GetSolution()[iv.index()]
 }
 
 // BooleanValue returns the decided value of the given Literal. This is only
 // valid to use if the result is optimal or feasible.
 func (r Result) BooleanValue(l Literal) bool {
 	if l.negated() {
-		return r.Value(l.negation("")) == 0
+		return r.Value(l.Not()) == 0
 	}
 
 	return r.Value(l) == 1
@@ -72,5 +72,5 @@ func (r Result) BooleanValue(l Literal) bool {
 // of any feasible solution. For a maximization problem, it will be the
 // lower-bound.
 func (r Result) ObjectiveValue() float64 {
-	return r.proto.GetObjectiveValue()
+	return r.pb.GetObjectiveValue()
 }

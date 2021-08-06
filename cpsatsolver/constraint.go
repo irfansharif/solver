@@ -15,22 +15,41 @@
 package cpsatsolver
 
 import (
-	"fmt"
-
 	swigpb "github.com/irfansharif/or-tools/internal/cpsatsolver/pb"
 )
 
+// TODO(irfansharif): Add interval constraints. Update documentation for
+// OnlyEnforceIf when doing so.
+
 // Constraint is what a model attempts to satisfy when deciding on a solution.
-type Constraint = *constraint
+type Constraint interface {
+	// OnlyEnforceIf enforces the constraint iff all literals listed are true. If
+	// not explicitly called, of if the list is empty, then the constraint will
+	// always be enforced.
+	//
+	// NB: Only a few constraints support enforcement:
+	// - NewBooleanOrConstraint
+	// - NewBooleanAndConstraint
+	// - NewLinearConstraint
+	OnlyEnforceIf(literals ...Literal) Constraint
+
+	// protos returns the underlying CP-SAT constraint protobuf representations.
+	protos() []*swigpb.ConstraintProto
+}
 
 type constraint struct {
-	proto *swigpb.ConstraintProto
+	pb *swigpb.ConstraintProto
 }
+
+type constraints []Constraint
+
+var _ Constraint = &constraint{}
+var _ Constraint = &constraints{}
 
 // NewAllDifferentConstraint forces all variables to take different values.
 func NewAllDifferentConstraint(vars ...IntVar) Constraint {
 	return &constraint{
-		proto: &swigpb.ConstraintProto{
+		pb: &swigpb.ConstraintProto{
 			Constraint: &swigpb.ConstraintProto_AllDiff{
 				AllDiff: &swigpb.AllDifferentConstraintProto{
 					Vars: intVars(vars).indexes(),
@@ -40,27 +59,50 @@ func NewAllDifferentConstraint(vars ...IntVar) Constraint {
 	}
 }
 
-// NewAtMostOneConstraint enforces that no more than one literal is
-// true at the same time.
-func NewAtMostOneConstraint(literals ...Literal) Constraint {
-	return &constraint{
-		proto: &swigpb.ConstraintProto{
-			Constraint: &swigpb.ConstraintProto_AtMostOne{
-				AtMostOne: &swigpb.BoolArgumentProto{
-					Literals: intVars(literals).indexes(),
-				},
-			},
-		},
+// NewAllSameConstraint forces all variables to take the same values.
+func NewAllSameConstraint(vars ...IntVar) Constraint {
+	var cs []Constraint
+	for i := range vars {
+		if i == 0 {
+			continue
+		}
+		cs = append(cs, NewMaximumConstraint(vars[i-1], vars[i]))
 	}
+	return constraints(cs)
+}
+
+// NewAtMostKConstraint enforces that no more than k literals are
+// true at the same time.
+func NewAtMostKConstraint(k int, literals ...Literal) Constraint {
+	if k == 1 {
+		return newAtMostOneConstraint(literals...)
+	}
+
+	lb, ub := int64(0), int64(k)
+	return NewLinearConstraint(Sum(lits(literals).intVars()...), NewDomain(lb, ub))
+}
+
+// NewAtLeastKConstraint enforces that no less than k literals are
+// true at the same time.
+func NewAtLeastKConstraint(k int, literals ...Literal) Constraint {
+	lb, ub := int64(k), int64(len(literals))
+	return NewLinearConstraint(Sum(lits(literals).intVars()...), NewDomain(lb, ub))
+}
+
+// NewExactlyKConstraint enforces that exactly than k literals are
+// true at the same time.
+func NewExactlyKConstraint(k int, literals ...Literal) Constraint {
+	lb, ub := int64(k), int64(k)
+	return NewLinearConstraint(Sum(lits(literals).intVars()...), NewDomain(lb, ub))
 }
 
 // NewBooleanAndConstraint forces all the literals to be true.
 func NewBooleanAndConstraint(literals ...Literal) Constraint {
 	return &constraint{
-		proto: &swigpb.ConstraintProto{
+		pb: &swigpb.ConstraintProto{
 			Constraint: &swigpb.ConstraintProto_BoolAnd{
 				BoolAnd: &swigpb.BoolArgumentProto{
-					Literals: intVars(literals).indexes(),
+					Literals: lits(literals).indexes(),
 				},
 			},
 		},
@@ -70,10 +112,10 @@ func NewBooleanAndConstraint(literals ...Literal) Constraint {
 // NewBooleanOrConstraint forces at least one literal to be true.
 func NewBooleanOrConstraint(literals ...Literal) Constraint {
 	return &constraint{
-		proto: &swigpb.ConstraintProto{
+		pb: &swigpb.ConstraintProto{
 			Constraint: &swigpb.ConstraintProto_BoolOr{
 				BoolOr: &swigpb.BoolArgumentProto{
-					Literals: intVars(literals).indexes(),
+					Literals: lits(literals).indexes(),
 				},
 			},
 		},
@@ -83,10 +125,10 @@ func NewBooleanOrConstraint(literals ...Literal) Constraint {
 // NewBooleanXorConstraint forces an odd number of the literals to be true.
 func NewBooleanXorConstraint(literals ...Literal) Constraint {
 	return &constraint{
-		proto: &swigpb.ConstraintProto{
+		pb: &swigpb.ConstraintProto{
 			Constraint: &swigpb.ConstraintProto_BoolXor{
 				BoolXor: &swigpb.BoolArgumentProto{
-					Literals: intVars(literals).indexes(),
+					Literals: lits(literals).indexes(),
 				},
 			},
 		},
@@ -95,7 +137,7 @@ func NewBooleanXorConstraint(literals ...Literal) Constraint {
 
 // NewImplicationConstraint ensures that the first literal implies the second.
 func NewImplicationConstraint(a, b Literal) Constraint {
-	return NewBooleanOrConstraint(a.negation(fmt.Sprintf("~%s", a.name())), b)
+	return NewBooleanOrConstraint(a.Not(), b)
 }
 
 // NewAllowedLiteralAssignmentsConstraint forces the values of the n-tuple
@@ -110,14 +152,14 @@ func NewAllowedLiteralAssignmentsConstraint(literals []Literal, assignments [][]
 // assignments.
 func NewForbiddenLiteralAssignmentsConstraint(literals []Literal, assignments [][]bool) Constraint {
 	constraint := newLiteralAssignmentsConstraintInternal(literals, assignments)
-	constraint.proto.GetTable().Negated = true
+	constraint.pb.GetTable().Negated = true
 	return constraint
 }
 
 // NewDivisionConstraint forces the target to equal numerator/denominator.
 func NewDivisionConstraint(target, numerator, denominator IntVar) Constraint {
 	return &constraint{
-		proto: &swigpb.ConstraintProto{
+		pb: &swigpb.ConstraintProto{
 			Constraint: &swigpb.ConstraintProto_IntDiv{
 				IntDiv: &swigpb.IntegerArgumentProto{
 					Target: target.index(),
@@ -132,7 +174,7 @@ func NewDivisionConstraint(target, numerator, denominator IntVar) Constraint {
 // multiplicands.
 func NewProductConstraint(target IntVar, multiplicands ...IntVar) Constraint {
 	return &constraint{
-		proto: &swigpb.ConstraintProto{
+		pb: &swigpb.ConstraintProto{
 			Constraint: &swigpb.ConstraintProto_IntProd{
 				IntProd: &swigpb.IntegerArgumentProto{
 					Target: target.index(),
@@ -147,7 +189,7 @@ func NewProductConstraint(target IntVar, multiplicands ...IntVar) Constraint {
 // variables.
 func NewMaximumConstraint(target IntVar, vars ...IntVar) Constraint {
 	return &constraint{
-		proto: &swigpb.ConstraintProto{
+		pb: &swigpb.ConstraintProto{
 			Constraint: &swigpb.ConstraintProto_IntMax{
 				IntMax: &swigpb.IntegerArgumentProto{
 					Target: target.index(),
@@ -162,7 +204,7 @@ func NewMaximumConstraint(target IntVar, vars ...IntVar) Constraint {
 // variables.
 func NewMinimumConstraint(target IntVar, vars ...IntVar) Constraint {
 	return &constraint{
-		proto: &swigpb.ConstraintProto{
+		pb: &swigpb.ConstraintProto{
 			Constraint: &swigpb.ConstraintProto_IntMin{
 				IntMin: &swigpb.IntegerArgumentProto{
 					Target: target.index(),
@@ -176,7 +218,7 @@ func NewMinimumConstraint(target IntVar, vars ...IntVar) Constraint {
 // NewModuloConstraint forces the target to equal dividend%divisor.
 func NewModuloConstraint(target, dividend, divisor IntVar) Constraint {
 	return &constraint{
-		proto: &swigpb.ConstraintProto{
+		pb: &swigpb.ConstraintProto{
 			Constraint: &swigpb.ConstraintProto_IntMod{
 				IntMod: &swigpb.IntegerArgumentProto{
 					Target: target.index(),
@@ -199,7 +241,7 @@ func NewAllowedAssignmentsConstraint(vars []IntVar, assignments [][]int64) Const
 // assignments.
 func NewForbiddenAssignmentsConstraint(vars []IntVar, assignments [][]int64) Constraint {
 	constraint := newAssignmentsConstraintInternal(vars, assignments)
-	constraint.proto.GetTable().Negated = true
+	constraint.pb.GetTable().Negated = true
 	return constraint
 }
 
@@ -207,7 +249,7 @@ func NewForbiddenAssignmentsConstraint(vars []IntVar, assignments [][]int64) Con
 // such as 0 <= x + 2y <= 10.
 func NewLinearConstraint(e LinearExpr, d Domain) Constraint {
 	return &constraint{
-		proto: &swigpb.ConstraintProto{
+		pb: &swigpb.ConstraintProto{
 			Constraint: &swigpb.ConstraintProto_Linear{
 				Linear: &swigpb.LinearConstraintProto{
 					Vars:   e.vars(),
@@ -223,10 +265,10 @@ func NewLinearConstraint(e LinearExpr, d Domain) Constraint {
 // linear expressions.
 func NewLinearMaximumConstraint(target LinearExpr, exprs ...LinearExpr) Constraint {
 	return &constraint{
-		proto: &swigpb.ConstraintProto{
+		pb: &swigpb.ConstraintProto{
 			Constraint: &swigpb.ConstraintProto_LinMax{
 				LinMax: &swigpb.LinearArgumentProto{
-					Target: target.proto,
+					Target: target.proto(),
 					Exprs:  linearExprs(exprs).protos(),
 				},
 			},
@@ -238,10 +280,10 @@ func NewLinearMaximumConstraint(target LinearExpr, exprs ...LinearExpr) Constrai
 // linear expressions.
 func NewLinearMinimumConstraint(target LinearExpr, exprs ...LinearExpr) Constraint {
 	return &constraint{
-		proto: &swigpb.ConstraintProto{
+		pb: &swigpb.ConstraintProto{
 			Constraint: &swigpb.ConstraintProto_LinMin{
 				LinMin: &swigpb.LinearArgumentProto{
-					Target: target.proto,
+					Target: target.proto(),
 					Exprs:  linearExprs(exprs).protos(),
 				},
 			},
@@ -253,7 +295,7 @@ func NewLinearMinimumConstraint(target LinearExpr, exprs ...LinearExpr) Constrai
 // index takes on one of the values in [0, len(vars)).
 func NewElementConstraint(target, index IntVar, vars ...IntVar) Constraint {
 	return &constraint{
-		proto: &swigpb.ConstraintProto{
+		pb: &swigpb.ConstraintProto{
 			Constraint: &swigpb.ConstraintProto_Element{
 				Element: &swigpb.ElementConstraintProto{
 					Target: target.index(),
@@ -265,25 +307,49 @@ func NewElementConstraint(target, index IntVar, vars ...IntVar) Constraint {
 	}
 }
 
-// NewElementLiteralConstraint forces the target to equal literals[index].
-// Implicitly, index takes on one of the values in [0, len(literals)).
-func NewElementLiteralConstraint(target Literal, index IntVar, literals ...Literal) Constraint {
-	return NewElementConstraint(target, index, literals...)
+// newAtMostOneConstraint is a special case of NewAtMostKConstraint that uses a
+// more efficient internal encoding.
+func newAtMostOneConstraint(literals ...Literal) Constraint {
+	return &constraint{
+		pb: &swigpb.ConstraintProto{
+			Constraint: &swigpb.ConstraintProto_AtMostOne{
+				AtMostOne: &swigpb.BoolArgumentProto{
+					Literals: lits(literals).indexes(),
+				},
+			},
+		},
+	}
 }
 
-// OnlyEnforceIf enforces the constraint iff all literals listed are true. If
-// not explicitly called, of if the list is empty, then the constraint will
-// always be enforced.
-//
-// NB: Only a few constraint support enforcement:
-// - NewBooleanOrConstraint
-// - NewBooleanAndConstraint
-// - NewLinearConstraint
-func (c *constraint) OnlyEnforceIf(literals ...Literal) {
-	c.proto.EnforcementLiteral = intVars(literals).indexes()
+// OnlyEnforceIf is part of the Constraint interface.
+func (c *constraint) OnlyEnforceIf(literals ...Literal) Constraint {
+	c.pb.EnforcementLiteral = lits(literals).indexes()
+	return c
 }
 
-func newLiteralAssignmentsConstraintInternal(literals []Literal, assignments [][]bool) Constraint {
+// protos is part of the Constraint interface.
+func (c *constraint) protos() []*swigpb.ConstraintProto {
+	return []*swigpb.ConstraintProto{c.pb}
+}
+
+// OnlyEnforceIf is part of the Constraint interface.
+func (cs constraints) OnlyEnforceIf(literals ...Literal) Constraint {
+	for _, c := range cs {
+		c.OnlyEnforceIf(literals...)
+	}
+	return cs
+}
+
+// protos is part of the Constraint interface.
+func (cs constraints) protos() []*swigpb.ConstraintProto {
+	var res []*swigpb.ConstraintProto
+	for _, c := range cs {
+		res = append(res, c.protos()...)
+	}
+	return res
+}
+
+func newLiteralAssignmentsConstraintInternal(literals []Literal, assignments [][]bool) *constraint {
 	var integerAssignments [][]int64
 	for _, assignment := range assignments { // convert [][]bool to [][]int64
 		var integerAssignment []int64
@@ -297,10 +363,10 @@ func newLiteralAssignmentsConstraintInternal(literals []Literal, assignments [][
 		integerAssignments = append(integerAssignments, integerAssignment)
 	}
 
-	return newAssignmentsConstraintInternal(literals, integerAssignments)
+	return newAssignmentsConstraintInternal(lits(literals).intVars(), integerAssignments)
 }
 
-func newAssignmentsConstraintInternal(vars []IntVar, assignments [][]int64) Constraint {
+func newAssignmentsConstraintInternal(vars []IntVar, assignments [][]int64) *constraint {
 	var values []int64
 	for _, assignment := range assignments {
 		if len(assignment) != len(vars) {
@@ -309,7 +375,7 @@ func newAssignmentsConstraintInternal(vars []IntVar, assignments [][]int64) Cons
 		values = append(values, assignment...)
 	}
 	return &constraint{
-		proto: &swigpb.ConstraintProto{
+		pb: &swigpb.ConstraintProto{
 			Constraint: &swigpb.ConstraintProto_Table{
 				Table: &swigpb.TableConstraintProto{
 					Vars:   intVars(vars).indexes(),

@@ -26,26 +26,19 @@ import (
 
 // Model is a constraint programming problem.
 type Model struct {
-	proto *swigpb.CpModelProto
+	pb *swigpb.CpModelProto
 }
 
 // NewModel instantiates a new model.
 func NewModel() *Model {
 	return &Model{
-		proto: &swigpb.CpModelProto{},
+		pb: &swigpb.CpModelProto{},
 	}
 }
 
 // NewLiteral adds a new literal to the model.
 func (m *Model) NewLiteral(name string) Literal {
-	return m.NewIntVarFromDomain(NewDomain(0, 1), name)
-}
-
-// NewNegation adds a new literal to the model, one that's a negation of
-// the given one. It uses a more efficient encoding than two literals with a
-// model constraint xor-ing them together.
-func (m *Model) NewNegation(l Literal, name string) Literal {
-	return l.negation(name)
+	return m.NewIntVarFromDomain(NewDomain(0, 1), name).(Literal)
 }
 
 // NewIntVar adds a new integer variable to the model, one that's constrained to
@@ -57,9 +50,9 @@ func (m *Model) NewIntVar(lb int64, ub int64, name string) IntVar {
 // NewIntVarFromDomain adds a new integer variable to the model, one that's
 // constrained to the given domain.
 func (m *Model) NewIntVarFromDomain(d Domain, name string) IntVar {
-	idx := len(m.proto.GetVariables())
+	idx := len(m.pb.GetVariables())
 	iv := newIntVar(d, int32(idx), name)
-	m.proto.Variables = append(m.proto.Variables, iv.proto)
+	m.pb.Variables = append(m.pb.Variables, iv.pb)
 	return iv
 }
 
@@ -72,13 +65,13 @@ func (m *Model) NewConstant(c int64) IntVar {
 // these constraints will need to be satisfied.
 func (m *Model) AddConstraints(cs ...Constraint) {
 	for _, c := range cs {
-		m.proto.Constraints = append(m.proto.Constraints, c.proto)
+		m.pb.Constraints = append(m.pb.Constraints, c.protos()...)
 	}
 }
 
 // Minimize sets a minimization objective for the model.
 func (m *Model) Minimize(e LinearExpr) {
-	m.proto.Objective = &swigpb.CpObjectiveProto{
+	m.pb.Objective = &swigpb.CpObjectiveProto{
 		Vars:   e.vars(),
 		Coeffs: e.coeffs(),
 		Offset: float64(e.offset()),
@@ -88,17 +81,17 @@ func (m *Model) Minimize(e LinearExpr) {
 // Maximize sets a maximization objective for the model.
 func (m *Model) Maximize(e LinearExpr) {
 	m.Minimize(e)
-	for i, coeff := range m.proto.GetObjective().GetCoeffs() {
-		m.proto.GetObjective().GetCoeffs()[i] = -coeff
+	for i, coeff := range m.pb.GetObjective().GetCoeffs() {
+		m.pb.GetObjective().GetCoeffs()[i] = -coeff
 	}
-	m.proto.GetObjective().ScalingFactor = -1
-	m.proto.GetObjective().Offset = -m.proto.GetObjective().GetOffset()
+	m.pb.GetObjective().ScalingFactor = -1
+	m.pb.GetObjective().Offset = -m.pb.GetObjective().GetOffset()
 }
 
 // Validate checks whether the model is valid. If not, a descriptive error
 // message is returned.
 func (m *Model) Validate() (ok bool, _ error) {
-	msg := swig.SatHelperValidateModel(*m.proto)
+	msg := swig.SatHelperValidateModel(*m.pb)
 	if msg == "" {
 		return true, nil
 	}
@@ -111,8 +104,8 @@ func (m *Model) Validate() (ok bool, _ error) {
 // optimal result if an objective function is declared. If not, it returns
 // the first found result that satisfies the model.
 func (m *Model) Solve() Result {
-	proto := swig.SatHelperSolve(*m.proto)
-	return Result{proto: &proto}
+	proto := swig.SatHelperSolve(*m.pb)
+	return Result{pb: &proto}
 }
 
 // SolveAll returns all valid results that satisfy the model.
@@ -125,7 +118,7 @@ func (m *Model) SolveAll() []Result {
 
 	enumerate := true
 	params := swigpb.SatParameters{EnumerateAllSolutions: &enumerate}
-	swig.SatHelperSolveWithParametersAndSolutionCallback(*m.proto, params, cb.director)
+	swig.SatHelperSolveWithParametersAndSolutionCallback(*m.pb, params, cb.director)
 	swig.DeleteDirectorSolutionCallback(cb.director)
 	return results
 }
@@ -137,5 +130,5 @@ type solutionCallback struct {
 
 func (p *solutionCallback) OnSolutionCallback() {
 	proto := p.director.Response()
-	p.cb(Result{proto: &proto})
+	p.cb(Result{pb: &proto})
 }

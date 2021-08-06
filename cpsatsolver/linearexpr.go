@@ -25,17 +25,43 @@ import (
 // In the expression above {x, y, z} are variables (IntVars) to be decided on by
 // the model, {5, -7, 21} are coefficients for said variables, and -42 is the
 // offset.
-type LinearExpr = *linearExpr
+type LinearExpr interface {
+	vars() []int32
+	offset() int64
+	coeffs() []int64
+	proto() *swigpb.LinearExpressionProto
+}
 
 type linearExpr struct {
-	proto *swigpb.LinearExpressionProto
+	pb *swigpb.LinearExpressionProto
+}
+
+func (l *linearExpr) proto() *swigpb.LinearExpressionProto {
+	return l.pb
+}
+
+var _ LinearExpr = &linearExpr{}
+
+// Sum instantiates a new linear expression representing the sum of the given
+// variables.
+func Sum(vars ...IntVar) LinearExpr {
+	var coeffs []int64
+	for range vars {
+		coeffs = append(coeffs, 1)
+	}
+	return NewLinearExpr(vars, coeffs, 0)
 }
 
 // TODO(irfansharif): Could instead construct a linear constraint iteratively,
 // setting coefficient per int var, setting offset, etc.
 //
-// 	expr := NewLinearExpr()
-// 	expr.SetCoefficient(iv, 2)
+// 	expr := NewLinearExpr(
+// 		WithVars(...),
+// 		WithOffset(),
+// 		WithCoeffs(),
+// 	)
+// 	expr := NewLinearExpr(vars...)
+// 	expr.SetCoefficient(v, 2)
 // 	expr.SetOffset(2)
 
 // NewLinearExpr instantiates a new linear expression, representing:
@@ -43,7 +69,7 @@ type linearExpr struct {
 //   sum(coefficients[i] * vars[i]) + offset
 func NewLinearExpr(vars []IntVar, coeffs []int64, offset int64) LinearExpr {
 	return &linearExpr{
-		proto: &swigpb.LinearExpressionProto{
+		pb: &swigpb.LinearExpressionProto{
 			Vars:   intVars(vars).indexes(),
 			Coeffs: coeffs,
 			Offset: offset,
@@ -52,15 +78,15 @@ func NewLinearExpr(vars []IntVar, coeffs []int64, offset int64) LinearExpr {
 }
 
 func (l *linearExpr) vars() []int32 {
-	return l.proto.GetVars()
+	return l.pb.GetVars()
 }
 
 func (l *linearExpr) offset() int64 {
-	return l.proto.GetOffset()
+	return l.pb.GetOffset()
 }
 
 func (l *linearExpr) coeffs() []int64 {
-	return l.proto.GetCoeffs()
+	return l.pb.GetCoeffs()
 }
 
 type linearExprs []LinearExpr
@@ -68,7 +94,7 @@ type linearExprs []LinearExpr
 func (le linearExprs) protos() []*swigpb.LinearExpressionProto {
 	var ls []*swigpb.LinearExpressionProto
 	for _, expr := range le {
-		ls = append(ls, expr.proto)
+		ls = append(ls, expr.proto())
 	}
 	return ls
 }

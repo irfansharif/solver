@@ -15,26 +15,47 @@
 package cpsatsolver
 
 import (
+	"fmt"
+
 	"github.com/irfansharif/or-tools/internal/cpsatsolver/pb"
 )
 
-type IntVar = *intVar
-
-type Literal = *intVar
-
-type intVar struct {
-	proto *pb.IntegerVariableProto
-	idx   int32
+// IntVar is an integer variable. It's typically constructed using a domain and
+// is used as part of a model's constraints/objectives. When solving a model,
+// the variable's integer value is decided on.
+type IntVar interface {
+	name() string
+	index() int32
 }
 
-func newIntVar(d *domain, idx int32, name string) *intVar {
+// Literal is a boolean variable. It's represented using an IntVar with a fixed
+// domain [0, 1].
+type Literal interface {
+	IntVar
+
+	// Not returns the negated form of literal. It uses a more efficient encoding
+	// than two literals with a model constraint xor-ing them together.
+	Not() Literal
+
+	negated() bool
+}
+
+type intVar struct {
+	pb  *pb.IntegerVariableProto
+	idx int32
+}
+
+func newIntVar(d Domain, idx int32, name string) *intVar {
 	return &intVar{
-		proto: &pb.IntegerVariableProto{
+		pb: &pb.IntegerVariableProto{
 			Name:   name,
 			Domain: d.list(0),
 		},
 		idx: idx,
 	}
+}
+func (i *intVar) name() string {
+	return i.pb.Name
 }
 
 func (i *intVar) index() int32 {
@@ -45,15 +66,12 @@ func (i *intVar) negated() bool {
 	return i.idx < 0
 }
 
-func (i *intVar) name() string {
-	return i.proto.Name
-}
-
-func (i *intVar) negation(name string) *intVar {
+// Not is part of the Literal interface.
+func (i *intVar) Not() Literal {
 	return &intVar{
-		proto: &pb.IntegerVariableProto{
-			Name:   name,
-			Domain: i.proto.Domain,
+		pb: &pb.IntegerVariableProto{
+			Name:   fmt.Sprintf("~%s", i.name()),
+			Domain: i.pb.Domain,
 		},
 		idx: -i.idx - 1,
 	}
@@ -67,4 +85,22 @@ func (is intVars) indexes() []int32 {
 		indexes = append(indexes, iv.index())
 	}
 	return indexes
+}
+
+type lits []Literal
+
+func (ls lits) indexes() []int32 {
+	var indexes []int32
+	for _, l := range ls {
+		indexes = append(indexes, l.index())
+	}
+	return indexes
+}
+
+func (ls lits) intVars() intVars {
+	var res []IntVar
+	for _, l := range ls {
+		res = append(res, l.(IntVar))
+	}
+	return res
 }

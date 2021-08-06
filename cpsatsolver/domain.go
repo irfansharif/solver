@@ -22,9 +22,9 @@ import (
 //
 // 		[min_0, max_0,  ..., min_{n-1}, max_{n-1}].
 //
-// Where:
-// - For all i < n   :      min_i <= max_i
-// - For all i < n-1 :  max_i + 1 < min_{i+1}.
+// The following constraints hold:
+// 		- For all i < n   :      min_i <= max_i
+// 		- For all i < n-1 :  max_i + 1 < min_{i+1}.
 //
 // The most common example being just [min, max]. If min == max, then this is a
 // constant variable.
@@ -33,7 +33,9 @@ import (
 // that we don't run into integer overflow in our algorithms. Avoid having
 // "unbounded" variables like [0, math.MaxInt64], opting instead for tighter
 // domains.
-type Domain = *domain
+type Domain interface {
+	list(shift int64) []int64
+}
 
 type domain struct {
 	intervals []int64
