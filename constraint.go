@@ -46,10 +46,16 @@ type Constraint interface {
 	protos() []*pb.ConstraintProto
 }
 
+// constraint is an implementation of the Constraint interface.
 type constraint struct {
-	pb          *pb.ConstraintProto
+	// TODO(irfansharif): We hold onto the entire string representation in
+	// memory, which isn't ... great. We could do better by creating stand-alone
+	// types for each kind of constraint and holding onto all the elements we
+	// need.
+	str string
+	pb  *pb.ConstraintProto
+
 	enforcement []Literal
-	str         string
 }
 
 // String is part of the Constraint interface.
@@ -61,7 +67,7 @@ func (c *constraint) String() string {
 	var b strings.Builder
 	b.WriteString(c.str)
 	if len(c.enforcement) != 0 {
-		b.WriteString(" iff (")
+		b.WriteString(" if (")
 		for i, l := range c.enforcement {
 			if i != 0 {
 				b.WriteString(", ")
@@ -78,14 +84,13 @@ var _ Constraint = &constraint{}
 // NewAllDifferentConstraint forces all variables to take different values.
 func NewAllDifferentConstraint(vars ...IntVar) Constraint {
 	var b strings.Builder
-	b.WriteString("all-different: [")
+	b.WriteString("all-different: ")
 	for i, v := range vars {
 		if i != 0 {
 			b.WriteString(", ")
 		}
 		b.WriteString(v.name())
 	}
-	b.WriteString("]")
 
 	return &constraint{
 		pb: &pb.ConstraintProto{
@@ -102,14 +107,13 @@ func NewAllDifferentConstraint(vars ...IntVar) Constraint {
 // NewAllSameConstraint forces all variables to take the same values.
 func NewAllSameConstraint(vars ...IntVar) Constraint {
 	var b strings.Builder
-	b.WriteString("all-same: [")
+	b.WriteString("all-same: ")
 	for i, v := range vars {
 		if i != 0 {
 			b.WriteString(", ")
 		}
 		b.WriteString(v.name())
 	}
-	b.WriteString("]")
 
 	var cs []Constraint
 	for i := range vars {
@@ -128,7 +132,20 @@ func NewAtMostKConstraint(k int, literals ...Literal) Constraint {
 	}
 
 	lb, ub := int64(0), int64(k)
-	return NewLinearConstraint(Sum(asIntVars(literals)...), NewDomain(lb, ub))
+	c := NewLinearConstraint(Sum(asIntVars(literals)...), NewDomain(lb, ub))
+
+	var b strings.Builder
+	b.WriteString("at-most-k: ")
+	for i, l := range literals {
+		if i != 0 {
+			b.WriteString(", ")
+		}
+		b.WriteString(l.name())
+	}
+	b.WriteString(fmt.Sprintf(" | %d", k))
+	c.(*constraint).str = b.String() // hijack the string representation
+
+	return c
 }
 
 // NewAtLeastKConstraint ensures that at least k literals are true.
@@ -138,7 +155,20 @@ func NewAtLeastKConstraint(k int, literals ...Literal) Constraint {
 	}
 
 	lb, ub := int64(k), int64(len(literals))
-	return NewLinearConstraint(Sum(asIntVars(literals)...), NewDomain(lb, ub))
+	c := NewLinearConstraint(Sum(asIntVars(literals)...), NewDomain(lb, ub))
+
+	var b strings.Builder
+	b.WriteString("at-least-k: ")
+	for i, l := range literals {
+		if i != 0 {
+			b.WriteString(", ")
+		}
+		b.WriteString(l.name())
+	}
+	b.WriteString(fmt.Sprintf(" | %d", k))
+	c.(*constraint).str = b.String() // hijack the string representation
+
+	return c
 }
 
 // NewExactlyKConstraint ensures that exactly k literals are true.
@@ -147,15 +177,16 @@ func NewExactlyKConstraint(k int, literals ...Literal) Constraint {
 	c := NewLinearConstraint(Sum(asIntVars(literals)...), NewDomain(lb, ub))
 
 	var b strings.Builder
-	b.WriteString(fmt.Sprintf("exactly-k: k=%d ", k))
+	b.WriteString("exactly-k: ")
 	for i, l := range literals {
 		if i != 0 {
 			b.WriteString(", ")
 		}
 		b.WriteString(l.name())
 	}
+	b.WriteString(fmt.Sprintf(" | %d", k))
+	c.(*constraint).str = b.String() // hijack the string representation
 
-	c.(*constraint).str = b.String()
 	return c
 }
 
@@ -232,7 +263,9 @@ func NewBooleanXorConstraint(literals ...Literal) Constraint {
 
 // NewImplicationConstraint ensures that the first literal implies the second.
 func NewImplicationConstraint(a, b Literal) Constraint {
-	return NewBooleanOrConstraint(a.Not(), b)
+	c := NewBooleanOrConstraint(a.Not(), b)
+	c.(*constraint).str = fmt.Sprintf("implication: %s → %s", a.name(), b.name()) // hijack the string representation
+	return c
 }
 
 // NewAllowedLiteralAssignmentsConstraint ensures that the values of the n-tuple
@@ -245,9 +278,9 @@ func NewAllowedLiteralAssignmentsConstraint(literals []Literal, assignments [][]
 // n-tuple formed by the given literals is not one of the listed n-tuple
 // assignments.
 func NewForbiddenLiteralAssignmentsConstraint(literals []Literal, assignments [][]bool) Constraint {
-	constraint := newLiteralAssignmentsConstraintInternal(literals, assignments)
-	constraint.pb.GetTable().Negated = true
-	return constraint
+	c := newLiteralAssignmentsConstraintInternal(literals, assignments)
+	c.pb.GetTable().Negated = true
+	return c
 }
 
 // NewDivisionConstraint ensures that the target is to equal to
@@ -262,6 +295,7 @@ func NewDivisionConstraint(target, numerator, denominator IntVar) Constraint {
 				},
 			},
 		},
+		str: fmt.Sprintf("%s == %s / %s", target.name(), numerator.name(), denominator.name()),
 	}
 }
 
@@ -333,9 +367,9 @@ func NewAllowedAssignmentsConstraint(vars []IntVar, assignments [][]int64) Const
 // NewForbiddenAssignmentsConstraint ensures that the values of the n-tuple
 // formed by the given variables is not one of the listed n-tuple assignments.
 func NewForbiddenAssignmentsConstraint(vars []IntVar, assignments [][]int64) Constraint {
-	constraint := newAssignmentsConstraintInternal(vars, assignments)
-	constraint.pb.GetTable().Negated = true
-	return constraint
+	c := newAssignmentsConstraintInternal(vars, assignments)
+	c.pb.GetTable().Negated = true
+	return c
 }
 
 // NewLinearConstraint ensures that the linear expression lies in the given
@@ -347,7 +381,7 @@ func NewLinearConstraint(e LinearExpr, d Domain) Constraint {
 	var b strings.Builder
 	b.WriteString("linear-constraint: ")
 	b.WriteString(e.String())
-	b.WriteString(" within ")
+	b.WriteString(" in ")
 	b.WriteString(d.String())
 
 	return &constraint{

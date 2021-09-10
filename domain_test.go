@@ -35,11 +35,6 @@ func TestDomainValidation(t *testing.T) {
 		func() { NewDomain(0, 2, 3, 4) })
 }
 
-func TestDomainString(t *testing.T) {
-	require.Equal(t, "[0,12]", NewDomain(0, 12).String())
-	require.Equal(t, "[0,12] [24,32]", NewDomain(0, 12, 24, 32).String())
-}
-
 func TestDomainList(t *testing.T) {
 	require.Equal(t, []int64{0, 12}, NewDomain(0, 12).list(0))
 	require.Equal(t, []int64{0, 12, 24, 32}, NewDomain(0, 12, 24, 32).list(0))

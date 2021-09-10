@@ -42,17 +42,28 @@ func WritableSandboxPathFor(t *testing.T, pkg, path string) (writable string, im
 		require.Nil(t, ioutil.WriteFile(dest, input, 0644))
 	}
 
+	workspace, scratchdir := WorkspacePath(t), ScratchDirectory(t)
+	dest := filepath.Join(scratchdir, path)
+
+	cp(t, path, dest)
+	return dest, func() { cp(t, dest, filepath.Join(workspace, pkg, path)) }
+}
+
+// WorkspacePath returns the path of the bazel workspace.
+func WorkspacePath(t *testing.T) string {
 	workspace := os.Getenv("BAZEL_WORKSPACE")
 	if workspace == "" {
 		t.Fatal("BAZEL_WORKSPACE unset")
 	}
+	return workspace
+}
 
-	outdir := os.Getenv("TEST_UNDECLARED_OUTPUTS_DIR")
-	if outdir == "" {
+// ScratchDirectory returns the path of the scratch directory in the bazel
+// sandbox.
+func ScratchDirectory(t *testing.T) string {
+	scratchdir := os.Getenv("TEST_UNDECLARED_OUTPUTS_DIR")
+	if scratchdir == "" {
 		t.Fatal("expected to find TEST_UNDECLARED_OUTPUTS_DIR")
 	}
-	dest := filepath.Join(outdir, path)
-
-	cp(t, path, dest)
-	return dest, func() { cp(t, dest, filepath.Join(workspace, pkg, path)) }
+	return scratchdir
 }

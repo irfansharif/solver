@@ -119,8 +119,8 @@ func (m *Model) Maximize(e LinearExpr) {
 // Validate checks whether the model is valid. If not, a descriptive error
 // message is returned.
 //
-// XXX: This validation message refers to things using indexes, which is not
-// readable.
+// TODO(irfansharif): This validation message refers to things using indexes,
+// which is not really usable.
 func (m *Model) Validate() (ok bool, _ error) {
 	msg := internal.SatHelperValidateModel(*m.pb)
 	if msg == "" {
@@ -137,35 +137,41 @@ func (m *Model) String() string {
 
 	for i, v := range m.vars {
 		if i == 0 {
-			b.WriteString(fmt.Sprintf("  variables (len = %d)\n", len(m.vars)))
+			b.WriteString(fmt.Sprintf("  variables (num = %d)\n", len(m.vars)))
 		}
 		b.WriteString(fmt.Sprintf("    %s\n", v.String()))
 	}
 
 	for i, c := range m.constants {
 		if i == 0 {
-			b.WriteString(fmt.Sprintf("  constants (len = %d)\n", len(m.constraints)))
+			b.WriteString(fmt.Sprintf("  constants (num = %d)\n", len(m.constraints)))
 		}
 		b.WriteString(fmt.Sprintf("    %s\n", c.String()))
 	}
 
 	for i, l := range m.literals {
 		if i == 0 {
-			b.WriteString(fmt.Sprintf("  literals (len = %d)\n", len(m.literals)))
+			b.WriteString(fmt.Sprintf("  literals (num = %d)\n", len(m.literals)))
+			b.WriteString("    ")
+		} else {
+			b.WriteString(", ")
 		}
-		b.WriteString(fmt.Sprintf("    %s\n", l.String()))
+		b.WriteString(fmt.Sprintf("%s", l.String()))
+		if i == len(m.literals)-1 {
+			b.WriteString("\n")
+		}
 	}
 
 	for i, iv := range m.intervals {
 		if i == 0 {
-			b.WriteString(fmt.Sprintf("  intervals (len = %d)\n", len(m.intervals)))
+			b.WriteString(fmt.Sprintf("  intervals (num = %d)\n", len(m.intervals)))
 		}
 		b.WriteString(fmt.Sprintf("    %s\n", iv.String()))
 	}
 
 	for i, c := range m.constraints {
 		if i == 0 {
-			b.WriteString(fmt.Sprintf("  constraints (len = %d)\n", len(m.constraints)))
+			b.WriteString(fmt.Sprintf("  constraints (num = %d)\n", len(m.constraints)))
 		}
 		b.WriteString(fmt.Sprintf("    %s\n", c.String()))
 	}

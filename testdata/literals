@@ -5,21 +5,18 @@ constrain.at-most-k(x to z| 2)
 model.print()
 ----
 model=ex
-  literals (len = 3)
-    x
-    y
-    z
-  constraints (len = 1)
-    linear-constraint: x + y + z within [0,2]
+  literals (num = 3)
+    x, y, z
+  constraints (num = 1)
+    at-most-k: x, y, z | 2
 
 sat
 model.solve()
-result.optimal()
 ----
-true
+optimal
 
 sat
-result.booleans(x to z)
+result.bools(x to z)
 ----
 x = false
 y = false

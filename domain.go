@@ -95,10 +95,10 @@ func (d *domain) String() string {
 	var b strings.Builder
 	for i := 0; i < len(d.intervals); i += 2 {
 		if i != 0 {
-			b.WriteString(" ")
+			b.WriteString(" ∪ ")
 		}
 		min, max := d.intervals[i], d.intervals[i+1]
-		b.WriteString(fmt.Sprintf("[%d,%d]", min, max))
+		b.WriteString(fmt.Sprintf("[%d, %d]", min, max))
 	}
 	return b.String()
 }

@@ -85,11 +85,10 @@ type LinearTerm struct {
 }
 
 func (l *LinearTerm) String() string {
-	var coeff string
-	if l.Coefficient != 1 {
-		coeff = strconv.FormatInt(int64(l.Coefficient), 10)
+	if l.Coefficient == 1 {
+		return fmt.Sprintf("%s", l.Variable)
 	}
-	return fmt.Sprintf("%s%s", coeff, l.Variable)
+	return fmt.Sprintf("%d%s", l.Coefficient, l.Variable)
 }
 
 // LinearExpr represents a linear expression.

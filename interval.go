@@ -92,10 +92,11 @@ func (i *interval) OnlyEnforceIf(literals ...Literal) Constraint {
 // String is part of the Interval interface.
 func (i *interval) String() string {
 	var b strings.Builder
-	b.WriteString(fmt.Sprintf("{%s, %s | %s}", i.start.name(), i.end.name(), i.size.name()))
+	b.WriteString(fmt.Sprintf("[%s, %s | %s]", i.start.name(), i.end.name(), i.size.name()))
 	if i.enforcement != nil {
-		b.WriteString(" iff ")
+		b.WriteString(" if [")
 		b.WriteString(i.enforcement.name())
+		b.WriteString("]")
 	}
 
 	return b.String()

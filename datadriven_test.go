@@ -16,6 +16,7 @@ package solver_test
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -24,6 +25,7 @@ import (
 	"github.com/irfansharif/solver/internal/testutils"
 	"github.com/irfansharif/solver/internal/testutils/bazel"
 	"github.com/irfansharif/solver/internal/testutils/parser/ast"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDatadriven(t *testing.T) {
@@ -32,18 +34,44 @@ func TestDatadriven(t *testing.T) {
 		defer implant()
 
 		model := solver.NewModel("") // instantiate a model
-		varMap := make(map[string]solver.IntVar)
-		litMap := make(map[string]solver.Literal)
+		varM := make(map[string]solver.IntVar)
+		litM := make(map[string]solver.Literal)
 		var result solver.Result
+		var solved bool
+
+		getIntVars := func(s *testutils.Scanner, vars []string) []solver.IntVar {
+			var intVars []solver.IntVar
+			for _, v := range vars {
+				iv, ok := varM[v]
+				if !ok {
+					s.Fatalf("unrecognized variable: %s", v)
+				}
+
+				intVars = append(intVars, iv)
+			}
+			return intVars
+		}
+
+		getLiterals := func(s *testutils.Scanner, vars []string) []solver.Literal {
+			var literals []solver.Literal
+			for _, l := range vars {
+				lit, ok := litM[l]
+				if !ok {
+					s.Fatalf("unrecognized literal: %s", l)
+				}
+
+				literals = append(literals, lit)
+			}
+			return literals
+		}
 
 		datadriven.RunTest(t, path, func(t *testing.T, d *datadriven.TestData) string {
-			s := testutils.NewScanner(t, strings.NewReader(d.Input), path)
+			parts := strings.Split(d.Pos, ":")
+			line, _ := strconv.Atoi(parts[1])
+			s := testutils.NewScanner(t, strings.NewReader(d.Input), path, line)
 			var out strings.Builder
 			for s.Scan() {
-				stmt, err := testutils.Compile(s.Text())
-				if err != nil {
-					s.Fatal(err)
-				}
+				stmt := testutils.Compile(s, s.Text())
 				if d.Cmd == "recognize" {
 					continue
 				}
@@ -56,144 +84,132 @@ func TestDatadriven(t *testing.T) {
 					argument := stmt.Argument.(*ast.DomainArgument)
 					dom := argument.AsSolverDomain()
 					for _, v := range argument.Variables {
-						varMap[v] = model.NewIntVarFromDomain(dom, v)
+						varM[v] = model.NewIntVarFromDomain(dom, v)
 					}
 				case ast.LiteralsMethod: // model.literals(c,d)
 					argument := stmt.Argument.(*ast.VariablesArgument)
 					for _, l := range argument.Variables {
-						litMap[l] = model.NewLiteral(l)
+						litM[l] = model.NewLiteral(l)
 					}
 				case ast.ConstantsMethod: // model.constants(a,b == 42)
 					argument := stmt.Argument.(*ast.ConstantsArgument)
-					for _, v := range argument.Variables {
-						iv := model.NewConstant(int64(argument.Constant), v)
-						varMap[v] = iv
+					for _, c := range argument.Variables {
+						varM[c] = model.NewConstant(int64(argument.Constant), c)
 					}
 				case ast.PrintMethod: // model.print()
 					out.WriteString(model.String())
 				case ast.ValidateMethod: // m.validate()
-					var ok bool
-					ok, err = model.Validate()
+					ok, err := model.Validate()
 					if ok {
 						out.WriteString("ok")
 					} else {
-						out.WriteString(fmt.Sprintf("validation error: %v", err.Error()))
+						out.WriteString(fmt.Sprintf("invalid: %v", err.Error()))
 					}
 				case ast.SolveMethod: // model.solve()
 					result = model.Solve()
-				case ast.OptimalMethod: // result.optimal()
-					out.WriteString(fmt.Sprintf("%t", result.Optimal()))
-				case ast.InfeasibleMethod: // result.infeasible()
-					out.WriteString(fmt.Sprintf("%t", result.Infeasible()))
-				case ast.FeasibleMethod: // result.feasible()
-					out.WriteString(fmt.Sprintf("%t", result.Feasible()))
-				case ast.InvalidMethod: // result.invalid()
-					out.WriteString(fmt.Sprintf("%t", result.Invalid()))
-				case ast.BooleansMethod: // result.booleans(x,y to z)
-					argument := stmt.Argument.(*ast.VariablesArgument)
-					for i, l := range argument.Variables {
-						lit, ok := litMap[l]
-						if !ok {
-							t.Fatalf("unrecognized literal: %s", l)
-						}
-
-						val := result.BooleanValue(lit)
-						out.WriteString(fmt.Sprintf("%s = %t", l, val))
-						if i != len(argument.Variables)-1 {
-							out.WriteString("\n")
-						}
-					}
-				case ast.ValuesMethod: // result.values(x,y to z)
-					argument := stmt.Argument.(*ast.VariablesArgument)
-					for i, v := range argument.Variables {
-						iv, ok := varMap[v]
-						if !ok {
-							t.Fatalf("unrecognized variable: %s", v)
-						}
-
-						val := result.Value(iv)
-						out.WriteString(fmt.Sprintf("%s = %d", v, val))
-						if i != len(argument.Variables)-1 {
-							out.WriteString("\n")
-						}
+					solved = true
+					switch {
+					case result.Feasible():
+						out.WriteString("feasible")
+					case result.Infeasible():
+						out.WriteString("infeasible")
+					case result.Invalid():
+						out.WriteString("invalid")
+					case result.Optimal():
+						out.WriteString("optimal")
 					}
 
 				case ast.AllDifferentMethod: // constrain.all-different(x,y,z)
 					argument := stmt.Argument.(*ast.VariablesArgument)
-					var intVars []solver.IntVar
-					for _, v := range argument.Variables {
-						iv, ok := varMap[v]
-						if !ok {
-							t.Fatalf("unrecognized variable: %s", v)
-						}
+					intVars := getIntVars(s, argument.Variables)
 
-						intVars = append(intVars, iv)
-					}
-
-					model.AddConstraints(
-						solver.NewAllDifferentConstraint(intVars...),
-					)
+					model.AddConstraints(solver.NewAllDifferentConstraint(intVars...))
 				case ast.AllSameMethod: // constrain.all-same(x,y,z)
 					argument := stmt.Argument.(*ast.VariablesArgument)
-					var intVars []solver.IntVar
-					for _, v := range argument.Variables {
-						iv, ok := varMap[v]
-						if !ok {
-							t.Fatalf("unrecognized variable: %s", v)
-						}
+					intVars := getIntVars(s, argument.Variables)
 
-						intVars = append(intVars, iv)
-					}
-
-					model.AddConstraints(
-						solver.NewAllSameConstraint(intVars...),
-					)
-				case ast.BooleanAndMethod: // constrain.boolean -and(x,y,z) [if a,b]
+					model.AddConstraints(solver.NewAllSameConstraint(intVars...))
+				case ast.ImplicationMethod: // constrain.boolean-and(x,y,z) [if a,b]
+					argument := stmt.Argument.(*ast.ImplicationArgument)
+					literals := getLiterals(s, []string{argument.Left, argument.Right})
+					model.AddConstraints(solver.NewImplicationConstraint(literals[0], literals[1]))
+				case ast.BooleanAndMethod: // constrain.boolean-and(x,y,z) [if a,b]
 					argument := stmt.Argument.(*ast.VariablesArgument)
-					var literals []solver.Literal
-					for _, l := range argument.Variables {
-						lit, ok := litMap[l]
-						if !ok {
-							t.Fatalf("unrecognized literal: %s", l)
-						}
-
-						literals = append(literals, lit)
-					}
-
+					literals := getLiterals(s, argument.Variables)
 					var enforcement []solver.Literal
 					if stmt.Enforcement != nil {
-						for _, l := range stmt.Enforcement.Variables {
-							lit, ok := litMap[l]
-							if !ok {
-								t.Fatalf("unrecognized enforcement literal: %s", l)
-							}
-
-							enforcement = append(enforcement, lit)
-						}
+						enforcement = getLiterals(s, stmt.Enforcement.Variables)
 					}
 
-					model.AddConstraints(
-						solver.NewBooleanAndConstraint(literals...).OnlyEnforceIf(enforcement...),
-					)
+					model.AddConstraints(solver.NewBooleanAndConstraint(literals...).OnlyEnforceIf(enforcement...))
+				case ast.BooleanOrMethod: // constrain.boolean-or(x,y,z) [if a,b]
+					argument := stmt.Argument.(*ast.VariablesArgument)
+					literals := getLiterals(s, argument.Variables)
+					var enforcement []solver.Literal
+					if stmt.Enforcement != nil {
+						enforcement = getLiterals(s, stmt.Enforcement.Variables)
+					}
+
+					model.AddConstraints(solver.NewBooleanOrConstraint(literals...).OnlyEnforceIf(enforcement...))
+				case ast.BooleanXorMethod: // constrain.boolean-xor(x,y,z)
+					argument := stmt.Argument.(*ast.VariablesArgument)
+					literals := getLiterals(s, argument.Variables)
+					model.AddConstraints(solver.NewBooleanXorConstraint(literals...))
 				case ast.AtMostKMethod: // constrain.at-most-k(x to z | K)
 					argument := stmt.Argument.(*ast.KArgument)
-					var literals []solver.Literal
-					for _, l := range argument.Variables {
-						lit, ok := litMap[l]
-						if !ok {
-							t.Fatalf("unrecognized literal: %s", l)
+					literals := getLiterals(s, argument.Variables)
+					model.AddConstraints(solver.NewAtMostKConstraint(argument.K, literals...))
+				case ast.AtLeastKMethod: // constrain.at-least-k(x to z | K)
+					argument := stmt.Argument.(*ast.KArgument)
+					literals := getLiterals(s, argument.Variables)
+					model.AddConstraints(solver.NewAtLeastKConstraint(argument.K, literals...))
+				case ast.ExactlyKMethod: // constrain.exactly-k(x to z | K)
+					argument := stmt.Argument.(*ast.KArgument)
+					literals := getLiterals(s, argument.Variables)
+					model.AddConstraints(solver.NewExactlyKConstraint(argument.K, literals...))
+				case ast.AssignmentsMethod:
+					argument := stmt.Argument.(*ast.AssignmentsArgument)
+					if argument.ForLiterals() {
+						literals := getLiterals(s, argument.Variables)
+						if argument.In {
+							model.AddConstraints(solver.NewAllowedLiteralAssignmentsConstraint(literals, argument.AllowedLiteralAssignments))
+						} else {
+							model.AddConstraints(solver.NewForbiddenLiteralAssignmentsConstraint(literals, argument.AllowedLiteralAssignments))
 						}
-
-						literals = append(literals, lit)
+					} else {
+						variables := getIntVars(s, argument.Variables)
+						if argument.In {
+							model.AddConstraints(solver.NewAllowedAssignmentsConstraint(variables, argument.AsInt64s()))
+						} else {
+							model.AddConstraints(solver.NewForbiddenAssignmentsConstraint(variables, argument.AsInt64s()))
+						}
+					}
+				case ast.BoolsMethod: // result.booleans(x,y to z)
+					require.True(t, solved)
+					argument := stmt.Argument.(*ast.VariablesArgument)
+					literals := getLiterals(s, argument.Variables)
+					for i, lit := range literals {
+						val := result.BooleanValue(lit)
+						out.WriteString(fmt.Sprintf("%s = %t", argument.Variables[i], val))
+						if i != len(literals)-1 {
+							out.WriteString("\n")
+						}
 					}
 
-					model.AddConstraints(
-						solver.NewAtMostKConstraint(argument.K, literals...),
-					)
+				case ast.ValuesMethod: // result.values(x,y to z)
+					require.True(t, solved)
+					argument := stmt.Argument.(*ast.VariablesArgument)
+					variables := getIntVars(s, argument.Variables)
+					for i, iv := range variables {
+						val := result.Value(iv)
+						out.WriteString(fmt.Sprintf("%s = %d", argument.Variables[i], val))
+						if i != len(variables)-1 {
+							out.WriteString("\n")
+						}
+					}
 				default:
 					t.Fatalf("unrecognized method: %s", stmt.Method)
 				}
-
 			}
 
 			return out.String()

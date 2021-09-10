@@ -26,7 +26,7 @@ jobs:
       - name: Run bazel version
         run: bazel --version
 
-      - name: Check bazel generated code # we're skipping over swig, proto, go:generate to keep CI teams low
+      - name: Check generated code # we're skipping over swig, proto, and go files to bound CI image size/speed low
         run: |
           make bzl
           git diff --exit-code

@@ -1,0 +1,43 @@
+sat
+model.name(m)
+model.vars(a to c in [0, 10])
+model.literals(x to z)
+model.print()
+----
+model=m
+  variables (num = 3)
+    a in [0, 10]
+    b in [0, 10]
+    c in [0, 10]
+  literals (num = 3)
+    x, y, z
+
+sat
+constrain.all-different(a to c)
+constrain.all-same(a to c)
+constrain.at-most-k(x to z | 2)
+constrain.at-least-k(x to z | 2)
+constrain.exactly-k(x to z | 2)
+constrain.boolean-and(x to z)
+constrain.boolean-or(x to z)
+constrain.boolean-xor(x to z)
+constrain.implication(x → z)
+model.print()
+----
+model=m
+  variables (num = 3)
+    a in [0, 10]
+    b in [0, 10]
+    c in [0, 10]
+  literals (num = 3)
+    x, y, z
+  constraints (num = 9)
+    all-different: a, b, c
+    all-same: a, b, c
+    at-most-k: x, y, z | 2
+    at-least-k: x, y, z | 2
+    exactly-k: x, y, z | 2
+    boolean-and: x, y, z
+    boolean-or: x, y, z
+    boolean-xor: x, y, z
+    implication: x → z

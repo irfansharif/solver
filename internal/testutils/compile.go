@@ -15,34 +15,31 @@
 package testutils
 
 import (
-	"fmt"
+	"testing"
 
 	"github.com/irfansharif/solver/internal/testutils/parser"
 	"github.com/irfansharif/solver/internal/testutils/parser/ast"
 )
 
-// Compile compiles the given statement and returns the corresponding ast node.
-func Compile(stmt string) (*ast.Statement, error) {
-	p := parser.New(stmt)
-	s, err := p.Statement()
-	if err != nil {
-		return nil, err
-	}
+// Compile compiles the given statement and returns the corresponding AST node.
+func Compile(tb testing.TB, input string) *ast.Statement {
+	p := parser.New(tb, input)
+	stmt := p.Statement()
 
 	// TODO(irfansharif): Should we make a single receiver+method type? There
 	// are only three receivers, and a static list of methods.
-	switch s.Receiver {
+	switch stmt.Receiver {
 	case "model":
-		switch s.Method {
+		switch stmt.Method {
 		case ast.ConstantsMethod, ast.IntervalsMethod, ast.LiteralsMethod,
 			ast.MaximizeMethod, ast.MinimizeMethod, ast.NameMethod,
 			ast.PrintMethod, ast.SolveMethod, ast.SolveAllMethod,
 			ast.ValidateMethod, ast.VarsMethod:
 		default:
-			return nil, fmt.Errorf("unrecognized method: %s.%s", s.Receiver, s.Method)
+			tb.Fatalf("unrecognized method: %s.%s", stmt.Receiver, stmt.Method)
 		}
 	case "constrain":
-		switch s.Method {
+		switch stmt.Method {
 		case ast.AllDifferentMethod, ast.AllSameMethod, ast.AssignmentsMethod,
 			ast.AtLeastKMethod, ast.AtMostKMethod, ast.BinaryOpMethod,
 			ast.BooleanAndMethod, ast.BooleanOrMethod, ast.BooleanXorMethod,
@@ -50,129 +47,128 @@ func Compile(stmt string) (*ast.Statement, error) {
 			ast.ExactlyKMethod, ast.ImplicationMethod, ast.LinearExprsMethod,
 			ast.NonOverlappingMethod, ast.NonOverlapping2DMethod:
 		default:
-			return nil, fmt.Errorf("unrecognized method: %s.%s", s.Receiver, s.Method)
+			tb.Fatalf("unrecognized method: %s.%s", stmt.Receiver, stmt.Method)
 		}
 	case "result":
-		switch s.Method {
-		case ast.BooleansMethod, ast.FeasibleMethod, ast.InfeasibleMethod,
-			ast.InvalidMethod, ast.ObjectiveValueMethod, ast.OptimalMethod,
-			ast.ValuesMethod:
+		switch stmt.Method {
+		case ast.BoolsMethod, ast.ObjectiveValueMethod, ast.ValuesMethod:
 		default:
-			return nil, fmt.Errorf("unrecognized method: %s.%s", s.Receiver, s.Method)
+			tb.Fatalf("unrecognized method: %s.%s", stmt.Receiver, stmt.Method)
 		}
 	default:
-		return nil, fmt.Errorf("unrecognized reciever: %s", s.Receiver)
+		tb.Fatalf("unrecognized receiver: %s", stmt.Receiver)
 	}
 
-	if s.Enforcement != nil {
-		switch s.Method {
+	if stmt.Enforcement != nil {
+		switch stmt.Method {
 		case ast.BooleanOrMethod, ast.BooleanAndMethod, ast.LinearExprsMethod:
 		case ast.IntervalsMethod:
-			if len(s.Enforcement.Variables) > 1 {
-				return nil, fmt.Errorf("only single enforcement literal supported for %s.%s", s.Receiver, s.Method)
+			if len(stmt.Enforcement.Variables) > 1 {
+				tb.Fatalf("only single enforcement literal supported for %s.%s", stmt.Receiver, stmt.Method)
 			}
 		default:
-			return nil, fmt.Errorf("enforcement clause unsupported for %s.%s", s.Receiver, s.Method)
+			tb.Fatalf("enforcement clause unsupported for %s.%s", stmt.Receiver, stmt.Method)
 		}
 	}
 
-	if s.Argument != nil {
-		switch t := s.Argument.(type) {
+	if stmt.Argument != nil {
+		switch t := stmt.Argument.(type) {
 		case *ast.AssignmentsArgument:
-			switch s.Method {
+
+			switch stmt.Method {
 			case ast.AssignmentsMethod:
 			default:
-				return nil, fmt.Errorf("unexpected type for %s.%s: %T", s.Receiver, s.Method, t)
+				tb.Fatalf("unexpected type for %s.%s: %T", stmt.Receiver, stmt.Method, t)
 			}
 		case *ast.BinaryOpArgument:
-			switch s.Method {
+			switch stmt.Method {
 			case ast.BinaryOpMethod:
 			default:
-				return nil, fmt.Errorf("unexpected type for %s.%s: %T", s.Receiver, s.Method, t)
+				tb.Fatalf("unexpected type for %s.%s: %T", stmt.Receiver, stmt.Method, t)
 			}
 		case *ast.ConstantsArgument:
-			switch s.Method {
+			switch stmt.Method {
 			case ast.ConstantsMethod:
 			default:
-				return nil, fmt.Errorf("unexpected type for %s.%s: %T", s.Receiver, s.Method, t)
+				tb.Fatalf("unexpected type for %s.%s: %T", stmt.Receiver, stmt.Method, t)
 			}
 		case *ast.CumulativeArgument:
-			switch s.Method {
+			switch stmt.Method {
 			case ast.CumulativeMethod:
 			default:
-				return nil, fmt.Errorf("unexpected type for %s.%s: %T", s.Receiver, s.Method, t)
+				tb.Fatalf("unexpected type for %s.%s: %T", stmt.Receiver, stmt.Method, t)
 			}
 		case *ast.DomainArgument:
-			switch s.Method {
+			switch stmt.Method {
 			case ast.VarsMethod, ast.LinearExprsMethod:
 			default:
-				return nil, fmt.Errorf("unexpected type for %s.%s: %T", s.Receiver, s.Method, t)
+				tb.Fatalf("unexpected type for %s.%s: %T", stmt.Receiver, stmt.Method, t)
 			}
 		case *ast.ElementArgument:
-			switch s.Method {
+			switch stmt.Method {
 			case ast.ElementMethod:
 			default:
-				return nil, fmt.Errorf("unexpected type for %s.%s: %T", s.Receiver, s.Method, t)
+				tb.Fatalf("unexpected type for %s.%s: %T", stmt.Receiver, stmt.Method, t)
 			}
 		case *ast.ImplicationArgument:
-			switch s.Method {
+			switch stmt.Method {
 			case ast.ImplicationMethod:
 			default:
-				return nil, fmt.Errorf("unexpected type for %s.%s: %T", s.Receiver, s.Method, t)
+				tb.Fatalf("unexpected type for %s.%s: %T", stmt.Receiver, stmt.Method, t)
 			}
 		case *ast.IntervalsArgument:
-			switch s.Method {
+			switch stmt.Method {
 			case ast.IntervalsMethod:
 			default:
-				return nil, fmt.Errorf("unexpected type for %s.%s: %T", s.Receiver, s.Method, t)
+				tb.Fatalf("unexpected type for %s.%s: %T", stmt.Receiver, stmt.Method, t)
 			}
 		case *ast.KArgument:
-			switch s.Method {
+			switch stmt.Method {
 			case ast.AtMostKMethod, ast.AtLeastKMethod, ast.ExactlyKMethod:
 			default:
-				return nil, fmt.Errorf("unexpected type for %s.%s: %T", s.Receiver, s.Method, t)
+				tb.Fatalf("unexpected type for %s.%s: %T", stmt.Receiver, stmt.Method, t)
 			}
 		case *ast.LinearEqualityArgument:
-			switch s.Method {
+			switch stmt.Method {
 			case ast.EqualityMethod:
 			default:
-				return nil, fmt.Errorf("unexpected type for %s.%s: %T", s.Receiver, s.Method, t)
+				tb.Fatalf("unexpected type for %s.%s: %T", stmt.Receiver, stmt.Method, t)
 			}
 		case *ast.LinearExprsArgument:
-			switch s.Method {
+			switch stmt.Method {
 			case ast.MaximizeMethod, ast.MinimizeMethod:
 			default:
-				return nil, fmt.Errorf("unexpected type for %s.%s: %T", s.Receiver, s.Method, t)
+				tb.Fatalf("unexpected type for %s.%s: %T", stmt.Receiver, stmt.Method, t)
 			}
 		case *ast.NonOverlapping2DArgument:
-			switch s.Method {
+			switch stmt.Method {
 			case ast.NonOverlapping2DMethod:
 			default:
-				return nil, fmt.Errorf("unexpected type for %s.%s: %T", s.Receiver, s.Method, t)
+				tb.Fatalf("unexpected type for %s.%s: %T", stmt.Receiver, stmt.Method, t)
 			}
 		case *ast.VariableEqualityArgument:
-			switch s.Method {
+			switch stmt.Method {
 			case ast.EqualityMethod:
 			default:
-				return nil, fmt.Errorf("unexpected type for %s.%s: %T", s.Receiver, s.Method, t)
+				tb.Fatalf("unexpected type for %s.%s: %T", stmt.Receiver, stmt.Method, t)
 			}
 		case *ast.VariablesArgument:
-			switch s.Method {
+			switch stmt.Method {
 			case ast.AllDifferentMethod, ast.AllSameMethod,
 				ast.BooleanAndMethod, ast.BooleanOrMethod, ast.BooleanXorMethod,
-				ast.BooleansMethod, ast.LiteralsMethod, ast.NameMethod,
+				ast.BoolsMethod, ast.LiteralsMethod, ast.NameMethod,
 				ast.NonOverlappingMethod, ast.ValuesMethod:
 			case ast.MaximizeMethod, ast.MinimizeMethod:
 				// There's ambiguity in the grammar, and we give precedence to
 				// VariablesArgument during parsing. Let's fix up here.
-				s.Argument = t.AsLinearExprsArgument()
+				stmt.Argument = t.AsLinearExprsArgument()
 			default:
-				return nil, fmt.Errorf("unexpected type for %s.%s: %T", s.Receiver, s.Method, t)
+				tb.Fatalf("unexpected type for %s.%s: %T", stmt.Receiver, stmt.Method, t)
 			}
 		default:
-			return nil, fmt.Errorf("unrecognized type: %T", t)
+			tb.Fatalf("unrecognized type: %T", t)
 		}
 	}
 
-	return s, nil
+	return stmt
 }

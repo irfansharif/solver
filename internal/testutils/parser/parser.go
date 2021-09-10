@@ -20,388 +20,257 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"testing"
 
 	"github.com/irfansharif/solver/internal/testutils/parser/ast"
 	"github.com/irfansharif/solver/internal/testutils/parser/lexer"
 	"github.com/irfansharif/solver/internal/testutils/parser/token"
+	"github.com/stretchr/testify/require"
 )
 
 // Parser exposes a set of parsing primitives to process the datadriven tests.
 type Parser struct {
-	l   *lexer.Lexer
-	cur token.Token
+	lexer *lexer.Lexer
+	cur   token.Token
+
+	tb     testing.TB
+	trying bool // whether we're currently under a try closure
+	failed bool // whether the try closure has failed
 }
 
 // New initializes a new parser for the given input.
-func New(s string) *Parser {
-	p := &Parser{l: lexer.New(s)}
-	p.cur = p.l.Next() // stage cur
+func New(tb testing.TB, input string) *Parser {
+	p := &Parser{tb: tb, lexer: lexer.New(input)}
+	p.cur = p.lexer.Next() // stage the current token
 	return p
 }
 
-// XXX: Use testing.T throughout instead?
-
-// ------------------------------- TOKEN TYPES.
+// ---------------------------------------------------------------- Token types.
 
 // Digits = Digit { Digit } .
-func (p *Parser) Digits() (int, error) {
-	val := p.cur.Value
-	if err := p.eat(token.DIGITS); err != nil {
-		return 0, err
-	}
-
-	return strconv.Atoi(val)
+func (p *Parser) Digits() int {
+	digits := p.cur.Value
+	p.eat(token.DIGITS)
+	n, err := strconv.Atoi(digits)
+	require.Nil(p, err)
+	return n
 }
 
 // Word = Letter { Letter } .
-func (p *Parser) Word() (string, error) {
-	result := p.cur.Value
-	if err := p.eat(token.WORD); err != nil {
-		return "", err
-	}
-	return result, nil
+func (p *Parser) Word() string {
+	word := p.cur.Value
+	p.eat(token.WORD)
+	return word
 }
 
 // Boolean = "true" | "false" .
-func (p *Parser) Boolean() (bool, error) {
-	val := p.cur.Value
-	if err := p.eat(token.BOOL); err != nil {
-		return false, err
-	}
-	return strconv.ParseBool(val)
+func (p *Parser) Boolean() bool {
+	boolean := p.cur.Value
+	p.eat(token.BOOL)
+	b, err := strconv.ParseBool(boolean)
+	require.Nil(p, err)
+	return b
 }
 
-// ------------------------------- BASE TYPES.
+// ----------------------------------------------------------------- Base types.
 
 // Identifier = Word .
-func (p *Parser) Identifier() (string, error) {
+func (p *Parser) Identifier() string {
 	return p.Word()
 }
 
 // Number = [ "-" ] Digits .
-func (p *Parser) Number() (int, error) {
-	negative := p.cur.Type == token.MINUS
+func (p *Parser) Number() int {
+	negative := p.match(token.MINUS)
 	if negative {
-		_ = p.eat(token.MINUS)
+		p.eat(token.MINUS)
 	}
 
-	number, err := p.Digits()
-	if err != nil {
-		return 0, err
-	}
+	number := p.Digits()
 	if negative {
 		number *= -1
 	}
-	return number, nil
+	return number
 }
 
 // Domain = "[" Number "," Number "]" .
-func (p *Parser) Domain() (*ast.Domain, error) {
+func (p *Parser) Domain() *ast.Domain {
 	domain := &ast.Domain{}
-	var err error
-	if err = p.eat(token.LBRACKET); err != nil {
-		return nil, err
-	}
-	if domain.LowerBound, err = p.Number(); err != nil {
-		return nil, err
-	}
-	if err = p.eat(token.COMMA); err != nil {
-		return nil, err
-	}
-	if domain.UpperBound, err = p.Number(); err != nil {
-		return nil, err
-	}
-	if err = p.eat(token.RBRACKET); err != nil {
-		return nil, err
-	}
-	return domain, nil
+	p.eat(token.LBRACKET)
+	domain.LowerBound = p.Number()
+	p.eat(token.COMMA)
+	domain.UpperBound = p.Number()
+	p.eat(token.RBRACKET)
+	return domain
 }
 
 // Variable = Identifier | Letter "to" Letter .
-func (p *Parser) Variable() (string, error) {
-	var out strings.Builder
-	first, err := p.Identifier()
-	if err != nil {
-		return "", err
+func (p *Parser) Variable() string {
+	first := p.Identifier()
+	if !p.match(token.TO) {
+		return first
 	}
-	out.WriteString(first)
-
-	if p.cur.Type != token.TO {
-		return out.String(), nil
-	}
-
-	out.WriteString(" to ")
-	_ = p.eat(token.TO)
-
-	second, err := p.Identifier()
-	if err != nil {
-		return "", err
-	}
-	out.WriteString(second)
-
-	if len(first) != 1 {
-		return "", fmt.Errorf("expected single letter, got %s", first)
-	}
-	if len(second) != 1 {
-		return "", fmt.Errorf("expected single letter, got %s", second)
-	}
-	return out.String(), nil
+	p.eat(token.TO)
+	second := p.Identifier()
+	require.Lenf(p, first, 1, "expected single letter, got %s", first)
+	require.Lenf(p, second, 1, "expected single letter, got %s", second)
+	return fmt.Sprintf("%s to %s", first, second)
 }
 
 // Interval = Identifier "as" "[" Identifier "," Identifier "|" Identifier "]" .
-func (p *Parser) Interval() (*ast.Interval, error) {
+func (p *Parser) Interval() *ast.Interval {
 	interval := &ast.Interval{}
-	var err error
-	interval.Name, err = p.Identifier()
-	if err != nil {
-		return nil, err
-	}
-
-	if err = p.eat(token.AS); err != nil {
-		return nil, err
-	}
-
-	if err = p.eat(token.LBRACKET); err != nil {
-		return nil, err
-	}
-
-	interval.Start, err = p.Identifier()
-	if err != nil {
-		return nil, err
-	}
-
-	if err = p.eat(token.COMMA); err != nil {
-		return nil, err
-	}
-
-	interval.End, err = p.Identifier()
-	if err != nil {
-		return nil, err
-	}
-
-	if err = p.eat(token.PIPE); err != nil {
-		return nil, err
-	}
-
-	interval.Size, err = p.Identifier()
-	if err != nil {
-		return nil, err
-	}
-
-	if err = p.eat(token.RBRACKET); err != nil {
-		return nil, err
-	}
-
-	return interval, nil
+	interval.Name = p.Identifier()
+	p.eat(token.AS, token.LBRACKET)
+	interval.Start = p.Identifier()
+	p.eat(token.COMMA)
+	interval.End = p.Identifier()
+	p.eat(token.PIPE)
+	interval.Size = p.Identifier()
+	p.eat(token.RBRACKET)
+	return interval
 }
 
 // LinearTerm = { Digits } Identifier | Digits .
-func (p *Parser) LinearTerm() (*ast.LinearTerm, error) {
+func (p *Parser) LinearTerm() *ast.LinearTerm {
 	term := &ast.LinearTerm{}
-	var err error
-	digits := p.try(func() error {
-		term.Coefficient, err = p.Digits()
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-	if !digits {
+
+	var digits int
+	if p.try(func() { digits = p.Digits() }) {
+		term.Coefficient = digits
+	} else {
 		term.Coefficient = 1
-		if term.Variable, err = p.Identifier(); err != nil {
-			return nil, err
-		}
-		return term, nil
+		term.Variable = p.Identifier()
+		return term
 	}
 
-	_ = p.try(func() error {
-		if term.Variable, err = p.Identifier(); err != nil {
-			return err
-		}
-		return nil
-	})
+	var variable string
+	if p.try(func() { variable = p.Identifier() }) {
+		term.Variable = variable
+	}
 
-	return term, nil
+	return term
 }
 
 // LinearExpr = [ "-" ] LinearTerm { ("+" | "-") LinearTerm } | "Σ" "(" Variables ")" .
-func (p *Parser) LinearExpr() (*ast.LinearExpr, error) {
+func (p *Parser) LinearExpr() *ast.LinearExpr {
 	expr := &ast.LinearExpr{}
-	if p.cur.Type == token.SUM {
-		if err := p.eat(token.SUM); err != nil {
-			return nil, err
-		}
-		if err := p.eat(token.LPAREN); err != nil {
-			return nil, err
-		}
-		variables, err := p.Variables()
-		if err != nil {
-			return nil, err
-		}
-		if err := p.eat(token.RPAREN); err != nil {
-			return nil, err
-		}
-
+	if p.match(token.SUM) {
+		p.eat(token.SUM, token.LPAREN)
+		variables := p.Variables()
+		p.eat(token.RPAREN)
 		for _, variable := range variables {
 			expr.LinearTerms = append(expr.LinearTerms, &ast.LinearTerm{
 				Coefficient: 1,
 				Variable:    variable,
 			})
 		}
-		return expr, nil
+		return expr
 	}
 
-	negative := p.cur.Type == token.MINUS
+	negative := p.match(token.MINUS)
 	if negative {
-		_ = p.eat(token.MINUS)
+		p.eat(token.MINUS)
 	}
 
-	term, err := p.LinearTerm()
-	if err != nil {
-		return nil, err
-	}
+	term := p.LinearTerm()
 	if negative {
 		term.Coefficient *= -1
 	}
 	expr.LinearTerms = append(expr.LinearTerms, term)
 
 	for {
-		if p.cur.Type != token.PLUS && p.cur.Type != token.MINUS {
+		if !p.match(token.PLUS, token.MINUS) {
 			break
 		}
 
-		negative = p.cur.Type == token.MINUS
-		_ = p.eat(p.cur.Type)
+		negative = p.match(token.MINUS)
+		p.eat(p.cur.Type)
 
-		term, err = p.LinearTerm()
-		if err != nil {
-			return nil, err
-		}
+		term = p.LinearTerm()
 		if negative {
 			term.Coefficient *= -1
 		}
 		expr.LinearTerms = append(expr.LinearTerms, term)
 	}
 
-	return expr, nil
+	return expr
 }
 
 // IntervalDemand = Identifier ":" Number .
-func (p *Parser) IntervalDemand() (*ast.IntervalDemand, error) {
+func (p *Parser) IntervalDemand() *ast.IntervalDemand {
 	demand := &ast.IntervalDemand{}
-	var err error
-	if demand.Name, err = p.Identifier(); err != nil {
-		return nil, err
-	}
-
-	if err = p.eat(token.COLON); err != nil {
-		return nil, err
-	}
-
-	if demand.Demand, err = p.Number(); err != nil {
-		return nil, err
-	}
-
-	return demand, nil
+	demand.Name = p.Identifier()
+	p.eat(token.COLON)
+	demand.Demand = p.Number()
+	return demand
 }
 
-// ------------------------------- LIST TYPES.
+// ----------------------------------------------------------------- List types.
 
 // Booleans = Boolean { "," Boolean } .
-func (p *Parser) Booleans() ([]bool, error) {
+func (p *Parser) Booleans() []bool {
 	var booleans []bool
-	boolean, err := p.Boolean()
-	if err != nil {
-		return nil, err
-	}
-	booleans = append(booleans, boolean)
+	booleans = append(booleans, p.Boolean())
 
 	for {
-		if p.cur.Type != token.COMMA {
+		if !p.match(token.COMMA) {
 			break
 		}
 
-		_ = p.eat(token.COMMA)
-		boolean, err = p.Boolean()
-		if err != nil {
-			return nil, err
-		}
-		booleans = append(booleans, boolean)
+		p.eat(token.COMMA)
+		booleans = append(booleans, p.Boolean())
 	}
 
-	return booleans, nil
+	return booleans
 }
 
 // Numbers = Number { "," Number } .
-func (p *Parser) Numbers() ([]int, error) {
+func (p *Parser) Numbers() []int {
 	var numbers []int
-	number, err := p.Number()
-	if err != nil {
-		return nil, err
-	}
-	numbers = append(numbers, number)
+	numbers = append(numbers, p.Number())
 
 	for {
-		if p.cur.Type != token.COMMA {
+		if !p.match(token.COMMA) {
 			break
 		}
 
-		_ = p.eat(token.COMMA)
-		number, err = p.Number()
-		if err != nil {
-			return nil, err
-		}
-		numbers = append(numbers, number)
+		p.eat(token.COMMA)
+		numbers = append(numbers, p.Number())
 	}
 
-	return numbers, nil
+	return numbers
 }
 
 // Domains = Domain { "∪" Domain } .
-func (p *Parser) Domains() ([]*ast.Domain, error) {
+func (p *Parser) Domains() []*ast.Domain {
 	var domains []*ast.Domain
-	domain, err := p.Domain()
-	if err != nil {
-		return nil, err
-	}
-	domains = append(domains, domain)
+	domains = append(domains, p.Domain())
 
 	for {
-		if p.cur.Type != token.UNION {
+		if !p.match(token.UNION) {
 			break
 		}
 
-		_ = p.eat(token.UNION)
-		domain, err := p.Domain()
-		if err != nil {
-			return nil, err
-		}
-		domains = append(domains, domain)
+		p.eat(token.UNION)
+		domains = append(domains, p.Domain())
 	}
 
-	return domains, nil
+	return domains
 }
 
 // Variables = Variable { "," Variable } .
-func (p *Parser) Variables() ([]string, error) {
+func (p *Parser) Variables() []string {
 	var variables []string
-	variable, err := p.Variable()
-	if err != nil {
-		return nil, err
-	}
-	variables = append(variables, variable)
+	variables = append(variables, p.Variable())
 
 	for {
-		if p.cur.Type != token.COMMA {
+		if !p.match(token.COMMA) {
 			break
 		}
 
-		_ = p.eat(token.COMMA)
-		variable, err = p.Variable()
-		if err != nil {
-			return nil, err
-		}
-		variables = append(variables, variable)
+		p.eat(token.COMMA)
+		variables = append(variables, p.Variable())
 	}
 
 	var expanded []string
@@ -422,488 +291,273 @@ func (p *Parser) Variables() ([]string, error) {
 		}
 	}
 
-	return expanded, nil
+	return expanded
 }
 
 // Intervals = Interval { "," Interval } .
-func (p *Parser) Intervals() ([]*ast.Interval, error) {
+func (p *Parser) Intervals() []*ast.Interval {
 	var intervals []*ast.Interval
-	interval, err := p.Interval()
-	if err != nil {
-		return nil, err
-	}
-	intervals = append(intervals, interval)
+	intervals = append(intervals, p.Interval())
 
 	for {
-		if p.cur.Type != token.COMMA {
+		if !p.match(token.COMMA) {
 			break
 		}
 
-		_ = p.eat(token.COMMA)
-		interval, err = p.Interval()
-		if err != nil {
-			return nil, err
-		}
-		intervals = append(intervals, interval)
+		p.eat(token.COMMA)
+		intervals = append(intervals, p.Interval())
 	}
 
-	return intervals, nil
+	return intervals
 }
 
 // LinearExprs = LinearExpr { "," LinearExpr } .
-func (p *Parser) LinearExprs() ([]*ast.LinearExpr, error) {
+func (p *Parser) LinearExprs() []*ast.LinearExpr {
 	var exprs []*ast.LinearExpr
-	expr, err := p.LinearExpr()
-	if err != nil {
-		return nil, err
-	}
-	exprs = append(exprs, expr)
+	exprs = append(exprs, p.LinearExpr())
 
 	for {
-		if p.cur.Type != token.COMMA {
+		if !p.match(token.COMMA) {
 			break
 		}
 
-		_ = p.eat(token.COMMA)
-		expr, err = p.LinearExpr()
-		if err != nil {
-			return nil, err
-		}
-		exprs = append(exprs, expr)
+		p.eat(token.COMMA)
+		exprs = append(exprs, p.LinearExpr())
 	}
 
-	return exprs, nil
+	return exprs
 }
 
 // IntervalDemands = IntervalDemand {"," IntervalDemand } .
-func (p *Parser) IntervalDemands() ([]*ast.IntervalDemand, error) {
+func (p *Parser) IntervalDemands() []*ast.IntervalDemand {
 	var demands []*ast.IntervalDemand
-	demand, err := p.IntervalDemand()
-	if err != nil {
-		return nil, err
-	}
-	demands = append(demands, demand)
+	demands = append(demands, p.IntervalDemand())
 
 	for {
-		if p.cur.Type != token.COMMA {
+		if !p.match(token.COMMA) {
 			break
 		}
 
-		_ = p.eat(token.COMMA)
-		demand, err := p.IntervalDemand()
-		if err != nil {
-			return nil, err
-		}
-		demands = append(demands, demand)
+		p.eat(token.COMMA)
+		demands = append(demands, p.IntervalDemand())
 	}
 
-	return demands, nil
+	return demands
 }
 
-// ------------------------------- LIST TYPES.
+// --------------------------------------------------------- List of list types.
 
 // NumbersList = "[" Numbers "]" { "∪" "[" Numbers "]" } .
-func (p *Parser) NumbersList() ([][]int, error) {
-	if err := p.eat(token.LBRACKET); err != nil {
-		return nil, err
-	}
+func (p *Parser) NumbersList() [][]int {
+	p.eat(token.LBRACKET)
 	var array [][]int
-	numbers, err := p.Numbers()
-	if err != nil {
-		return nil, err
-	}
-	array = append(array, numbers)
-	if err = p.eat(token.RBRACKET); err != nil {
-		return nil, err
-	}
+	array = append(array, p.Numbers())
+	p.eat(token.RBRACKET)
 
 	for {
-		if p.cur.Type != token.UNION {
+		if !p.match(token.UNION) {
 			break
 		}
 
-		_ = p.eat(token.UNION)
-
-		if err = p.eat(token.LBRACKET); err != nil {
-			return nil, err
-		}
-		numbers, err = p.Numbers()
-		if err != nil {
-			return nil, err
-		}
-		array = append(array, numbers)
-		if err = p.eat(token.RBRACKET); err != nil {
-			return nil, err
-		}
+		p.eat(token.UNION, token.LBRACKET)
+		array = append(array, p.Numbers())
+		p.eat(token.RBRACKET)
 	}
 
-	return array, nil
+	return array
 }
 
 // BooleansList  = "[" Booleans "]" { "∪" "[" Booleans "]" } .
-func (p *Parser) BooleansList() ([][]bool, error) {
-	if err := p.eat(token.LBRACKET); err != nil {
-		return nil, err
-	}
+func (p *Parser) BooleansList() [][]bool {
+	p.eat(token.LBRACKET)
 	var array [][]bool
-	booleans, err := p.Booleans()
-	if err != nil {
-		return nil, err
-	}
-	array = append(array, booleans)
-	if err = p.eat(token.RBRACKET); err != nil {
-		return nil, err
-	}
-
+	array = append(array, p.Booleans())
+	p.eat(token.RBRACKET)
 	for {
-		if p.cur.Type != token.UNION {
+		if !p.match(token.UNION) {
 			break
 		}
 
-		_ = p.eat(token.UNION)
-
-		if err = p.eat(token.LBRACKET); err != nil {
-			return nil, err
-		}
-		booleans, err = p.Booleans()
-		if err != nil {
-			return nil, err
-		}
-		array = append(array, booleans)
-		if err = p.eat(token.RBRACKET); err != nil {
-			return nil, err
-		}
+		p.eat(token.UNION, token.LBRACKET)
+		array = append(array, p.Booleans())
+		p.eat(token.RBRACKET)
 	}
 
-	return array, nil
+	return array
 }
 
-// ------------------------------- ARGUMENT TYPES.
+// ------------------------------------------------------------- Argument types.
 
 // AssignmentsArgument = "[" Variables "]" ("∈" | "∉") (NumbersList | BooleanList) .
-func (p *Parser) AssignmentsArgument() (ast.Argument, error) {
+func (p *Parser) AssignmentsArgument() ast.Argument {
 	argument := &ast.AssignmentsArgument{}
-	var err error
-	if err = p.eat(token.LBRACKET); err != nil {
-		return nil, err
-	}
-
-	if argument.Variables, err = p.Variables(); err != nil {
-		return nil, err
-	}
-
-	if err = p.eat(token.RBRACKET); err != nil {
-		return nil, err
-	}
-
-	if p.cur.Type != token.EXISTS && p.cur.Type != token.NEXISTS {
-		return nil, fmt.Errorf("expected either %s or %s token, got %q (%s)",
+	p.eat(token.LBRACKET)
+	argument.Variables = p.Variables()
+	p.eat(token.RBRACKET)
+	if !p.match(token.EXISTS, token.NEXISTS) {
+		p.Fatalf("expected either %s or %s token, got %q (%s)",
 			token.EXISTS, token.NEXISTS, p.cur.Value, p.cur.Type)
 	}
-	argument.In = p.cur.Type == token.EXISTS
-	_ = p.eat(p.cur.Type)
+	argument.In = p.match(token.EXISTS)
+	p.eat(p.cur.Type)
 
-	numbers := p.try(func() error {
-		argument.NumbersList, err = p.NumbersList()
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-	if numbers {
-		return argument, nil
+	var numbers [][]int
+	if p.try(func() { numbers = p.NumbersList() }) {
+		argument.AllowedIntVarAssignments = numbers
+		return argument
 	}
 
-	if argument.BooleansList, err = p.BooleansList(); err != nil {
-		return nil, err
-	}
-	return argument, nil
+	argument.AllowedLiteralAssignments = p.BooleansList()
+	return argument
 }
 
 // BinaryOpArgument = Identifier ( "/" | "%" | "*" ) Identifier "==" Identifier .
-func (p *Parser) BinaryOpArgument() (ast.Argument, error) {
+func (p *Parser) BinaryOpArgument() ast.Argument {
 	argument := &ast.BinaryOpArgument{}
-	var err error
-	if argument.Left, err = p.Identifier(); err != nil {
-		return nil, err
-	}
+	argument.Left = p.Identifier()
 
-	if p.cur.Type != token.SLASH && p.cur.Type != token.MOD && p.cur.Type != token.ASTERISK {
-		return nil, fmt.Errorf("expected one of %s, %s, or %s tokens, got %q (%s)",
+	if !p.match(token.SLASH, token.MOD, token.ASTERISK) {
+		p.Fatalf("expected one of %s, %s, or %s tokens, got %q (%s)",
 			token.SLASH, token.MOD, token.ASTERISK, p.cur.Value, p.cur.Type)
 	}
 	argument.Op = p.cur.Value
-	_ = p.eat(p.cur.Type)
-
-	if argument.Right, err = p.Identifier(); err != nil {
-		return nil, err
-	}
-
-	if err = p.eat(token.EQ); err != nil {
-		return nil, err
-	}
-	if argument.Target, err = p.Identifier(); err != nil {
-		return nil, err
-	}
-	return argument, err
+	p.eat(p.cur.Type)
+	argument.Right = p.Identifier()
+	p.eat(token.EQ)
+	argument.Target = p.Identifier()
+	return argument
 }
 
 // ConstantsArgument = Variables "==" Number .
-func (p *Parser) ConstantsArgument() (ast.Argument, error) {
+func (p *Parser) ConstantsArgument() ast.Argument {
 	argument := &ast.ConstantsArgument{}
-	var err error
-	if argument.Variables, err = p.Variables(); err != nil {
-		return nil, err
-	}
-
-	if err = p.eat(token.EQ); err != nil {
-		return nil, err
-	}
-
-	if argument.Constant, err = p.Number(); err != nil {
-		return nil, err
-	}
-	return argument, err
+	argument.Variables = p.Variables()
+	p.eat(token.EQ)
+	argument.Constant = p.Number()
+	return argument
 }
 
 // CumulativeArgument = IntervalDemands "|" Number .
-func (p *Parser) CumulativeArgument() (ast.Argument, error) {
+func (p *Parser) CumulativeArgument() ast.Argument {
 	argument := &ast.CumulativeArgument{}
-	var err error
-	if argument.IntervalDemands, err = p.IntervalDemands(); err != nil {
-		return nil, err
-	}
-
-	if err = p.eat(token.PIPE); err != nil {
-		return nil, err
-	}
-
-	if argument.Capacity, err = p.Number(); err != nil {
-		return nil, err
-	}
-	return argument, err
+	argument.IntervalDemands = p.IntervalDemands()
+	p.eat(token.PIPE)
+	argument.Capacity = p.Number()
+	return argument
 }
 
 // DomainArgument = ( Variables | LinearExprs ) "in" Domains .
-func (p *Parser) DomainArgument() (ast.Argument, error) {
+func (p *Parser) DomainArgument() ast.Argument {
 	argument := &ast.DomainArgument{}
-	var err error
-	variables := p.try(func() error {
-		if argument.Variables, err = p.Variables(); err != nil {
-			return err
-		}
-		return nil
-	})
-	if !variables {
-		if argument.LinearExprs, err = p.LinearExprs(); err != nil {
-			return nil, err
-		}
+
+	var variables []string
+	if p.try(func() { variables = p.Variables() }) {
+		argument.Variables = variables
+	} else {
+		argument.LinearExprs = p.LinearExprs()
 	}
 
-	if err = p.eat(token.IN); err != nil {
-		return nil, err
-	}
-
-	if argument.Domains, err = p.Domains(); err != nil {
-		return nil, err
-	}
-	return argument, err
+	p.eat(token.IN)
+	argument.Domains = p.Domains()
+	return argument
 }
 
 // ElementArgument = Identifier "==" "[" Variables "]" "[" Identifier "]" .
-func (p *Parser) ElementArgument() (ast.Argument, error) {
+func (p *Parser) ElementArgument() ast.Argument {
 	argument := &ast.ElementArgument{}
-	var err error
-	if argument.Target, err = p.Identifier(); err != nil {
-		return nil, err
-	}
-	if err = p.eat(token.EQ); err != nil {
-		return nil, err
-	}
-	if err = p.eat(token.LBRACKET); err != nil {
-		return nil, err
-	}
-	if argument.Variables, err = p.Variables(); err != nil {
-		return nil, err
-	}
-	if err = p.eat(token.RBRACKET); err != nil {
-		return nil, err
-	}
-	if err = p.eat(token.LBRACKET); err != nil {
-		return nil, err
-	}
-	if argument.Index, err = p.Identifier(); err != nil {
-		return nil, err
-	}
-	if err = p.eat(token.RBRACKET); err != nil {
-		return nil, err
-	}
-	return argument, err
+	argument.Target = p.Identifier()
+	p.eat(token.EQ, token.LBRACKET)
+	argument.Variables = p.Variables()
+	p.eat(token.RBRACKET, token.LBRACKET)
+	argument.Index = p.Identifier()
+	p.eat(token.RBRACKET)
+	return argument
 }
 
 // ImplicationArgument = Identifier "→"  Identifier .
-func (p *Parser) ImplicationArgument() (ast.Argument, error) {
+func (p *Parser) ImplicationArgument() ast.Argument {
 	argument := &ast.ImplicationArgument{}
-	var err error
-	if argument.Left, err = p.Identifier(); err != nil {
-		return nil, err
-	}
-
-	if err = p.eat(token.IMPL); err != nil {
-		return nil, err
-	}
-
-	if argument.Right, err = p.Identifier(); err != nil {
-		return nil, err
-	}
-	return argument, err
+	argument.Left = p.Identifier()
+	p.eat(token.IMPL)
+	argument.Right = p.Identifier()
+	return argument
 }
 
 // IntervalsArgument = Intervals .
-func (p *Parser) IntervalsArgument() (ast.Argument, error) {
+func (p *Parser) IntervalsArgument() ast.Argument {
 	argument := &ast.IntervalsArgument{}
-	var err error
-	if argument.Intervals, err = p.Intervals(); err != nil {
-		return nil, err
-	}
-	return argument, nil
+	argument.Intervals = p.Intervals()
+	return argument
 }
 
 // KArgument = Variables "|" Digits .
-func (p *Parser) KArgument() (ast.Argument, error) {
+func (p *Parser) KArgument() ast.Argument {
 	argument := &ast.KArgument{}
-	var err error
-	if argument.Variables, err = p.Variables(); err != nil {
-		return nil, err
-	}
-
-	if err = p.eat(token.PIPE); err != nil {
-		return nil, err
-	}
-
-	if argument.K, err = p.Digits(); err != nil {
-		return nil, err
-	}
-	return argument, err
+	argument.Variables = p.Variables()
+	p.eat(token.PIPE)
+	argument.K = p.Digits()
+	return argument
 }
 
 // LinearEqualityArgument = LinearExpr "==" ("max" | "min") "(" LinearExprs ")" .
-func (p *Parser) LinearEqualityArgument() (ast.Argument, error) {
+func (p *Parser) LinearEqualityArgument() ast.Argument {
 	argument := &ast.LinearEqualityArgument{}
-	var err error
-	if argument.Target, err = p.LinearExpr(); err != nil {
-		return nil, err
-	}
-
-	if err = p.eat(token.EQ); err != nil {
-		return nil, err
-	}
-
-	if p.cur.Type != token.MAX && p.cur.Type != token.MIN {
-		return nil, fmt.Errorf("expected either %s or %s token type, got %q (%s)",
+	argument.Target = p.LinearExpr()
+	p.eat(token.EQ)
+	if !p.match(token.MAX, token.MIN) {
+		p.Fatalf("expected either %s or %s token type, got %q (%s)",
 			token.MAX, token.MIN, p.cur.Value, p.cur.Type)
 	}
 	argument.Op = p.cur.Value
-	_ = p.eat(p.cur.Type)
-
-	if err = p.eat(token.LPAREN); err != nil {
-		return nil, err
-	}
-	if argument.Exprs, err = p.LinearExprs(); err != nil {
-		return nil, err
-	}
-	if err = p.eat(token.RPAREN); err != nil {
-		return nil, err
-	}
-	return argument, nil
+	p.eat(p.cur.Type, token.LPAREN)
+	argument.Exprs = p.LinearExprs()
+	p.eat(token.RPAREN)
+	return argument
 }
 
 // LinearExprsArgument = LinearExprs .
-func (p *Parser) LinearExprsArgument() (ast.Argument, error) {
+func (p *Parser) LinearExprsArgument() ast.Argument {
 	argument := &ast.LinearExprsArgument{}
-	var err error
-	if argument.Exprs, err = p.LinearExprs(); err != nil {
-		return nil, err
-	}
-	return argument, nil
+	argument.Exprs = p.LinearExprs()
+	return argument
 }
 
 // NonOverlapping2DArgument = "[" Variables "]" "," "[" Variables "]" "," Boolean .
-func (p *Parser) NonOverlapping2DArgument() (ast.Argument, error) {
+func (p *Parser) NonOverlapping2DArgument() ast.Argument {
 	argument := &ast.NonOverlapping2DArgument{}
-	var err error
-	if err = p.eat(token.LBRACKET); err != nil {
-		return nil, err
-	}
-	if argument.XVariables, err = p.Variables(); err != nil {
-		return nil, err
-	}
-	if err = p.eat(token.RBRACKET); err != nil {
-		return nil, err
-	}
-	if err = p.eat(token.COMMA); err != nil {
-		return nil, err
-	}
-	if err = p.eat(token.LBRACKET); err != nil {
-		return nil, err
-	}
-	if argument.YVariables, err = p.Variables(); err != nil {
-		return nil, err
-	}
-	if err = p.eat(token.RBRACKET); err != nil {
-		return nil, err
-	}
-	if err = p.eat(token.COMMA); err != nil {
-		return nil, err
-	}
-	if argument.BoxesWithNoAreaCanOverlap, err = p.Boolean(); err != nil {
-		return nil, err
-	}
-	return argument, nil
+	p.eat(token.LBRACKET)
+	argument.XVariables = p.Variables()
+	p.eat(token.RBRACKET, token.COMMA, token.LBRACKET)
+	argument.YVariables = p.Variables()
+	p.eat(token.RBRACKET, token.COMMA)
+	argument.BoxesWithNoAreaCanOverlap = p.Boolean()
+	return argument
 }
 
 // VariableEqualityArgument = Identifier "==" ("max" | "min" ) "(" Variables ")" .
-func (p *Parser) VariableEqualityArgument() (ast.Argument, error) {
+func (p *Parser) VariableEqualityArgument() ast.Argument {
 	argument := &ast.VariableEqualityArgument{}
-	var err error
-	if argument.Target, err = p.Identifier(); err != nil {
-		return nil, err
-	}
-
-	if err = p.eat(token.EQ); err != nil {
-		return nil, err
-	}
-
-	if p.cur.Type != token.MAX && p.cur.Type != token.MIN {
-		return nil, fmt.Errorf("expected either %s or %s token type, got %q (%s)",
+	argument.Target = p.Identifier()
+	p.eat(token.EQ)
+	if !p.match(token.MAX, token.MIN) {
+		p.Fatalf("expected either %s or %s token type, got %q (%s)",
 			token.MAX, token.MIN, p.cur.Value, p.cur.Type)
 	}
 	argument.Op = p.cur.Value
-	_ = p.eat(p.cur.Type)
-
-	if err = p.eat(token.LPAREN); err != nil {
-		return nil, err
-	}
-	if argument.Variables, err = p.Variables(); err != nil {
-		return nil, err
-	}
-	if err = p.eat(token.RPAREN); err != nil {
-		return nil, err
-	}
-	return argument, nil
+	p.eat(p.cur.Type, token.LPAREN)
+	argument.Variables = p.Variables()
+	p.eat(token.RPAREN)
+	return argument
 }
 
 // VariablesArgument = Variables .
-func (p *Parser) VariablesArgument() (ast.Argument, error) {
+func (p *Parser) VariablesArgument() ast.Argument {
 	argument := &ast.VariablesArgument{}
-	var err error
-	if argument.Variables, err = p.Variables(); err != nil {
-		return nil, err
-	}
-	return argument, nil
+	argument.Variables = p.Variables()
+	return argument
 }
 
-// ------------------------------- STATEMENT COMPONENTS.
+// -------------------------------------------------- Statement component types.
 
 // Argument = AssignmentsArgument
 //          | BinaryOpArgument
@@ -919,8 +573,8 @@ func (p *Parser) VariablesArgument() (ast.Argument, error) {
 //          | NonOverlapping2DArgument
 //          | VariableEqualityArgument
 //          | VariablesArgument .
-func (p *Parser) Argument() (ast.Argument, error) {
-	fns := []func() (ast.Argument, error){
+func (p *Parser) Argument() ast.Argument {
+	fns := []func() ast.Argument{
 		p.AssignmentsArgument,
 		p.BinaryOpArgument,
 		p.ConstantsArgument,
@@ -934,139 +588,169 @@ func (p *Parser) Argument() (ast.Argument, error) {
 		p.NonOverlapping2DArgument,
 		p.VariableEqualityArgument,
 
-		p.VariablesArgument, // there's ambiguity: give precedence to parsing variables argument
+		p.VariablesArgument, // there's ambiguity; give precedence to parsing variables argument
 		p.LinearExprsArgument,
 	}
 
 	for _, fn := range fns {
 		var argument ast.Argument
-		var err error
-		if found := p.try(func() error {
-			argument, err = fn()
-			if err != nil {
-				return err
+		if p.try(func() {
+			argument = fn()
+			if !p.match(token.RPAREN) {
+				p.Fatalf("expected %s token, got %s (value=%q)",
+					token.RPAREN.String(), p.cur.Type.String(), p.cur.Value)
 			}
-
-			if p.cur.Type != token.RPAREN {
-				return fmt.Errorf("expected %s token, got %q (%s)", token.RPAREN, p.cur.Value, p.cur.Type)
-			}
-			return nil
-		}); found {
-			return argument, nil
+		}) {
+			return argument
 		}
 	}
 
-	return nil, fmt.Errorf("expected to match an argument type")
+	p.Fatal("expected to match an argument type")
+	return nil
 }
 
 // Receiver = Identifier .
-func (p *Parser) Receiver() (string, error) {
+func (p *Parser) Receiver() string {
 	return p.Identifier()
 }
 
 // Method = Identifier { "-" | Identifier | Digits } .
-func (p *Parser) Method() (ast.Method, error) {
+func (p *Parser) Method() ast.Method {
 	var out strings.Builder
-	identifier, err := p.Identifier()
-	if err != nil {
-		return ast.Unrecognized, err
-	}
+	identifier := p.Identifier()
 	out.WriteString(identifier)
 
-	for p.cur.Type == token.MINUS || p.cur.Type == token.WORD || p.cur.Type == token.DIGITS {
+	for p.match(token.MINUS, token.WORD, token.DIGITS) {
 		out.WriteString(p.cur.Value)
-		_ = p.eat(p.cur.Type)
+		p.eat(p.cur.Type)
 	}
 
-	method, ok := ast.LookupMethod(out.String())
-	if !ok {
-		return ast.Unrecognized, fmt.Errorf("unrecognized method: %s", out.String())
-	}
-	return method, nil
+	methodStr := out.String()
+	method, ok := ast.LookupMethod(methodStr)
+	require.Truef(p, ok, "unrecognized method: %s", methodStr)
+	return method
 }
 
 // Enforcement = "if" Variables .
-func (p *Parser) Enforcement() (*ast.Enforcement, error) {
-	var err error
-	if err = p.eat(token.IF); err != nil {
-		return nil, err
-	}
-
+func (p *Parser) Enforcement() *ast.Enforcement {
+	p.eat(token.IF)
 	enforcement := &ast.Enforcement{}
-	if enforcement.Variables, err = p.Variables(); err != nil {
-		return nil, err
-	}
-
-	return enforcement, nil
+	enforcement.Variables = p.Variables()
+	return enforcement
 }
 
 // Statement = Receiver "." Method "(" [ Argument ] ")" [ Enforcement ] .
-func (p *Parser) Statement() (*ast.Statement, error) {
+func (p *Parser) Statement() *ast.Statement {
 	stmt := &ast.Statement{}
-
-	var err error
-	if stmt.Receiver, err = p.Receiver(); err != nil {
-		return nil, err
+	stmt.Receiver = p.Receiver()
+	p.eat(token.DOT)
+	stmt.Method = p.Method()
+	p.eat(token.LPAREN)
+	if !p.match(token.RPAREN) {
+		stmt.Argument = p.Argument()
 	}
-
-	if err = p.eat(token.DOT); err != nil {
-		return nil, err
+	p.eat(token.RPAREN)
+	if !p.match(token.EOF) {
+		stmt.Enforcement = p.Enforcement()
 	}
-
-	if stmt.Method, err = p.Method(); err != nil {
-		return nil, err
-	}
-
-	if err = p.eat(token.LPAREN); err != nil {
-		return nil, err
-	}
-
-	if p.cur.Type != token.RPAREN {
-		if stmt.Argument, err = p.Argument(); err != nil {
-			return nil, err
-		}
-	}
-
-	if err = p.eat(token.RPAREN); err != nil {
-		return nil, err
-	}
-
-	if p.cur.Type != token.EOF {
-		if stmt.Enforcement, err = p.Enforcement(); err != nil {
-			return nil, err
-		}
-	}
-
-	if err = p.eat(token.EOF); err != nil {
-		return nil, err
-	}
-	return stmt, nil
-}
-
-// try executes the given closure, and if an error is returned, resets the
-// underlying cursors to their original states.
-func (p *Parser) try(f func() error) bool {
-	idx, cur := p.l.Index(), p.cur
-	if err := f(); err != nil {
-		p.l.Reposition(idx)
-		p.cur = cur
-		return false
-	}
-	return true
+	p.eat(token.EOF)
+	return stmt
 }
 
 // EOF returns true if we're at the end of the input.
 func (p *Parser) EOF() bool {
-	return p.cur.Type == token.EOF
+	return p.match(token.EOF)
 }
 
-// eat asserts that the current token is of the given type and moves and cursor
-// over to the next token.
-func (p *Parser) eat(t token.Type) error {
-	if p.cur.Type != t {
-		return fmt.Errorf("expected %s token, got %q (%s)", t, p.cur.Value, p.cur.Type)
+// try attempts to parse using the given closure; if it fails, it resets the
+// underlying cursors to their original states. The returned boolean indicates
+// whether the parsing attempt was successful. It's invalid to use state from
+// the closure if the attempt failed.
+func (p *Parser) try(parse func()) (success bool) {
+	idx, cur := p.lexer.Index(), p.cur
+	trying, failed := p.trying, p.failed
+	defer func() {
+		p.trying, p.failed = trying, failed
+		if !success {
+			p.lexer.Reposition(idx)
+			p.cur = cur
+		}
+	}()
+
+	p.trying, p.failed = true, false
+	parse()
+	return !p.failed
+}
+
+// eat asserts that the current and subsequent tokens are of the given types,
+// consuming them as it does. It moves the cursor over past the last token.
+func (p *Parser) eat(ts ...token.Type) {
+	for _, t := range ts {
+		require.Truef(p, p.match(t), "expected %s token, got %s (value=%s)", t.String(), p.cur.Type.String(), p.cur.Value)
+		p.cur = p.lexer.Next()
+	}
+}
+
+// match returns whether the current token is one of the given types.
+func (p *Parser) match(ts ...token.Type) bool {
+	match := false
+	for _, t := range ts {
+		match = match || p.cur.Type == t
+	}
+	return match
+}
+
+// testingT is n wrapper around testing.T; it's used by the parser to collect
+// intercept parsing errors with arbitrary look-ahead.
+type testingT interface {
+	Errorf(format string, args ...interface{})
+	Fatalf(format string, args ...interface{})
+	Fatal(args ...interface{})
+	Fail()
+	FailNow()
+}
+
+var _ testingT = &Parser{}
+
+// Errorf is parting of the testingT interface.
+func (p *Parser) Errorf(format string, args ...interface{}) {
+	if !p.trying {
+		p.tb.Logf(format, args...)
+	}
+	p.Fail()
+}
+
+// Fatalf is parting of the testingT interface.
+func (p *Parser) Fatalf(format string, args ...interface{}) {
+	if !p.trying {
+		p.tb.Logf(format, args...)
+	}
+	p.FailNow()
+}
+
+// Fatal is parting of the testingT interface.
+func (p *Parser) Fatal(args ...interface{}) {
+	if !p.trying {
+		p.tb.Log(args...)
+	}
+	p.FailNow()
+}
+
+// Fail is parting of the testingT interface.
+func (p *Parser) Fail() {
+	if p.trying {
+		p.failed = true
+		return
 	}
 
-	p.cur = p.l.Next()
-	return nil
+	p.tb.Fail()
+}
+
+// FailNow is parting of the testingT interface.
+func (p *Parser) FailNow() {
+	if p.trying {
+		p.failed = true
+		return
+	}
+	p.tb.FailNow()
 }

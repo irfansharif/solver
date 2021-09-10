@@ -25,7 +25,21 @@ func BuiltWithBazel() bool {
 	return false
 }
 
-// WritableSandboxPathFor is not implemented.
+// WritableSandboxPathFor returns a writable path for a given path in the source
+// tree. It also returns a callback to copy over the contents of the writable
+// path back into the source tree (`--sandbox_writable_path` is expected to have
+// been declared over it).
 func WritableSandboxPathFor(t *testing.T, pkg, path string) (writable string, implant func()) {
+	panic("not built with Bazel")
+}
+
+// WorkspacePath returns the path of the bazel workspace.
+func WorkspacePath(t *testing.T) string {
+	panic("not built with Bazel")
+}
+
+// ScratchDirectory returns the path of the scratch directory in the bazel
+// sandbox.
+func ScratchDirectory(t *testing.T) string {
 	panic("not built with Bazel")
 }

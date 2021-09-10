@@ -1,11 +1,11 @@
-Digit  = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" .
-Digits = Digit { Digit } .
-Letter = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L"
-       | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X"
-       | "Y" | "Z" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j"
-       | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v"
-       | "w" | "x" | "y" | "z" .
-Word   = Letter { Letter } .
+Digit    = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" .
+Digits   = Digit { Digit } .
+Letter   = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L"
+         | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X"
+         | "Y" | "Z" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j"
+         | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v"
+         | "w" | "x" | "y" | "z" .
+Word     = Letter { Letter } .
 Boolean  = "true" | "false" .
 
 Identifier     = Word .
@@ -13,7 +13,7 @@ Number         = [ "-" ] Digits .
 Domain         = "[" Number "," Number "]" .
 Variable       = Identifier | Letter "to" Letter .
 Interval       = Identifier "as" "[" Identifier "," Identifier "|" Identifier "]" .
-LinearTerm     = { Digits } Identifier | Digits .
+LinearTerm     = ( [ Digits ] Identifier ) | Digits .
 LinearExpr     = [ "-" ] LinearTerm { ( "+" | "-" ) LinearTerm } | "Σ" "(" Variables ")" .
 IntervalDemand = Identifier ":" Number .
 
@@ -38,7 +38,7 @@ ImplicationArgument      = Identifier "→"  Identifier .
 IntervalsArgument        = Intervals .
 KArgument                = Variables "|" Digits .
 LinearEqualityArgument   = LinearExpr "==" ( "max" | "min" ) "(" LinearExprs ")" .
-LinearExprsArgument       = LinearExprs .
+LinearExprsArgument      = LinearExprs .
 NonOverlapping2DArgument = "[" Variables "]" "," "[" Variables "]" "," Boolean .
 VariableEqualityArgument = Identifier "==" ( "max" | "min" ) "(" Variables ")" .
 VariablesArgument        = Variables .

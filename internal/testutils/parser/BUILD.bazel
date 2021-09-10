@@ -9,6 +9,7 @@ go_library(
         "//internal/testutils/parser/ast",
         "//internal/testutils/parser/lexer",
         "//internal/testutils/parser/token",
+        "@com_github_stretchr_testify//require",
     ],
 )
 
@@ -19,8 +20,8 @@ go_test(
         "testdata/**",
         "grammar.ebnf",
     ]),
-    embed = [":parser"],
     deps = [
+        ":parser",
         "//internal/testutils/bazel",
         "//internal/testutils/parser/ast",
         "@com_github_cockroachdb_datadriven//:datadriven",

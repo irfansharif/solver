@@ -194,11 +194,6 @@ a / b == c
 a / b == c
 
 binary-op-argument
-a → b == c
-----
-err: expected one of SLASH, MOD, or ASTERISK tokens, got "→" (IMPL)
-
-binary-op-argument
 a % b == c
 ----
 a % b == c

@@ -40,7 +40,7 @@ type Literal interface {
 	// than two literals with a model constraint xor-ing them together.
 	Not() Literal
 
-	// isNegated returns true if the literal is negation.
+	// isNegated returns true if the literal is negated.
 	isNegated() bool
 }
 
@@ -76,7 +76,7 @@ func (i *intVar) String() string {
 	} else if i.isConst {
 		domainStr = fmt.Sprintf(" == %d", i.domain.list(0)[0])
 	} else {
-		domainStr = fmt.Sprintf(" ∈ %s", i.domain.String())
+		domainStr = fmt.Sprintf(" in %s", i.domain.String())
 	}
 
 	return fmt.Sprintf("%s%s", i.name(), domainStr)

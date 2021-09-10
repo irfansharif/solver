@@ -50,8 +50,8 @@ type AssignmentsArgument struct {
 	Variables []string
 	In        bool
 
-	BooleansList [][]bool // either-or
-	NumbersList  [][]int
+	AllowedLiteralAssignments [][]bool // either-or
+	AllowedIntVarAssignments  [][]int
 }
 
 func (a *AssignmentsArgument) String() string {
@@ -65,8 +65,8 @@ func (a *AssignmentsArgument) String() string {
 		out.WriteString(" ∉ ")
 	}
 
-	if len(a.NumbersList) != 0 {
-		for i, arr := range a.NumbersList {
+	if len(a.AllowedIntVarAssignments) != 0 {
+		for i, arr := range a.AllowedIntVarAssignments {
 			if i != 0 {
 				out.WriteString(" ∪ ")
 			}
@@ -78,7 +78,7 @@ func (a *AssignmentsArgument) String() string {
 			out.WriteString(fmt.Sprintf("[%s]", strings.Join(inner, ", ")))
 		}
 	} else {
-		for i, arr := range a.BooleansList {
+		for i, arr := range a.AllowedLiteralAssignments {
 			if i != 0 {
 				out.WriteString(" ∪ ")
 			}
@@ -90,6 +90,34 @@ func (a *AssignmentsArgument) String() string {
 		}
 	}
 	return out.String()
+}
+
+// ForLiterals returns true iff this argument refers to literals.
+func (a *AssignmentsArgument) ForLiterals() bool {
+	return len(a.AllowedLiteralAssignments) != 0
+}
+
+// ForIntVars returns true iff this argument refers to int vars.
+func (a *AssignmentsArgument) ForIntVars() bool {
+	return !a.ForLiterals()
+}
+
+// AsInt64s converts the underlying assignments int matrix to a matrix of
+// int64s.
+func (a *AssignmentsArgument) AsInt64s() [][]int64 {
+	if !a.ForIntVars() {
+		panic("not for int vars")
+	}
+
+	var assignments [][]int64
+	for _, assignment := range a.AllowedIntVarAssignments {
+		var conv []int64
+		for _, v := range assignment {
+			conv = append(conv, int64(v))
+		}
+		assignments = append(assignments, conv)
+	}
+	return assignments
 }
 
 // BinaryOpArgument represents a binary operation argument: a * b == c.

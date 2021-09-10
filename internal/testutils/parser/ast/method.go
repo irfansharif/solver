@@ -28,17 +28,14 @@ const (
 	BooleanAndMethod
 	BooleanOrMethod
 	BooleanXorMethod
-	BooleansMethod
+	BoolsMethod
 	ConstantsMethod
 	CumulativeMethod
 	ElementMethod
 	EqualityMethod
 	ExactlyKMethod
-	FeasibleMethod
 	ImplicationMethod
-	InfeasibleMethod
 	IntervalsMethod
-	InvalidMethod
 	LinearExprsMethod
 	LiteralsMethod
 	MaximizeMethod
@@ -47,7 +44,6 @@ const (
 	NonOverlappingMethod
 	NonOverlapping2DMethod
 	ObjectiveValueMethod
-	OptimalMethod
 	PrintMethod
 	SolveMethod
 	SolveAllMethod
@@ -66,17 +62,14 @@ var methods = map[Method]string{
 	BooleanAndMethod:       "boolean-and",
 	BooleanOrMethod:        "boolean-or",
 	BooleanXorMethod:       "boolean-xor",
-	BooleansMethod:         "booleans",
+	BoolsMethod:            "bools",
 	ConstantsMethod:        "constants",
 	CumulativeMethod:       "cumulative",
 	ElementMethod:          "element",
 	EqualityMethod:         "equality",
 	ExactlyKMethod:         "exactly-k",
-	FeasibleMethod:         "feasible",
 	ImplicationMethod:      "implication",
-	InfeasibleMethod:       "infeasible",
 	IntervalsMethod:        "intervals",
-	InvalidMethod:          "invalid",
 	LinearExprsMethod:      "linear-exprs",
 	LiteralsMethod:         "literals",
 	MaximizeMethod:         "maximize",
@@ -85,7 +78,6 @@ var methods = map[Method]string{
 	NonOverlappingMethod:   "non-overlapping",
 	NonOverlapping2DMethod: "non-overlapping-2D",
 	ObjectiveValueMethod:   "objective-value",
-	OptimalMethod:          "optimal",
 	PrintMethod:            "print",
 	SolveMethod:            "solve",
 	SolveAllMethod:         "solve-all",
