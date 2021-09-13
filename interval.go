@@ -23,12 +23,14 @@ import (
 
 // Interval represents an interval parameterized by a start, end, and
 // size. When added to a model, it automatically enforces the following
-// relation:
+// properties:
 //
 //      start + size == end
+//      size >= 0
 //
 // It can be used to define interval-based constraints. Constraints differ in how
-// they interpret zero-sized intervals, and whether the end is exclusive.
+// they interpret zero-sized intervals and whether the end is considered
+// exclusive.
 type Interval interface {
 	Constraint
 

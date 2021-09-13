@@ -3,11 +3,11 @@ OR-Tools for Go
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/irfansharif/solver.svg)](https://godocs.io/github.com/irfansharif/solver)
 
-
 This project contains a cgo-based API for using Google's [Operations Research
 Tools](https://developers.google.com/optimization/). It exposes a high-level
 package for the [CP-SAT
-Solver](https://developers.google.com/optimization/cp/cp_solver).
+Solver](https://developers.google.com/optimization/cp/cp_solver), targeting the
+[v9.0](https://github.com/google/or-tools/releases/tag/v9.0) release.
 
 ### Examples
 
@@ -99,10 +99,11 @@ d := model.NewLiteral("d")
 e := model.NewLiteral("e")
 f := model.NewLiteral("f")
 
-and := NewBooleanAndConstraint(a, b) // a && b
-or := NewBooleanOrConstraint(c, d)   // c || d
-xor := NewBooleanXorConstraint(e, f) // e != f
-model.AddConstraints(and, or, xor)
+model.AddConstraints(
+  NewBooleanAndConstraint(a, b), // a && b
+  NewBooleanOrConstraint(c, d),  // c || d
+  NewBooleanXorConstraint(e, f), // e != f
+)
 
 result := model.Solve()
 require.True(t, result.Optimal(), "expected solver to find solution")
@@ -121,7 +122,8 @@ require.True(t, result.Optimal(), "expected solver to find solution")
 }
 ```
 
-For more, look through the package tests.
+For more, look through the package tests and the
+[docs](https://godocs.io/github.com/irfansharif/solver).
 
 ### Contributing
 
@@ -130,9 +132,10 @@ be found under `internal/`. SWIG generated code is ugly and difficult to work
 with; a sanitized API is exposed via the top-level package.
 
 Because of the C++ dependencies, the library is compiled/tested using
-[Bazel](https://bazel.build).
+[Bazel](https://bazel.build). The top-level Makefiles packages most things
+you'd need.
 
-```
+```sh
 # ensure that the submodules are initialized:
 #   git submodule update --init --recursive
 #
@@ -157,7 +160,41 @@ ok
 $ make test
 ...
 INFO: Build completed successfully, 4 total actions
+```
 
+#### Testing
+
+This library is tested using the (awesome)
+[datadriven](https://github.com/cockroachdb/datadriven) library + a tiny
+testing grammar. See `testdata/` for what that looks like.
+
+```
+sat
+model.name(ex)
+model.literals(x, y, z)
+constrain.at-most-k(x to z | 2)
+model.print()
+----
+model=ex
+  literals (num = 3)
+    x, y, z
+  constraints (num = 1)
+    at-most-k: x, y, z | 2
+
+sat
+model.solve()
+----
+optimal
+
+sat
+result.bools(x to z)
+----
+x = false
+y = false
+z = false
+```
+
+```sh
 # to update the testdata files
 $ make rewrite
 
@@ -172,6 +209,7 @@ $ bazel test :all internal/... --test_output=all \
 
 The SWIG interface files to work with protobufs was cribbed from
 [AirspaceTechnologies/or-tools](https://github.com/AirspaceTechnologies/or-tools).
-To structure this package as a stand-alone bazel target, I stole from
+To figure out how to structure this package as a stand-alone bazel target, I
+looked towards from
 [gonzojive/or-tools-go](https://github.com/gonzojive/or-tools-go). The CP-SAT
 stuff was then mostly pattern matching.

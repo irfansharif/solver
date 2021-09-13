@@ -41,6 +41,7 @@ type Domain interface {
 	fmt.Stringer
 
 	list(shift int64) []int64
+	positive() bool
 }
 
 type domain struct {
@@ -115,4 +116,9 @@ func (d *domain) list(shift int64) []int64 {
 	}
 
 	return ls
+}
+
+// domain is part of the Domain interface.
+func (d *domain) positive() bool {
+	return d.intervals[0] >= 0
 }

@@ -127,12 +127,13 @@ func NewAllSameConstraint(vars ...IntVar) Constraint {
 
 // NewAtMostKConstraint ensures that no more than k literals are true.
 func NewAtMostKConstraint(k int, literals ...Literal) Constraint {
+	var c Constraint
 	if k == 1 {
-		return newAtMostOneConstraint(literals...)
+		c = newAtMostOneConstraint(literals...)
+	} else {
+		lb, ub := int64(0), int64(k)
+		c = NewLinearConstraint(Sum(asIntVars(literals)...), NewDomain(lb, ub))
 	}
-
-	lb, ub := int64(0), int64(k)
-	c := NewLinearConstraint(Sum(asIntVars(literals)...), NewDomain(lb, ub))
 
 	var b strings.Builder
 	b.WriteString("at-most-k: ")
@@ -150,12 +151,13 @@ func NewAtMostKConstraint(k int, literals ...Literal) Constraint {
 
 // NewAtLeastKConstraint ensures that at least k literals are true.
 func NewAtLeastKConstraint(k int, literals ...Literal) Constraint {
+	var c Constraint
 	if k == 1 {
-		return NewBooleanOrConstraint(literals...)
+		c = NewBooleanOrConstraint(literals...)
+	} else {
+		lb, ub := int64(k), int64(len(literals))
+		c = NewLinearConstraint(Sum(asIntVars(literals)...), NewDomain(lb, ub))
 	}
-
-	lb, ub := int64(k), int64(len(literals))
-	c := NewLinearConstraint(Sum(asIntVars(literals)...), NewDomain(lb, ub))
 
 	var b strings.Builder
 	b.WriteString("at-least-k: ")
@@ -173,8 +175,13 @@ func NewAtLeastKConstraint(k int, literals ...Literal) Constraint {
 
 // NewExactlyKConstraint ensures that exactly k literals are true.
 func NewExactlyKConstraint(k int, literals ...Literal) Constraint {
-	lb, ub := int64(k), int64(k)
-	c := NewLinearConstraint(Sum(asIntVars(literals)...), NewDomain(lb, ub))
+	var c Constraint
+	if k == 1 {
+		c = newExactlyOneConstraint(literals...)
+	} else {
+		lb, ub := int64(k), int64(k)
+		c = NewLinearConstraint(Sum(asIntVars(literals)...), NewDomain(lb, ub))
+	}
 
 	var b strings.Builder
 	b.WriteString("exactly-k: ")
@@ -264,7 +271,8 @@ func NewBooleanXorConstraint(literals ...Literal) Constraint {
 // NewImplicationConstraint ensures that the first literal implies the second.
 func NewImplicationConstraint(a, b Literal) Constraint {
 	c := NewBooleanOrConstraint(a.Not(), b)
-	c.(*constraint).str = fmt.Sprintf("implication: %s → %s", a.name(), b.name()) // hijack the string representation
+	c.(*constraint).str = fmt.Sprintf("implication: %s → %s",
+		a.name(), b.name()) // hijack the string representation
 	return c
 }
 
@@ -284,7 +292,7 @@ func NewForbiddenLiteralAssignmentsConstraint(literals []Literal, assignments []
 }
 
 // NewDivisionConstraint ensures that the target is to equal to
-// numerator/denominator.
+// numerator/denominator. It also ensures that the denominator is non-zero.
 func NewDivisionConstraint(target, numerator, denominator IntVar) Constraint {
 	return &constraint{
 		pb: &pb.ConstraintProto{
@@ -300,7 +308,8 @@ func NewDivisionConstraint(target, numerator, denominator IntVar) Constraint {
 }
 
 // NewProductConstraint ensures that the target to equal to the product of all
-// multiplicands.
+// multiplicands. An empty multiplicands list forces the target to be equal to
+// one.
 func NewProductConstraint(target IntVar, multiplicands ...IntVar) Constraint {
 	return &constraint{
 		pb: &pb.ConstraintProto{
@@ -344,8 +353,12 @@ func NewMinimumConstraint(target IntVar, vars ...IntVar) Constraint {
 	}
 }
 
-// NewModuloConstraint ensures that the target to equal to dividend%divisor.
+// NewModuloConstraint ensures that the target to equal to dividend%divisor. The
+// domain of the divisor must be strictly positive.
 func NewModuloConstraint(target, dividend, divisor IntVar) Constraint {
+	if !divisor.domain().positive() {
+		panic("invalid domain for divisor: not strictly positive")
+	}
 	return &constraint{
 		pb: &pb.ConstraintProto{
 			Constraint: &pb.ConstraintProto_IntMod{
@@ -536,6 +549,20 @@ func newAtMostOneConstraint(literals ...Literal) Constraint {
 		pb: &pb.ConstraintProto{
 			Constraint: &pb.ConstraintProto_AtMostOne{
 				AtMostOne: &pb.BoolArgumentProto{
+					Literals: asIntVars(literals).indexes(),
+				},
+			},
+		},
+	}
+}
+
+// newExactlyOneConstraint is a special case of NewExactlyKConstraint that uses
+// a more efficient internal encoding.
+func newExactlyOneConstraint(literals ...Literal) Constraint {
+	return &constraint{
+		pb: &pb.ConstraintProto{
+			Constraint: &pb.ConstraintProto_ExactlyOne{
+				ExactlyOne: &pb.BoolArgumentProto{
 					Literals: asIntVars(literals).indexes(),
 				},
 			},

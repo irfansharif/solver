@@ -29,6 +29,7 @@ type IntVar interface {
 
 	name() string
 	index() int32
+	domain() Domain
 }
 
 // Literal is a boolean variable. It's represented using an IntVar with a fixed
@@ -47,8 +48,8 @@ type Literal interface {
 type intVar struct {
 	pb  *pb.IntegerVariableProto
 	idx int32
+	d   Domain
 
-	domain             Domain
 	isLiteral, isConst bool
 }
 
@@ -62,7 +63,7 @@ func newIntVar(d Domain, idx int32, isLiteral, isConst bool, name string) *intVa
 			Domain: d.list(0),
 		},
 		idx:       idx,
-		domain:    d,
+		d:         d,
 		isLiteral: isLiteral,
 		isConst:   isConst,
 	}
@@ -74,9 +75,9 @@ func (i *intVar) String() string {
 	if i.isLiteral {
 		domainStr = ""
 	} else if i.isConst {
-		domainStr = fmt.Sprintf(" == %d", i.domain.list(0)[0])
+		domainStr = fmt.Sprintf(" == %d", i.d.list(0)[0])
 	} else {
-		domainStr = fmt.Sprintf(" in %s", i.domain.String())
+		domainStr = fmt.Sprintf(" in %s", i.d.String())
 	}
 
 	return fmt.Sprintf("%s%s", i.name(), domainStr)
@@ -100,15 +101,19 @@ func (i *intVar) isNegated() bool {
 	return i.idx < 0
 }
 
+func (i *intVar) domain() Domain {
+	return i.d
+}
+
 // Not is part of the Literal interface.
 func (i *intVar) Not() Literal {
 	return &intVar{
 		pb: &pb.IntegerVariableProto{
 			Name:   fmt.Sprintf("~%s", i.name()),
-			Domain: i.domain.list(0),
+			Domain: i.d.list(0),
 		},
-		idx:    -i.idx - 1,
-		domain: i.domain,
+		idx: -i.idx - 1,
+		d:   i.d,
 	}
 }
 
