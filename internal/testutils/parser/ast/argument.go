@@ -154,6 +154,25 @@ type CumulativeArgument struct {
 	Capacity        int
 }
 
+// Intervals is a helper method that returns a slice of the underlying interval
+// names.
+func (c *CumulativeArgument) Intervals() []string {
+	var intervals []string
+	for _, id := range c.IntervalDemands {
+		intervals = append(intervals, id.Name)
+	}
+	return intervals
+}
+
+// Demands is a helper method that returns a slice of the underlying demands.
+func (c *CumulativeArgument) Demands() []int32 {
+	var ds []int32
+	for _, id := range c.IntervalDemands {
+		ds = append(ds, int32(id.Demand))
+	}
+	return ds
+}
+
 func (c *CumulativeArgument) String() string {
 	var strs []string
 	for _, demand := range c.IntervalDemands {
@@ -247,12 +266,12 @@ func (i *IntervalsArgument) String() string {
 //
 //   KArgument = Variables "|" Digits .
 type KArgument struct {
-	Variables []string
-	K         int
+	Literals []string
+	K        int
 }
 
 func (k *KArgument) String() string {
-	return fmt.Sprintf("%s | %d", strings.Join(k.Variables, ", "), k.K)
+	return fmt.Sprintf("%s | %d", strings.Join(k.Literals, ", "), k.K)
 }
 
 // LinearEqualityArgument represents a linear expression equality argument: 2j == max(k+i, i+2f).

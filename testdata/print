@@ -2,6 +2,8 @@ sat
 model.name(m)
 model.vars(a to c in [0, 10])
 model.literals(x to z)
+model.constants(C == 42)
+model.intervals(i as [a, b | C], j as [b, c | C])
 model.print()
 ----
 model=m
@@ -9,8 +11,13 @@ model=m
     a in [0, 10]
     b in [0, 10]
     c in [0, 10]
+  constants (num = 0)
+    C == 42
   literals (num = 3)
     x, y, z
+  intervals (num = 2)
+    [a, b | C]
+    [b, c | C]
 
 sat
 constrain.all-different(a to c)
@@ -22,6 +29,10 @@ constrain.boolean-and(x to z)
 constrain.boolean-or(x to z)
 constrain.boolean-xor(x to z)
 constrain.implication(x → z)
+constrain.binary-op(a % b == c)
+constrain.binary-op(a / b == c)
+constrain.binary-op(a * b == c)
+constrain.cumulative(i: 1, j: 2 | 3)
 model.print()
 ----
 model=m
@@ -29,9 +40,14 @@ model=m
     a in [0, 10]
     b in [0, 10]
     c in [0, 10]
+  constants (num = 13)
+    C == 42
   literals (num = 3)
     x, y, z
-  constraints (num = 9)
+  intervals (num = 2)
+    [a, b | C]
+    [b, c | C]
+  constraints (num = 13)
     all-different: a, b, c
     all-same: a, b, c
     at-most-k: x, y, z | 2
@@ -41,3 +57,7 @@ model=m
     boolean-or: x, y, z
     boolean-xor: x, y, z
     implication: x → z
+    c == a % b
+    c == a / b
+    c == a * b
+    cumulative: i: 1, j: 2 | 3

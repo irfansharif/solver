@@ -63,7 +63,7 @@ func Compile(tb testing.TB, input string) *ast.Statement {
 		switch stmt.Method {
 		case ast.BooleanOrMethod, ast.BooleanAndMethod, ast.LinearExprsMethod:
 		case ast.IntervalsMethod:
-			if len(stmt.Enforcement.Variables) > 1 {
+			if len(stmt.Enforcement.Literals) > 1 {
 				tb.Fatalf("only single enforcement literal supported for %s.%s", stmt.Receiver, stmt.Method)
 			}
 		default:

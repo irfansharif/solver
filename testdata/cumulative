@@ -1,0 +1,35 @@
+sat
+model.name(m)
+model.vars(sA, sB, sC in [0, 6])
+model.vars(eA, eB, eC in [4, 10])
+model.constants(size == 4)
+model.intervals(iA as [sA,eA|size], iB as [sB,eB|size], iC as [sC,eC|size])
+constrain.cumulative(iA: 1, iB: 2, iC: 3 | 6)
+model.print()
+----
+model=m
+  variables (num = 6)
+    sA in [0, 6]
+    sB in [0, 6]
+    sC in [0, 6]
+    eA in [4, 10]
+    eB in [4, 10]
+    eC in [4, 10]
+  constants (num = 1)
+    size == 4
+  intervals (num = 3)
+    [sA, eA | size]
+    [sB, eB | size]
+    [sC, eC | size]
+  constraints (num = 1)
+    cumulative: iA: 1, iB: 2, iC: 3 | 6
+
+sat
+model.validate()
+----
+ok
+
+sat
+model.solve()
+----
+optimal

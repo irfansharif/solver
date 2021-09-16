@@ -493,7 +493,7 @@ func (p *Parser) IntervalsArgument() ast.Argument {
 // KArgument = Variables "|" Digits .
 func (p *Parser) KArgument() ast.Argument {
 	argument := &ast.KArgument{}
-	argument.Variables = p.Variables()
+	argument.Literals = p.Variables()
 	p.eat(token.PIPE)
 	argument.K = p.Digits()
 	return argument
@@ -635,7 +635,7 @@ func (p *Parser) Method() ast.Method {
 func (p *Parser) Enforcement() *ast.Enforcement {
 	p.eat(token.IF)
 	enforcement := &ast.Enforcement{}
-	enforcement.Variables = p.Variables()
+	enforcement.Literals = p.Variables()
 	return enforcement
 }
 

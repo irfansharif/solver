@@ -80,7 +80,7 @@ func (m *Model) NewIntVarFromDomain(d Domain, name string) IntVar {
 
 // NewInterval adds a new interval to the model, one that's defined using the
 // given start, end and size.
-func (m *Model) NewInterval(end, size, start IntVar, name string) Interval {
+func (m *Model) NewInterval(start, end, size IntVar, name string) Interval {
 	idx := len(m.pb.GetConstraints())
 	itv := newInterval(start, end, size, int32(idx), name)
 	m.addConstraintsInternal(itv)

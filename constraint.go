@@ -48,12 +48,13 @@ type Constraint interface {
 
 // constraint is an implementation of the Constraint interface.
 type constraint struct {
+	pb *pb.ConstraintProto
+
 	// TODO(irfansharif): We hold onto the entire string representation in
 	// memory, which isn't ... great. We could do better by creating stand-alone
 	// types for each kind of constraint and holding onto all the elements we
 	// need.
 	str string
-	pb  *pb.ConstraintProto
 
 	enforcement []Literal
 }
@@ -85,12 +86,7 @@ var _ Constraint = &constraint{}
 func NewAllDifferentConstraint(vars ...IntVar) Constraint {
 	var b strings.Builder
 	b.WriteString("all-different: ")
-	for i, v := range vars {
-		if i != 0 {
-			b.WriteString(", ")
-		}
-		b.WriteString(v.name())
-	}
+	printVars(&b, vars...)
 
 	return &constraint{
 		pb: &pb.ConstraintProto{
@@ -108,12 +104,7 @@ func NewAllDifferentConstraint(vars ...IntVar) Constraint {
 func NewAllSameConstraint(vars ...IntVar) Constraint {
 	var b strings.Builder
 	b.WriteString("all-same: ")
-	for i, v := range vars {
-		if i != 0 {
-			b.WriteString(", ")
-		}
-		b.WriteString(v.name())
-	}
+	printVars(&b, vars...)
 
 	var cs []Constraint
 	for i := range vars {
@@ -137,12 +128,7 @@ func NewAtMostKConstraint(k int, literals ...Literal) Constraint {
 
 	var b strings.Builder
 	b.WriteString("at-most-k: ")
-	for i, l := range literals {
-		if i != 0 {
-			b.WriteString(", ")
-		}
-		b.WriteString(l.name())
-	}
+	printLiterals(&b, literals...)
 	b.WriteString(fmt.Sprintf(" | %d", k))
 	c.(*constraint).str = b.String() // hijack the string representation
 
@@ -161,12 +147,7 @@ func NewAtLeastKConstraint(k int, literals ...Literal) Constraint {
 
 	var b strings.Builder
 	b.WriteString("at-least-k: ")
-	for i, l := range literals {
-		if i != 0 {
-			b.WriteString(", ")
-		}
-		b.WriteString(l.name())
-	}
+	printLiterals(&b, literals...)
 	b.WriteString(fmt.Sprintf(" | %d", k))
 	c.(*constraint).str = b.String() // hijack the string representation
 
@@ -185,12 +166,7 @@ func NewExactlyKConstraint(k int, literals ...Literal) Constraint {
 
 	var b strings.Builder
 	b.WriteString("exactly-k: ")
-	for i, l := range literals {
-		if i != 0 {
-			b.WriteString(", ")
-		}
-		b.WriteString(l.name())
-	}
+	printLiterals(&b, literals...)
 	b.WriteString(fmt.Sprintf(" | %d", k))
 	c.(*constraint).str = b.String() // hijack the string representation
 
@@ -201,12 +177,7 @@ func NewExactlyKConstraint(k int, literals ...Literal) Constraint {
 func NewBooleanAndConstraint(literals ...Literal) Constraint {
 	var b strings.Builder
 	b.WriteString("boolean-and: ")
-	for i, l := range literals {
-		if i != 0 {
-			b.WriteString(", ")
-		}
-		b.WriteString(l.name())
-	}
+	printLiterals(&b, literals...)
 
 	return &constraint{
 		pb: &pb.ConstraintProto{
@@ -226,12 +197,7 @@ func NewBooleanAndConstraint(literals ...Literal) Constraint {
 func NewBooleanOrConstraint(literals ...Literal) Constraint {
 	var b strings.Builder
 	b.WriteString("boolean-or: ")
-	for i, l := range literals {
-		if i != 0 {
-			b.WriteString(", ")
-		}
-		b.WriteString(l.name())
-	}
+	printLiterals(&b, literals...)
 
 	return &constraint{
 		pb: &pb.ConstraintProto{
@@ -249,12 +215,7 @@ func NewBooleanOrConstraint(literals ...Literal) Constraint {
 func NewBooleanXorConstraint(literals ...Literal) Constraint {
 	var b strings.Builder
 	b.WriteString("boolean-xor: ")
-	for i, l := range literals {
-		if i != 0 {
-			b.WriteString(", ")
-		}
-		b.WriteString(l.name())
-	}
+	printLiterals(&b, literals...)
 
 	return &constraint{
 		pb: &pb.ConstraintProto{
@@ -311,6 +272,14 @@ func NewDivisionConstraint(target, numerator, denominator IntVar) Constraint {
 // multiplicands. An empty multiplicands list forces the target to be equal to
 // one.
 func NewProductConstraint(target IntVar, multiplicands ...IntVar) Constraint {
+	var b strings.Builder
+	for i, m := range multiplicands {
+		if i != 0 {
+			b.WriteString(" * ")
+		}
+		b.WriteString(m.name())
+	}
+
 	return &constraint{
 		pb: &pb.ConstraintProto{
 			Constraint: &pb.ConstraintProto_IntProd{
@@ -320,6 +289,7 @@ func NewProductConstraint(target IntVar, multiplicands ...IntVar) Constraint {
 				},
 			},
 		},
+		str: fmt.Sprintf("%s == %s", target.name(), b.String()),
 	}
 }
 
@@ -368,6 +338,7 @@ func NewModuloConstraint(target, dividend, divisor IntVar) Constraint {
 				},
 			},
 		},
+		str: fmt.Sprintf("%s == %s %% %s", target.name(), dividend.name(), divisor.name()),
 	}
 }
 
@@ -527,8 +498,19 @@ func NewNonOverlapping2DConstraint(
 // NewCumulativeConstraint ensures that the sum of the demands of the intervals
 // (intervals[i]'s demand is specified in demands[i]) at each interval point
 // cannot exceed a max capacity. The intervals are interpreted as [start, end).
-// Intervals of size zero are ignored.
+// Intervals of size zero are ignored. The capacity cannot exceed the sum of all
+// the demands.
 func NewCumulativeConstraint(capacity int32, intervals []Interval, demands []int32) Constraint {
+	if len(intervals) != len(demands) {
+		panic("mismatched lengths of intervals and demands")
+	}
+	var b strings.Builder
+	for i := range intervals {
+		if i != 0 {
+			b.WriteString(", ")
+		}
+		b.WriteString(fmt.Sprintf("%s: %d", intervals[i].name(), demands[i]))
+	}
 	return &constraint{
 		pb: &pb.ConstraintProto{
 			Constraint: &pb.ConstraintProto_Cumulative{
@@ -539,6 +521,7 @@ func NewCumulativeConstraint(capacity int32, intervals []Interval, demands []int
 				},
 			},
 		},
+		str: fmt.Sprintf("cumulative: %s | %d", b.String(), capacity),
 	}
 }
 
@@ -644,5 +627,25 @@ func newAssignmentsConstraintInternal(vars []IntVar, assignments [][]int64) *con
 				},
 			},
 		},
+	}
+}
+
+// printVars is a helper to print out intvars of the form: i1, i2, ..., iN.
+func printVars(b *strings.Builder, vars ...IntVar) {
+	for i, v := range vars {
+		if i != 0 {
+			b.WriteString(", ")
+		}
+		b.WriteString(v.name())
+	}
+}
+
+// printLiterals is a helper to print out literals of the form: l1, l2, ..., lN.
+func printLiterals(b *strings.Builder, literals ...Literal) {
+	for i, l := range literals {
+		if i != 0 {
+			b.WriteString(", ")
+		}
+		b.WriteString(l.name())
 	}
 }

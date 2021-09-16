@@ -41,6 +41,7 @@ type Interval interface {
 	fmt.Stringer
 
 	index() int32
+	name() string
 }
 
 type interval struct {
@@ -49,10 +50,6 @@ type interval struct {
 
 	start, end, size IntVar
 	enforcement      Literal
-}
-
-func (i *interval) WithName(name string) Constraint {
-	panic("implement me")
 }
 
 var _ Interval = &interval{}
@@ -107,6 +104,15 @@ func (i *interval) String() string {
 // index is part of the Interval interface.
 func (i *interval) index() int32 {
 	return i.idx
+}
+
+// name is part of the Interval interface.
+func (i *interval) name() string {
+	name := i.pb.GetName()
+	if name == "" {
+		name = "<unnamed>"
+	}
+	return name
 }
 
 // protos is part of the Constraint interface.

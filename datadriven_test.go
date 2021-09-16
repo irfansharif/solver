@@ -34,14 +34,30 @@ func TestDatadriven(t *testing.T) {
 		defer implant()
 
 		model := solver.NewModel("") // instantiate a model
+
+		itvM := make(map[string]solver.Interval)
 		varM := make(map[string]solver.IntVar)
 		litM := make(map[string]solver.Literal)
+
 		var result solver.Result
 		var solved bool
 
-		getIntVars := func(s *testutils.Scanner, vars []string) []solver.IntVar {
+		getIntervals := func(s *testutils.Scanner, is ...string) []solver.Interval {
+			var intervals []solver.Interval
+			for _, v := range is {
+				iv, ok := itvM[v]
+				if !ok {
+					s.Fatalf("unrecognized variable: %s", v)
+				}
+
+				intervals = append(intervals, iv)
+			}
+			return intervals
+		}
+
+		getIntVars := func(s *testutils.Scanner, vs ...string) []solver.IntVar {
 			var intVars []solver.IntVar
-			for _, v := range vars {
+			for _, v := range vs {
 				iv, ok := varM[v]
 				if !ok {
 					s.Fatalf("unrecognized variable: %s", v)
@@ -52,9 +68,9 @@ func TestDatadriven(t *testing.T) {
 			return intVars
 		}
 
-		getLiterals := func(s *testutils.Scanner, vars []string) []solver.Literal {
+		getLiterals := func(s *testutils.Scanner, ls ...string) []solver.Literal {
 			var literals []solver.Literal
-			for _, l := range vars {
+			for _, l := range ls {
 				lit, ok := litM[l]
 				if !ok {
 					s.Fatalf("unrecognized literal: %s", l)
@@ -79,7 +95,7 @@ func TestDatadriven(t *testing.T) {
 				switch stmt.Method {
 				case ast.NameMethod: // model.name(arg)
 					argument := stmt.Argument.(*ast.VariablesArgument)
-					model.SetName(argument.Variables[0])
+					model.TestingSetName(argument.Variables[0])
 				case ast.VarsMethod: // m.vars(x,y,z in [0, 2])
 					argument := stmt.Argument.(*ast.DomainArgument)
 					dom := argument.AsSolverDomain()
@@ -91,10 +107,24 @@ func TestDatadriven(t *testing.T) {
 					for _, l := range argument.Variables {
 						litM[l] = model.NewLiteral(l)
 					}
+
 				case ast.ConstantsMethod: // model.constants(a,b == 42)
 					argument := stmt.Argument.(*ast.ConstantsArgument)
 					for _, c := range argument.Variables {
 						varM[c] = model.NewConstant(int64(argument.Constant), c)
+					}
+				case ast.IntervalsMethod: // model.intervals(i as [s,e|sz], j as [e,s|sz]) if a
+					var enforcement []solver.Literal
+					if stmt.Enforcement != nil {
+						enforcement = getLiterals(s, stmt.Enforcement.Literals...)
+					}
+
+					argument := stmt.Argument.(*ast.IntervalsArgument)
+					for _, iv := range argument.Intervals {
+						variables := getIntVars(s, iv.Start, iv.End, iv.Size)
+						start, end, size := variables[0], variables[1], variables[2]
+						itvM[iv.Name] = model.NewInterval(start, end, size, iv.Name)
+						itvM[iv.Name].OnlyEnforceIf(enforcement...)
 					}
 				case ast.PrintMethod: // model.print()
 					out.WriteString(model.String())
@@ -121,73 +151,100 @@ func TestDatadriven(t *testing.T) {
 
 				case ast.AllDifferentMethod: // constrain.all-different(x,y,z)
 					argument := stmt.Argument.(*ast.VariablesArgument)
-					intVars := getIntVars(s, argument.Variables)
-
+					intVars := getIntVars(s, argument.Variables...)
 					model.AddConstraints(solver.NewAllDifferentConstraint(intVars...))
 				case ast.AllSameMethod: // constrain.all-same(x,y,z)
 					argument := stmt.Argument.(*ast.VariablesArgument)
-					intVars := getIntVars(s, argument.Variables)
-
+					intVars := getIntVars(s, argument.Variables...)
 					model.AddConstraints(solver.NewAllSameConstraint(intVars...))
 				case ast.ImplicationMethod: // constrain.boolean-and(x,y,z) [if a,b]
 					argument := stmt.Argument.(*ast.ImplicationArgument)
-					literals := getLiterals(s, []string{argument.Left, argument.Right})
+					literals := getLiterals(s, argument.Left, argument.Right)
 					model.AddConstraints(solver.NewImplicationConstraint(literals[0], literals[1]))
 				case ast.BooleanAndMethod: // constrain.boolean-and(x,y,z) [if a,b]
 					argument := stmt.Argument.(*ast.VariablesArgument)
-					literals := getLiterals(s, argument.Variables)
+					literals := getLiterals(s, argument.Variables...)
 					var enforcement []solver.Literal
 					if stmt.Enforcement != nil {
-						enforcement = getLiterals(s, stmt.Enforcement.Variables)
+						enforcement = getLiterals(s, stmt.Enforcement.Literals...)
 					}
-
 					model.AddConstraints(solver.NewBooleanAndConstraint(literals...).OnlyEnforceIf(enforcement...))
 				case ast.BooleanOrMethod: // constrain.boolean-or(x,y,z) [if a,b]
 					argument := stmt.Argument.(*ast.VariablesArgument)
-					literals := getLiterals(s, argument.Variables)
+					literals := getLiterals(s, argument.Variables...)
 					var enforcement []solver.Literal
 					if stmt.Enforcement != nil {
-						enforcement = getLiterals(s, stmt.Enforcement.Variables)
+						enforcement = getLiterals(s, stmt.Enforcement.Literals...)
 					}
-
 					model.AddConstraints(solver.NewBooleanOrConstraint(literals...).OnlyEnforceIf(enforcement...))
 				case ast.BooleanXorMethod: // constrain.boolean-xor(x,y,z)
 					argument := stmt.Argument.(*ast.VariablesArgument)
-					literals := getLiterals(s, argument.Variables)
+					literals := getLiterals(s, argument.Variables...)
 					model.AddConstraints(solver.NewBooleanXorConstraint(literals...))
 				case ast.AtMostKMethod: // constrain.at-most-k(x to z | K)
 					argument := stmt.Argument.(*ast.KArgument)
-					literals := getLiterals(s, argument.Variables)
+					literals := getLiterals(s, argument.Literals...)
 					model.AddConstraints(solver.NewAtMostKConstraint(argument.K, literals...))
 				case ast.AtLeastKMethod: // constrain.at-least-k(x to z | K)
 					argument := stmt.Argument.(*ast.KArgument)
-					literals := getLiterals(s, argument.Variables)
+					literals := getLiterals(s, argument.Literals...)
 					model.AddConstraints(solver.NewAtLeastKConstraint(argument.K, literals...))
 				case ast.ExactlyKMethod: // constrain.exactly-k(x to z | K)
 					argument := stmt.Argument.(*ast.KArgument)
-					literals := getLiterals(s, argument.Variables)
+					literals := getLiterals(s, argument.Literals...)
 					model.AddConstraints(solver.NewExactlyKConstraint(argument.K, literals...))
 				case ast.AssignmentsMethod:
 					argument := stmt.Argument.(*ast.AssignmentsArgument)
 					if argument.ForLiterals() {
-						literals := getLiterals(s, argument.Variables)
+						literals := getLiterals(s, argument.Variables...)
 						if argument.In {
 							model.AddConstraints(solver.NewAllowedLiteralAssignmentsConstraint(literals, argument.AllowedLiteralAssignments))
 						} else {
 							model.AddConstraints(solver.NewForbiddenLiteralAssignmentsConstraint(literals, argument.AllowedLiteralAssignments))
 						}
 					} else {
-						variables := getIntVars(s, argument.Variables)
+						variables := getIntVars(s, argument.Variables...)
 						if argument.In {
 							model.AddConstraints(solver.NewAllowedAssignmentsConstraint(variables, argument.AsInt64s()))
 						} else {
 							model.AddConstraints(solver.NewForbiddenAssignmentsConstraint(variables, argument.AsInt64s()))
 						}
 					}
+				case ast.CumulativeMethod: // constrain.cumulative(i: 12, j: 13 | 32)
+					argument := stmt.Argument.(*ast.CumulativeArgument)
+					model.AddConstraints(
+						solver.NewCumulativeConstraint(
+							int32(argument.Capacity),
+							getIntervals(s, argument.Intervals()...),
+							argument.Demands(),
+						),
+					)
+				case ast.BinaryOpMethod: // constrain.binary-op(a % b == c)
+					argument := stmt.Argument.(*ast.BinaryOpArgument)
+					switch argument.Op {
+					case "%":
+						variables := getIntVars(s, argument.Left, argument.Right, argument.Target)
+						dividend, divisor, target := variables[0], variables[1], variables[2]
+						model.AddConstraints(
+							solver.NewModuloConstraint(target, dividend, divisor),
+						)
+					case "/":
+						variables := getIntVars(s, argument.Left, argument.Right, argument.Target)
+						dividend, divisor, target := variables[0], variables[1], variables[2]
+						model.AddConstraints(
+							solver.NewDivisionConstraint(target, dividend, divisor),
+						)
+					case "*":
+						variables := getIntVars(s, argument.Target, argument.Left, argument.Right)
+						target, multiplands := variables[0], variables[1:]
+						model.AddConstraints(
+							solver.NewProductConstraint(target, multiplands...),
+						)
+					}
 				case ast.BoolsMethod: // result.booleans(x,y to z)
 					require.True(t, solved)
 					argument := stmt.Argument.(*ast.VariablesArgument)
-					literals := getLiterals(s, argument.Variables)
+					literals := getLiterals(s, argument.Variables...)
 					for i, lit := range literals {
 						val := result.BooleanValue(lit)
 						out.WriteString(fmt.Sprintf("%s = %t", argument.Variables[i], val))
@@ -195,11 +252,10 @@ func TestDatadriven(t *testing.T) {
 							out.WriteString("\n")
 						}
 					}
-
 				case ast.ValuesMethod: // result.values(x,y to z)
 					require.True(t, solved)
 					argument := stmt.Argument.(*ast.VariablesArgument)
-					variables := getIntVars(s, argument.Variables)
+					variables := getIntVars(s, argument.Variables...)
 					for i, iv := range variables {
 						val := result.Value(iv)
 						out.WriteString(fmt.Sprintf("%s = %d", argument.Variables[i], val))

@@ -25,6 +25,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// TestingSetName is a testing-only helper to set the name of the model.
+func (m *Model) TestingSetName(name string) {
+	m.pb.Name = name
+}
+
 func TestIntVarAllDifferent(t *testing.T) {
 	model := NewModel("")
 
@@ -384,7 +389,7 @@ func TestNonOverlappingIntervalsWithEnforcement(t *testing.T) {
 		size := model.NewIntVar(int64(i), 10, fmt.Sprintf("size-%d", i))
 
 		intervals = append(intervals,
-			model.NewInterval(end, size, start, "").OnlyEnforceIf(lit).(Interval))
+			model.NewInterval(start, end, size, "").OnlyEnforceIf(lit).(Interval))
 	}
 
 	model.AddConstraints(NewNonOverlappingConstraint(intervals...))
@@ -423,8 +428,4 @@ func TestNonOverlappingIntervalsWithEnforcement(t *testing.T) {
 			last = sp.end
 		}
 	}
-}
-
-func (m *Model) SetName(name string) {
-	m.pb.Name = name
 }

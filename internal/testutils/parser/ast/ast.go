@@ -45,11 +45,11 @@ func (s *Statement) String() string {
 //
 //   Enforcement = "if" Variables .
 type Enforcement struct {
-	Variables []string
+	Literals []string
 }
 
 func (e *Enforcement) String() string {
-	return fmt.Sprintf("if %s", strings.Join(e.Variables, ", "))
+	return fmt.Sprintf("if %s", strings.Join(e.Literals, ", "))
 }
 
 // Interval represents a single interval.
