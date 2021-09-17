@@ -7,7 +7,7 @@ This project contains a cgo-based API for using Google's [Operations Research
 Tools](https://developers.google.com/optimization/). It exposes a high-level
 package for the [CP-SAT
 Solver](https://developers.google.com/optimization/cp/cp_solver), targeting the
-[v9.0](https://github.com/google/or-tools/releases/tag/v9.0) release.
+[v8.0](https://github.com/google/or-tools/releases/tag/v8.0) release.
 
 ### Examples
 

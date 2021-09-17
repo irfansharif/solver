@@ -156,13 +156,8 @@ func NewAtLeastKConstraint(k int, literals ...Literal) Constraint {
 
 // NewExactlyKConstraint ensures that exactly k literals are true.
 func NewExactlyKConstraint(k int, literals ...Literal) Constraint {
-	var c Constraint
-	if k == 1 {
-		c = newExactlyOneConstraint(literals...)
-	} else {
-		lb, ub := int64(k), int64(k)
-		c = NewLinearConstraint(Sum(asIntVars(literals)...), NewDomain(lb, ub))
-	}
+	lb, ub := int64(k), int64(k)
+	c := NewLinearConstraint(Sum(asIntVars(literals)...), NewDomain(lb, ub))
 
 	var b strings.Builder
 	b.WriteString("exactly-k: ")
@@ -540,6 +535,9 @@ func newAtMostOneConstraint(literals ...Literal) Constraint {
 
 // newExactlyOneConstraint is a special case of NewExactlyKConstraint that uses
 // a more efficient internal encoding.
+//
+// TODO(irfansharif): This doesn't work yet; we're not linking against or-tools
+// v9.0.
 func newExactlyOneConstraint(literals ...Literal) Constraint {
 	return &constraint{
 		pb: &pb.ConstraintProto{
