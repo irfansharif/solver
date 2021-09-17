@@ -15,7 +15,7 @@ Variable       = Identifier | Letter "to" Letter .
 Interval       = Identifier "as" "[" Identifier "," Identifier "|" Identifier "]" .
 LinearTerm     = ( [ Digits ] Identifier ) | Digits .
 LinearExpr     = [ "-" ] LinearTerm { ( "+" | "-" ) LinearTerm } | "Σ" "(" Variables ")" .
-IntervalDemand = Identifier ":" Number .
+IntervalDemand = Identifier ":" Identifier .
 
 Booleans        = Boolean { "," Boolean } .
 Numbers         = Number { "," Number } .

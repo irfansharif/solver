@@ -144,7 +144,7 @@ func (m *Model) String() string {
 
 	for i, c := range m.constants {
 		if i == 0 {
-			b.WriteString(fmt.Sprintf("  constants (num = %d)\n", len(m.constraints)))
+			b.WriteString(fmt.Sprintf("  constants (num = %d)\n", len(m.constants)))
 		}
 		b.WriteString(fmt.Sprintf("    %s\n", c.String()))
 	}

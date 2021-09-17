@@ -3,6 +3,8 @@ model.name(m)
 model.vars(a to c in [0, 10])
 model.literals(x to z)
 model.constants(C == 42)
+model.constants(d == 1)
+model.constants(e == 2)
 model.intervals(i as [a, b | C], j as [b, c | C])
 model.print()
 ----
@@ -11,8 +13,10 @@ model=m
     a in [0, 10]
     b in [0, 10]
     c in [0, 10]
-  constants (num = 0)
+  constants (num = 3)
     C == 42
+    d == 1
+    e == 2
   literals (num = 3)
     x, y, z
   intervals (num = 2)
@@ -32,7 +36,7 @@ constrain.implication(x → z)
 constrain.binary-op(a % b == c)
 constrain.binary-op(a / b == c)
 constrain.binary-op(a * b == c)
-constrain.cumulative(i: 1, j: 2 | C)
+constrain.cumulative(i: d, j: e | C)
 model.print()
 ----
 model=m
@@ -40,8 +44,10 @@ model=m
     a in [0, 10]
     b in [0, 10]
     c in [0, 10]
-  constants (num = 13)
+  constants (num = 3)
     C == 42
+    d == 1
+    e == 2
   literals (num = 3)
     x, y, z
   intervals (num = 2)
@@ -60,4 +66,4 @@ model=m
     c == a % b
     c == a / b
     c == a * b
-    cumulative: i: 1, j: 2 | C
+    cumulative: i: d, j: e | C
