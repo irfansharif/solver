@@ -32,7 +32,7 @@ constrain.implication(x → z)
 constrain.binary-op(a % b == c)
 constrain.binary-op(a / b == c)
 constrain.binary-op(a * b == c)
-constrain.cumulative(i: 1, j: 2 | 3)
+constrain.cumulative(i: 1, j: 2 | C)
 model.print()
 ----
 model=m
@@ -60,4 +60,4 @@ model=m
     c == a % b
     c == a / b
     c == a * b
-    cumulative: i: 1, j: 2 | 3
+    cumulative: i: 1, j: 2 | C

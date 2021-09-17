@@ -3,8 +3,9 @@ model.name(m)
 model.vars(sA, sB, sC in [0, 6])
 model.vars(eA, eB, eC in [4, 10])
 model.constants(size == 4)
+model.constants(cap == 6)
 model.intervals(iA as [sA,eA|size], iB as [sB,eB|size], iC as [sC,eC|size])
-constrain.cumulative(iA: 1, iB: 2, iC: 3 | 6)
+constrain.cumulative(iA: 1, iB: 2, iC: 3 | cap)
 model.print()
 ----
 model=m
@@ -17,12 +18,13 @@ model=m
     eC in [4, 10]
   constants (num = 1)
     size == 4
+    cap == 6
   intervals (num = 3)
     [sA, eA | size]
     [sB, eB | size]
     [sC, eC | size]
   constraints (num = 1)
-    cumulative: iA: 1, iB: 2, iC: 3 | 6
+    cumulative: iA: 1, iB: 2, iC: 3 | cap
 
 sat
 model.validate()

@@ -437,12 +437,12 @@ func (p *Parser) ConstantsArgument() ast.Argument {
 	return argument
 }
 
-// CumulativeArgument = IntervalDemands "|" Number .
+// CumulativeArgument = IntervalDemands "|" Variable .
 func (p *Parser) CumulativeArgument() ast.Argument {
 	argument := &ast.CumulativeArgument{}
 	argument.IntervalDemands = p.IntervalDemands()
 	p.eat(token.PIPE)
-	argument.Capacity = p.Number()
+	argument.Capacity = p.Variable()
 	return argument
 }
 

@@ -145,13 +145,13 @@ func (c *ConstantsArgument) String() string {
 	return fmt.Sprintf("%s == %d", strings.Join(c.Variables, ", "), c.Constant)
 }
 
-// CumulativeArgument represents a cumulative argument: i:2, j:4 | 32.
+// CumulativeArgument represents a cumulative argument: i:2, j:4 | C.
 // It's used to test NewCumulativeConstraint.
 //
-//   CumulativeArgument = IntervalDemands "|" Number .
+//   CumulativeArgument = IntervalDemands "|" Variable .
 type CumulativeArgument struct {
 	IntervalDemands []*IntervalDemand
-	Capacity        int
+	Capacity        string
 }
 
 // Intervals is a helper method that returns a slice of the underlying interval
@@ -178,7 +178,7 @@ func (c *CumulativeArgument) String() string {
 	for _, demand := range c.IntervalDemands {
 		strs = append(strs, demand.String())
 	}
-	return fmt.Sprintf("%s | %d", strings.Join(strs, ", "), c.Capacity)
+	return fmt.Sprintf("%s | %s", strings.Join(strs, ", "), c.Capacity)
 }
 
 // DomainArgument represents a domain argument: a, b to d in [0, 2].

@@ -498,9 +498,8 @@ func NewNonOverlapping2DConstraint(
 // NewCumulativeConstraint ensures that the sum of the demands of the intervals
 // (intervals[i]'s demand is specified in demands[i]) at each interval point
 // cannot exceed a max capacity. The intervals are interpreted as [start, end).
-// Intervals of size zero are ignored. The capacity cannot exceed the sum of all
-// the demands.
-func NewCumulativeConstraint(capacity int32, intervals []Interval, demands []int32) Constraint {
+// Intervals of size zero are ignored.
+func NewCumulativeConstraint(capacity IntVar, intervals []Interval, demands []int32) Constraint {
 	if len(intervals) != len(demands) {
 		panic("mismatched lengths of intervals and demands")
 	}
@@ -515,13 +514,13 @@ func NewCumulativeConstraint(capacity int32, intervals []Interval, demands []int
 		pb: &pb.ConstraintProto{
 			Constraint: &pb.ConstraintProto_Cumulative{
 				Cumulative: &pb.CumulativeConstraintProto{
-					Capacity:  capacity,
+					Capacity:  capacity.index(),
 					Intervals: intervalList(intervals).indexes(),
 					Demands:   demands,
 				},
 			},
 		},
-		str: fmt.Sprintf("cumulative: %s | %d", b.String(), capacity),
+		str: fmt.Sprintf("cumulative: %s | %s", b.String(), capacity.name()),
 	}
 }
 

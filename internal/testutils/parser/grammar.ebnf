@@ -31,7 +31,7 @@ BooleanList = "[" Booleans "]" { "∪" "[" Booleans "]" } .
 AssignmentsArgument      = "[" Variables "]" ( "∈" | "∉" ) ( NumbersList | BooleanList ) .
 BinaryOpArgument         = Identifier ( "/" | "%" | "*" ) Identifier "==" Identifier .
 ConstantsArgument        = Variables "==" Number .
-CumulativeArgument       = IntervalDemands "|" Number .
+CumulativeArgument       = IntervalDemands "|" Variable .
 DomainArgument           = ( Variables | LinearExprs ) "in" Domains .
 ElementArgument          = Identifier "==" "[" Variables "]" "[" Identifier "]" .
 ImplicationArgument      = Identifier "→"  Identifier .

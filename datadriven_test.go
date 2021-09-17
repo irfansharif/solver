@@ -212,9 +212,10 @@ func TestDatadriven(t *testing.T) {
 					}
 				case ast.CumulativeMethod: // constrain.cumulative(i: 12, j: 13 | 32)
 					argument := stmt.Argument.(*ast.CumulativeArgument)
+					capacity := getIntVars(s, argument.Capacity)[0]
 					model.AddConstraints(
 						solver.NewCumulativeConstraint(
-							int32(argument.Capacity),
+							capacity,
 							getIntervals(s, argument.Intervals()...),
 							argument.Demands(),
 						),

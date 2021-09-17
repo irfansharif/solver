@@ -79,6 +79,6 @@ constrain.non-overlapping([i, j], [k, l], true)
 constrain.non-overlapping([i, j], [k, l], true)
 
 statement
-constrain.cumulative(i:3, j:4 | 32)
+constrain.cumulative(i:3, j:4 | C)
 ----
-constrain.cumulative(i: 3, j: 4 | 32)
+constrain.cumulative(i: 3, j: 4 | C)
