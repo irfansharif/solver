@@ -141,7 +141,7 @@ you'd need.
 #
 # supported bazel version >= 4.0.0
 # supported swig version == 4.0.2
-# supported protoc version == 3.13.0
+# supported protoc version == 3.14.0
 # supported protoc-gen-go version == 1.27.1
 
 $ make help

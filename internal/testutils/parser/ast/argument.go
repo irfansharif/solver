@@ -148,7 +148,7 @@ func (c *ConstantsArgument) String() string {
 // CumulativeArgument represents a cumulative argument: i:2, j:4 | C.
 // It's used to test NewCumulativeConstraint.
 //
-//   CumulativeArgument = IntervalDemands "|" Variable .
+//   CumulativeArgument = IntervalDemands "|" Identifier .
 type CumulativeArgument struct {
 	IntervalDemands []*IntervalDemand
 	Capacity        string
