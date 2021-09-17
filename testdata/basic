@@ -25,7 +25,7 @@ model=m
     x in [0, 2]
     y in [0, 2]
     z in [0, 2]
-  constants (num = 5)
+  constants (num = 3)
     a == 2
     b == 2
     c == 1

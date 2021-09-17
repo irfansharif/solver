@@ -11,7 +11,7 @@ constrain.binary-op(a / b == c)
 constrain.boolean-and(a, b, c to f) if d, e
 constrain.boolean-or(a, b, c to f)
 constrain.boolean-xor(a, b, c to f)
-constrain.cumulative(i: 12, j: 13 | C)
+constrain.cumulative(i: d, j: d | C)
 constrain.element(t == [a, b, c][i])
 constrain.equality(2x + y + z + 6 == max(2f + j, n - y))
 constrain.equality(x == max(Σ(a to y)))

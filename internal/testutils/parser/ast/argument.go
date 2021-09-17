@@ -165,10 +165,10 @@ func (c *CumulativeArgument) Intervals() []string {
 }
 
 // Demands is a helper method that returns a slice of the underlying demands.
-func (c *CumulativeArgument) Demands() []int32 {
-	var ds []int32
+func (c *CumulativeArgument) Demands() []string {
+	var ds []string
 	for _, id := range c.IntervalDemands {
-		ds = append(ds, int32(id.Demand))
+		ds = append(ds, id.Demand)
 	}
 	return ds
 }

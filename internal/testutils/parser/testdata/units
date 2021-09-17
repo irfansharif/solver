@@ -164,14 +164,14 @@ linear-expr
 a + b + c + d
 
 interval-demand
-x: 1
+x: d
 ----
-x: 1
+x: d
 
 interval-demand
-abc: -21
+abc: d
 ----
-abc: -21
+abc: d
 
 numbers-list
 [-2, 3, -5] ∪ [-7, 5, 6]
@@ -209,9 +209,9 @@ a, b to d, e == 42
 a, b, c, d, e == 42
 
 cumulative-argument
-a: 3, b: 7 | C
+a: d, b: d | C
 ----
-a: 3, b: 7 | C
+a: d, b: d | C
 
 k-argument
 a, b, c | 12

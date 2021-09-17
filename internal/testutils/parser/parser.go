@@ -197,12 +197,12 @@ func (p *Parser) LinearExpr() *ast.LinearExpr {
 	return expr
 }
 
-// IntervalDemand = Identifier ":" Number .
+// IntervalDemand = Identifier ":" Identifier .
 func (p *Parser) IntervalDemand() *ast.IntervalDemand {
 	demand := &ast.IntervalDemand{}
 	demand.Name = p.Identifier()
 	p.eat(token.COLON)
-	demand.Demand = p.Number()
+	demand.Demand = p.Identifier()
 	return demand
 }
 

@@ -130,12 +130,12 @@ func (l *LinearExpr) String() string {
 // IntervalDemand represents an interval identifier and it's corresponding
 // demand.
 //
-//   IntervalDemand = Identifier ":" Number .
+//   IntervalDemand = Identifier ":" Identifier .
 type IntervalDemand struct {
 	Name   string
-	Demand int
+	Demand string
 }
 
 func (i *IntervalDemand) String() string {
-	return fmt.Sprintf("%s: %d", i.Name, i.Demand)
+	return fmt.Sprintf("%s: %s", i.Name, i.Demand)
 }

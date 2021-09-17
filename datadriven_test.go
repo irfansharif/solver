@@ -217,7 +217,7 @@ func TestDatadriven(t *testing.T) {
 						solver.NewCumulativeConstraint(
 							capacity,
 							getIntervals(s, argument.Intervals()...),
-							argument.Demands(),
+							getIntVars(s, argument.Demands()...),
 						),
 					)
 				case ast.BinaryOpMethod: // constrain.binary-op(a % b == c)
