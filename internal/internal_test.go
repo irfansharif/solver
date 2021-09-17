@@ -41,7 +41,8 @@ func TestSimpleCPSAT(t *testing.T) {
 	}
 	modelProto.Constraints = append(modelProto.Constraints, constraint)
 
-	response := SatHelperSolve(modelProto)
+	wrapper := NewSolveWrapper()
+	response := wrapper.Solve(modelProto)
 	if response.Status != pb.CpSolverStatus_FEASIBLE &&
 		response.Status != pb.CpSolverStatus_OPTIMAL {
 		t.Fatalf("expected solver to find solution")

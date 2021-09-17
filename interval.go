@@ -88,6 +88,12 @@ func (i *interval) OnlyEnforceIf(literals ...Literal) Constraint {
 	return i
 }
 
+// WithName is part of the Interval interface.
+func (i *interval) WithName(name string) Constraint {
+	i.pb.Name = name
+	return i
+}
+
 // String is part of the Interval interface.
 func (i *interval) String() string {
 	var b strings.Builder

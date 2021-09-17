@@ -137,7 +137,6 @@ func TestDatadriven(t *testing.T) {
 					}
 				case ast.SolveMethod: // model.solve()
 					result = model.Solve()
-					solved = true
 					switch {
 					case result.Feasible():
 						out.WriteString("feasible")
@@ -147,6 +146,7 @@ func TestDatadriven(t *testing.T) {
 						out.WriteString("invalid")
 					case result.Optimal():
 						out.WriteString("optimal")
+						solved = true
 					}
 
 				case ast.AllDifferentMethod: // constrain.all-different(x,y,z)
@@ -242,7 +242,7 @@ func TestDatadriven(t *testing.T) {
 							solver.NewProductConstraint(target, multiplands...),
 						)
 					}
-				case ast.BoolsMethod: // result.booleans(x,y to z)
+				case ast.BoolsMethod: // result.bool(x,y to z)
 					require.True(t, solved)
 					argument := stmt.Argument.(*ast.VariablesArgument)
 					literals := getLiterals(s, argument.Variables...)

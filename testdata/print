@@ -18,7 +18,9 @@ model=m
     d == 1
     e == 2
   literals (num = 3)
-    x, y, z
+    x
+    y
+    z
   intervals (num = 2)
     [a, b | C]
     [b, c | C]
@@ -49,7 +51,9 @@ model=m
     d == 1
     e == 2
   literals (num = 3)
-    x, y, z
+    x
+    y
+    z
   intervals (num = 2)
     [a, b | C]
     [b, c | C]
