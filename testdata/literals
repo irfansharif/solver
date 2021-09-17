@@ -1,14 +1,33 @@
 sat
 model.name(ex)
 model.literals(x,y,z)
-constrain.at-most-k(x to z| 2)
+constrain.at-least-k(x to z| 2)
+----
+
+sat
+model.literals(a to c)
+constrain.exactly-k(a to c| 1)
+----
+
+sat
 model.print()
 ----
 model=ex
-  literals (num = 3)
-    x, y, z
-  constraints (num = 1)
-    at-most-k: x, y, z | 2
+  literals (num = 6)
+    x
+    y
+    z
+    a
+    b
+    c
+  constraints (num = 2)
+    at-least-k: x, y, z | 2
+    exactly-k: a, b, c | 1
+
+sat
+model.validate()
+----
+ok
 
 sat
 model.solve()
@@ -16,8 +35,11 @@ model.solve()
 optimal
 
 sat
-result.bools(x to z)
+result.bools(a to c, x to z)
 ----
-x = false
-y = false
-z = false
+a = true
+b = false
+c = false
+x = true
+y = true
+z = true

@@ -6,7 +6,7 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository", "new_git_r
 
 git_repository(
     name = "ortools",
-    commit = "8d19323faf51f2f004e4de6c1b32a74001fbc7c1",  #tag v8.0
+    commit = "b37d9c786b69128f3505f15beca09e89bf078a89",  # tag v9.0
     remote = "https://github.com/google/or-tools.git",
 )
 
@@ -33,19 +33,13 @@ http_archive(
 
 git_repository(
     name = "com_google_protobuf",
-    commit = "2514f0bd7da7e2af1bed4c5d1b84f031c4d12c10",  # release v3.14.0
-    remote = "https://github.com/protocolbuffers/protobuf.git",
-)
-
-git_repository(
-    name = "com_google_protobuf_cc",
-    commit = "2514f0bd7da7e2af1bed4c5d1b84f031c4d12c10",  # release v3.14.0
+    commit = "436bd78",  # release v3.15.8
     remote = "https://github.com/protocolbuffers/protobuf.git",
 )
 
 git_repository(
     name = "com_google_absl",
-    commit = "b56cbdd",  # release 20200923
+    commit = "e1d388e", # release 20210324.1
     remote = "https://github.com/abseil/abseil-cpp.git",
 )
 
@@ -62,7 +56,7 @@ protobuf_deps()
 
 http_archive(
     name = "gtest",
-    build_file = "//bazel:gtest.BUILD",
+    build_file = "@ortools//bazel:gtest.BUILD",
     strip_prefix = "googletest-release-1.8.0/googletest",
     url = "https://github.com/google/googletest/archive/release-1.8.0.zip",
 )
@@ -70,8 +64,8 @@ http_archive(
 http_archive(
     name = "glpk",
     build_file = "@ortools//bazel:glpk.BUILD",
-    sha256 = "9a5dab356268b4f177c33e00ddf8164496dc2434e83bd1114147024df983a3bb",
-    url = "http://ftp.gnu.org/gnu/glpk/glpk-4.52.tar.gz",
+    sha256 = "4281e29b628864dfe48d393a7bedd781e5b475387c20d8b0158f329994721a10",
+    url = "http://ftp.gnu.org/gnu/glpk/glpk-4.65.tar.gz",
 )
 
 http_archive(

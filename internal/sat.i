@@ -1,11 +1,11 @@
-// Copyright 2010-2018 Google LLC
+// Copyright 2010-2021 Google LLC
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
 //
-// Unless required by appliable law or agreed to in writing, software
+// Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
@@ -53,19 +53,31 @@ PROTO2_RETURN(operations_research::sat::CpSolverResponse,
 
 %unignore operations_research;
 %unignore operations_research::sat;
-%unignore operations_research::sat::SatHelper;
-%unignore operations_research::sat::SatHelper::Solve;
-%unignore operations_research::sat::SatHelper::SolveWithParameters;
-%unignore operations_research::sat::SatHelper::SolveWithParametersAndSolutionCallback;
-%unignore operations_research::sat::SatHelper::ModelStats;
-%unignore operations_research::sat::SatHelper::SolverResponseStats;
-%unignore operations_research::sat::SatHelper::ValidateModel;
-%unignore operations_research::sat::SatHelper::VariableDomain;
+
+// Wrap the SolveWrapper class.
+%unignore operations_research::sat::SolveWrapper;
+%unignore operations_research::sat::SolveWrapper::AddLogCallback;        // unused
+%unignore operations_research::sat::SolveWrapper::AddSolutionCallback;
+%unignore operations_research::sat::SolveWrapper::ClearSolutionCallback; // unused
+%unignore operations_research::sat::SolveWrapper::SetParameters;
+%unignore operations_research::sat::SolveWrapper::Solve;
+%unignore operations_research::sat::SolveWrapper::StopSearch;            // unused
+
+// Wrap the CpSatHelper class.
+%unignore operations_research::sat::CpSatHelper;
+%unignore operations_research::sat::CpSatHelper::ModelStats;          // unused
+%unignore operations_research::sat::CpSatHelper::SolverResponseStats; // unused
+%unignore operations_research::sat::CpSatHelper::ValidateModel;
+%unignore operations_research::sat::CpSatHelper::VariableDomain;      // unused
 
 %feature("director") operations_research::sat::SolutionCallback;
 %unignore operations_research::sat::SolutionCallback;
 %unignore operations_research::sat::SolutionCallback::~SolutionCallback;
 %unignore operations_research::sat::SolutionCallback::BestObjectiveBound;
+%feature("director") operations_research::sat::LogCallback;
+%unignore operations_research::sat::LogCallback;
+%unignore operations_research::sat::LogCallback::~LogCallback;
+%unignore operations_research::sat::LogCallback::NewMessage;
 %feature("nodirector") operations_research::sat::SolutionCallback::BestObjectiveBound;
 %unignore operations_research::sat::SolutionCallback::HasResponse;
 %feature("nodirector") operations_research::sat::SolutionCallback::HasResponse;

@@ -14,7 +14,9 @@ model=m
   constants (num = 0)
     C == 42
   literals (num = 3)
-    x, y, z
+    x
+    y
+    z
   intervals (num = 2)
     [a, b | C]
     [b, c | C]
@@ -43,7 +45,9 @@ model=m
   constants (num = 13)
     C == 42
   literals (num = 3)
-    x, y, z
+    x
+    y
+    z
   intervals (num = 2)
     [a, b | C]
     [b, c | C]

@@ -122,12 +122,12 @@ func (m *Model) Maximize(e LinearExpr) {
 // TODO(irfansharif): This validation message refers to things using indexes,
 // which is not really usable.
 func (m *Model) Validate() (ok bool, _ error) {
-	msg := internal.SatHelperValidateModel(*m.pb)
-	if msg == "" {
+	validation := internal.CpSatHelperValidateModel(*m.pb)
+	if validation == "" {
 		return true, nil
 	}
 
-	return false, errors.New(msg)
+	return false, errors.New(validation)
 }
 
 // String provides a string representation of the model.
@@ -152,14 +152,8 @@ func (m *Model) String() string {
 	for i, l := range m.literals {
 		if i == 0 {
 			b.WriteString(fmt.Sprintf("  literals (num = %d)\n", len(m.literals)))
-			b.WriteString("    ")
-		} else {
-			b.WriteString(", ")
 		}
-		b.WriteString(fmt.Sprintf("%s", l.String()))
-		if i == len(m.literals)-1 {
-			b.WriteString("\n")
-		}
+		b.WriteString(fmt.Sprintf("    %s\n", l.String()))
 	}
 
 	for i, iv := range m.intervals {
@@ -192,22 +186,39 @@ func (m *Model) String() string {
 // optimal result if an objective function is declared. If not, it returns
 // the first found result that satisfies the model.
 func (m *Model) Solve() Result {
-	proto := internal.SatHelperSolve(*m.pb)
-	return Result{pb: &proto}
+	wrapper := internal.NewSolveWrapper()
+	defer func() {
+		internal.DeleteSolveWrapper(wrapper)
+	}()
+
+	resp := wrapper.Solve(*m.pb)
+	return Result{pb: &resp}
 }
 
 // SolveAll returns all valid results that satisfy the model.
 func (m *Model) SolveAll() []Result {
 	var results []Result
 	cb := &solutionCallback{
-		cb: func(r Result) { results = append(results, r) },
+		cb: func(r Result) {
+			results = append(results, r)
+		},
 	}
 	cb.director = internal.NewDirectorSolutionCallback(cb)
+	defer func() {
+		internal.DeleteDirectorSolutionCallback(cb.director)
+	}()
 
 	enumerate := true
 	params := pb.SatParameters{EnumerateAllSolutions: &enumerate}
-	internal.SatHelperSolveWithParametersAndSolutionCallback(*m.pb, params, cb.director)
-	internal.DeleteDirectorSolutionCallback(cb.director)
+
+	wrapper := internal.NewSolveWrapper()
+	defer func() {
+		internal.DeleteSolveWrapper(wrapper)
+	}()
+
+	wrapper.AddSolutionCallback(cb.director)
+	wrapper.SetParameters(params)
+	wrapper.Solve(*m.pb)
 	return results
 }
 

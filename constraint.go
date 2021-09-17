@@ -38,9 +38,14 @@ type Constraint interface {
 	// Stringer provides a printable format representation for the constraint.
 	fmt.Stringer
 
-	// XXX: Constraints can also be named, how do we support that? Would be nice
-	// to have a unified way to name things (model, intvar, literal, intervals,
-	// constraints).
+	// WithName sets a name for the constraint; used for debugging/logging
+	// purposes.
+	//
+	// TODO(irfansharif): We don't use it in our pretty printing, yet. That
+	// aside it would be nice to have a unified way to name things. For intvars,
+	// literal, intervals -- it's provided as part of initializer. We use
+	// separate things for models and constraints.
+	WithName(name string) Constraint
 
 	// protos returns the underlying CP-SAT constraint protobuf representations.
 	protos() []*pb.ConstraintProto
@@ -57,6 +62,12 @@ type constraint struct {
 	str string
 
 	enforcement []Literal
+}
+
+// WithName is part of the Constraint interface.
+func (c *constraint) WithName(name string) Constraint {
+	c.pb.Name = name
+	return c
 }
 
 // String is part of the Constraint interface.
@@ -156,8 +167,13 @@ func NewAtLeastKConstraint(k int, literals ...Literal) Constraint {
 
 // NewExactlyKConstraint ensures that exactly k literals are true.
 func NewExactlyKConstraint(k int, literals ...Literal) Constraint {
-	lb, ub := int64(k), int64(k)
-	c := NewLinearConstraint(Sum(asIntVars(literals)...), NewDomain(lb, ub))
+	var c Constraint
+	if k == 1 {
+		c = newExactlyOneConstraint(literals...)
+	} else {
+		lb, ub := int64(k), int64(k)
+		c = NewLinearConstraint(Sum(asIntVars(literals)...), NewDomain(lb, ub))
+	}
 
 	var b strings.Builder
 	b.WriteString("exactly-k: ")
@@ -535,9 +551,6 @@ func newAtMostOneConstraint(literals ...Literal) Constraint {
 
 // newExactlyOneConstraint is a special case of NewExactlyKConstraint that uses
 // a more efficient internal encoding.
-//
-// TODO(irfansharif): This doesn't work yet; we're not linking against or-tools
-// v9.0.
 func newExactlyOneConstraint(literals ...Literal) Constraint {
 	return &constraint{
 		pb: &pb.ConstraintProto{
@@ -563,20 +576,30 @@ func (c *constraint) protos() []*pb.ConstraintProto {
 }
 
 type constraints struct {
-	cs  []Constraint
-	str string
-}
-
-func (c constraints) String() string {
-	return c.str
+	cs        []Constraint
+	name, str string
 }
 
 var _ Constraint = &constraints{}
 
+// WithName is part of the Constraint interface.
+func (c constraints) WithName(name string) Constraint {
+	c.name = name
+	for i := range c.cs {
+		c.cs[i] = c.cs[i].WithName(name)
+	}
+	return c
+}
+
+// String is part of the Constraint interface.
+func (c constraints) String() string {
+	return c.str
+}
+
 // OnlyEnforceIf is part of the Constraint interface.
 func (c constraints) OnlyEnforceIf(literals ...Literal) Constraint {
-	for _, c := range c.cs {
-		c.OnlyEnforceIf(literals...)
+	for _, cons := range c.cs {
+		cons.OnlyEnforceIf(literals...)
 	}
 	return c
 }
@@ -584,8 +607,8 @@ func (c constraints) OnlyEnforceIf(literals ...Literal) Constraint {
 // protos is part of the Constraint interface.
 func (c constraints) protos() []*pb.ConstraintProto {
 	var res []*pb.ConstraintProto
-	for _, c := range c.cs {
-		res = append(res, c.protos()...)
+	for _, cons := range c.cs {
+		res = append(res, cons.protos()...)
 	}
 	return res
 }

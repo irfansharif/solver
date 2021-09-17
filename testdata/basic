@@ -30,7 +30,9 @@ model=m
     b == 2
     c == 1
   literals (num = 3)
-    d, e, f
+    d
+    e
+    f
   constraints (num = 5)
     all-different: x, y, z
     all-same: x, a

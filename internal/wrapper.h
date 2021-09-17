@@ -26,4 +26,15 @@ class SwigDirector_SolutionCallback : public operations_research::sat::SolutionC
   Swig_memory *swig_mem;
 };
 
+class SwigDirector_LogCallback : public operations_research::sat::LogCallback
+{
+ public:
+  SwigDirector_LogCallback(int swig_p);
+  virtual ~SwigDirector_LogCallback();
+  virtual void NewMessage(std::string const &message);
+ private:
+  intgo go_val;
+  Swig_memory *swig_mem;
+};
+
 #endif

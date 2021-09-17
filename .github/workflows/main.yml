@@ -1,4 +1,4 @@
-name: Continuous Integration
+name: CI
 
 on:
   push:
@@ -17,6 +17,14 @@ jobs:
           go-version: '1.16.5'
       - uses: bazelbuild/setup-bazelisk@v1
 
+      - name: Cache build artifacts
+        uses: actions/cache@v2
+        env:
+          cache-name: build-cache
+        with:
+          path: ~/.cache/bazel
+          key: ${{ runner.os }}-${{ env.cache-name }}
+
       - name: Run Go version
         run: go version
 
@@ -26,14 +34,10 @@ jobs:
       - name: Run bazel version
         run: bazel --version
 
-      - name: Check generated code # we're skipping over swig, proto, and go files to bound CI image size/speed low
-        run: |
+      - name: Check generated code
+        run: | # skip over swig, proto, and go files to bound image size and build times
           make bzl
           git diff --exit-code
-
-      - name: Compile artifacts
-        run: |
-          make build
 
       - name: Run tests
         run: |

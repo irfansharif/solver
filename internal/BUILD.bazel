@@ -8,8 +8,9 @@ go_library(
         "wrapper.cc",
         "wrapper.h",
     ],
-    cdeps = [":ortools-cpsat"],
+    cdeps = [":ortools-sat"],
     cgo = True,
+    cxxopts = ["-std=c++17"],  # keep
     importpath = "github.com/irfansharif/solver/internal",
     visibility = ["//:__subpackages__"],
     deps = [
@@ -26,12 +27,8 @@ go_test(
 )
 
 cc_library(
-    name = "ortools-cpsat",
-    srcs = [],
-    hdrs = [
-        "@ortools//ortools/sat:swig_helper.h",
-    ],
-    copts = [],
+    name = "ortools-sat",
+    hdrs = ["@ortools//ortools/sat:swig_helper.h"],
     deps = [
         "@ortools//ortools/base",
         "@ortools//ortools/sat:cp_model_cc_proto",

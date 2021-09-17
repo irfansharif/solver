@@ -2,3 +2,4 @@ bazel-*
 .bazel
 .bazelversion
 .bazelrc
+.bazelrc.user
