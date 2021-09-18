@@ -35,6 +35,8 @@ func TestDatadriven(t *testing.T) {
 
 		model := solver.NewModel("") // instantiate a model
 
+		// Identifier scope, mapping identifiers to the types they were
+		// instantiated with.
 		itvM := make(map[string]solver.Interval)
 		varM := make(map[string]solver.IntVar)
 		litM := make(map[string]solver.Literal)

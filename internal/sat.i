@@ -70,14 +70,15 @@ PROTO2_RETURN(operations_research::sat::CpSolverResponse,
 %unignore operations_research::sat::CpSatHelper::ValidateModel;
 %unignore operations_research::sat::CpSatHelper::VariableDomain;      // unused
 
+%feature("director") operations_research::sat::LogCallback; // unused
+%unignore operations_research::sat::LogCallback;
+%unignore operations_research::sat::LogCallback::~LogCallback;
+%unignore operations_research::sat::LogCallback::NewMessage;
+
 %feature("director") operations_research::sat::SolutionCallback;
 %unignore operations_research::sat::SolutionCallback;
 %unignore operations_research::sat::SolutionCallback::~SolutionCallback;
 %unignore operations_research::sat::SolutionCallback::BestObjectiveBound;
-%feature("director") operations_research::sat::LogCallback;
-%unignore operations_research::sat::LogCallback;
-%unignore operations_research::sat::LogCallback::~LogCallback;
-%unignore operations_research::sat::LogCallback::NewMessage;
 %feature("nodirector") operations_research::sat::SolutionCallback::BestObjectiveBound;
 %unignore operations_research::sat::SolutionCallback::HasResponse;
 %feature("nodirector") operations_research::sat::SolutionCallback::HasResponse;

@@ -199,7 +199,7 @@ z = false
 $ make rewrite
 
 # to run specific tests
-$ bazel test :all internal/... --test_output=all \
+$ bazel test ... --test_output=all \
   --cache_test_results=no \
   --test_arg='-test.v' \
   --test_filter='Test.*'

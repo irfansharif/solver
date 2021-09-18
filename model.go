@@ -185,41 +185,32 @@ func (m *Model) String() string {
 // for all the variables/literals that were instantiated into it. It returns the
 // optimal result if an objective function is declared. If not, it returns
 // the first found result that satisfies the model.
-func (m *Model) Solve() Result {
-	wrapper := internal.NewSolveWrapper()
-	defer func() {
-		internal.DeleteSolveWrapper(wrapper)
-	}()
+//
+// The solve process itself can be configured with various options.
+func (m *Model) Solve(os ...Option) Result {
+	solver := internal.NewSolveWrapper()
+	defer func() { internal.DeleteSolveWrapper(solver) }()
 
-	resp := wrapper.Solve(*m.pb)
-	return Result{pb: &resp}
-}
-
-// SolveAll returns all valid results that satisfy the model.
-func (m *Model) SolveAll() []Result {
-	var results []Result
-	cb := &solutionCallback{
-		cb: func(r Result) {
-			results = append(results, r)
-		},
+	var opts options
+	for _, o := range os {
+		o(&opts, solver)
 	}
-	cb.director = internal.NewDirectorSolutionCallback(cb)
-	defer func() {
-		internal.DeleteDirectorSolutionCallback(cb.director)
-	}()
+	if ok, err := opts.validate(); !ok {
+		panic(err)
+	}
+	if opts.solution != nil {
+		defer func() { internal.DeleteDirectorSolutionCallback(opts.solution.hook) }()
+	}
 
-	enumerate := true
-	params := pb.SatParameters{EnumerateAllSolutions: &enumerate}
+	solver.SetParameters(opts.params)
+	resp := solver.Solve(*m.pb)
 
-	wrapper := internal.NewSolveWrapper()
-	defer func() {
-		internal.DeleteSolveWrapper(wrapper)
-	}()
-
-	wrapper.AddSolutionCallback(cb.director)
-	wrapper.SetParameters(params)
-	wrapper.Solve(*m.pb)
-	return results
+	if opts.logger != nil {
+		for _, line := range strings.Split(resp.SolveLog, "\n") {
+			opts.logger.Print(line)
+		}
+	}
+	return Result{pb: &resp}
 }
 
 func (m *Model) name() string {
@@ -249,14 +240,4 @@ func (m *Model) toObjectiveProto(e LinearExpr) *pb.CpObjectiveProto {
 		Coeffs: e.coeffs(),
 		Offset: float64(e.offset()),
 	}
-}
-
-type solutionCallback struct {
-	cb       func(Result)
-	director internal.SolutionCallback
-}
-
-func (p *solutionCallback) OnSolutionCallback() {
-	proto := p.director.Response()
-	p.cb(Result{pb: &proto})
 }

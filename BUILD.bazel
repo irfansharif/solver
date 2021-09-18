@@ -19,6 +19,7 @@ go_library(
         "intvar.go",
         "linearexpr.go",
         "model.go",
+        "options.go",
         "result.go",
     ],
     importpath = "github.com/irfansharif/solver",

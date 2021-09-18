@@ -17,10 +17,12 @@ package solver
 import (
 	"fmt"
 	"math"
+	"os"
 	"reflect"
 	"sort"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -272,13 +274,16 @@ func TestElement(t *testing.T) {
 	require.True(t, result.Value(target) == 10*result.Value(index))
 }
 
-func TestIterateThroughSolutions(t *testing.T) {
+func TestEnumerateSolutions(t *testing.T) {
 	model := NewModel("")
 
 	var numVals int64 = 3
 	_ = model.NewIntVar(1, numVals, "x")
 
-	results := model.SolveAll()
+	var results []Result
+	_ = model.Solve(
+		WithEnumeration(func(r Result) { results = append(results, r) }),
+	)
 	require.Len(t, results, int(numVals))
 }
 
@@ -427,5 +432,28 @@ func TestNonOverlappingIntervalsWithEnforcement(t *testing.T) {
 			require.True(t, last <= sp.start)
 			last = sp.end
 		}
+	}
+}
+
+func TestSolverOptions(t *testing.T) {
+	model := NewModel("")
+
+	A := model.NewLiteral("A")
+	B := model.NewLiteral("B")
+	C := model.NewLiteral("C")
+
+	model.AddConstraints(NewAllSameConstraint(A, B, C))
+
+	t.Log(model.String())
+	result := model.Solve(
+		WithLogger(os.Stdout, "[solver]  "),
+		WithParallelism(4),
+		WithTimeout(time.Second),
+	)
+	require.True(t, result.Optimal(), "expected solver to find solution")
+
+	{
+		A, B, C := result.BooleanValue(A), result.BooleanValue(B), result.BooleanValue(C)
+		require.True(t, A == B && B == C)
 	}
 }

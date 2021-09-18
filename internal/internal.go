@@ -46,54 +46,57 @@ typedef _goslice_ swig_type_15;
 typedef _gostring_ swig_type_16;
 typedef _goslice_ swig_type_17;
 typedef _goslice_ swig_type_18;
-extern void _wrap_Swig_free_internal_43b76517707a94b8(uintptr_t arg1);
-extern uintptr_t _wrap_Swig_malloc_internal_43b76517707a94b8(swig_intgo arg1);
-extern uintptr_t _wrap__swig_NewDirectorSolutionCallbackSolutionCallback_internal_43b76517707a94b8(int);
-extern void _wrap_DeleteDirectorSolutionCallback_internal_43b76517707a94b8(uintptr_t arg1);
-extern void _wrap_delete_SolutionCallback_internal_43b76517707a94b8(uintptr_t arg1);
-extern void _wrap_SolutionCallback_OnSolutionCallback_internal_43b76517707a94b8(uintptr_t arg1);
-extern swig_type_1 _wrap_SolutionCallback_NumBooleans_internal_43b76517707a94b8(uintptr_t arg1);
-extern swig_type_2 _wrap_SolutionCallback_NumBranches_internal_43b76517707a94b8(uintptr_t arg1);
-extern swig_type_3 _wrap_SolutionCallback_NumConflicts_internal_43b76517707a94b8(uintptr_t arg1);
-extern swig_type_4 _wrap_SolutionCallback_NumBinaryPropagations_internal_43b76517707a94b8(uintptr_t arg1);
-extern swig_type_5 _wrap_SolutionCallback_NumIntegerPropagations_internal_43b76517707a94b8(uintptr_t arg1);
-extern double _wrap_SolutionCallback_WallTime_internal_43b76517707a94b8(uintptr_t arg1);
-extern double _wrap_SolutionCallback_UserTime_internal_43b76517707a94b8(uintptr_t arg1);
-extern double _wrap_SolutionCallback_ObjectiveValue_internal_43b76517707a94b8(uintptr_t arg1);
-extern double _wrap_SolutionCallback_BestObjectiveBound_internal_43b76517707a94b8(uintptr_t arg1);
-extern swig_type_6 _wrap_SolutionCallback_SolutionIntegerValue_internal_43b76517707a94b8(uintptr_t arg1, swig_intgo arg2);
-extern _Bool _wrap_SolutionCallback_SolutionBooleanValue_internal_43b76517707a94b8(uintptr_t arg1, swig_intgo arg2);
-extern void _wrap_SolutionCallback_StopSearch_internal_43b76517707a94b8(uintptr_t arg1);
-extern swig_type_7 _wrap_SolutionCallback_Response_internal_43b76517707a94b8(uintptr_t arg1);
-extern _Bool _wrap_SolutionCallback_HasResponse_internal_43b76517707a94b8(uintptr_t arg1);
-extern uintptr_t _wrap__swig_NewDirectorLogCallbackLogCallback_internal_43b76517707a94b8(int);
-extern void _wrap_DeleteDirectorLogCallback_internal_43b76517707a94b8(uintptr_t arg1);
-extern void _wrap_delete_LogCallback_internal_43b76517707a94b8(uintptr_t arg1);
-extern void _wrap_LogCallback_NewMessage_internal_43b76517707a94b8(uintptr_t arg1, swig_type_8 arg2);
-extern void _wrap_SolveWrapper_SetParameters_internal_43b76517707a94b8(uintptr_t arg1, swig_type_9 arg2);
-extern void _wrap_SolveWrapper_AddSolutionCallback_internal_43b76517707a94b8(uintptr_t arg1, uintptr_t arg2);
-extern void _wrap_SolveWrapper_ClearSolutionCallback_internal_43b76517707a94b8(uintptr_t arg1, uintptr_t arg2);
-extern void _wrap_SolveWrapper_AddLogCallback_internal_43b76517707a94b8(uintptr_t arg1, uintptr_t arg2);
-extern swig_type_10 _wrap_SolveWrapper_Solve_internal_43b76517707a94b8(uintptr_t arg1, swig_type_11 arg2);
-extern void _wrap_SolveWrapper_StopSearch_internal_43b76517707a94b8(uintptr_t arg1);
-extern uintptr_t _wrap_new_SolveWrapper_internal_43b76517707a94b8(void);
-extern void _wrap_delete_SolveWrapper_internal_43b76517707a94b8(uintptr_t arg1);
-extern swig_type_12 _wrap_CpSatHelper_ModelStats_internal_43b76517707a94b8(swig_type_13 arg1);
-extern swig_type_14 _wrap_CpSatHelper_SolverResponseStats_internal_43b76517707a94b8(swig_type_15 arg1);
-extern swig_type_16 _wrap_CpSatHelper_ValidateModel_internal_43b76517707a94b8(swig_type_17 arg1);
-extern uintptr_t _wrap_CpSatHelper_VariableDomain_internal_43b76517707a94b8(swig_type_18 arg1);
-extern uintptr_t _wrap_new_CpSatHelper_internal_43b76517707a94b8(void);
-extern void _wrap_delete_CpSatHelper_internal_43b76517707a94b8(uintptr_t arg1);
+extern void _wrap_Swig_free_internal_0eb8ac65aa8fcab2(uintptr_t arg1);
+extern uintptr_t _wrap_Swig_malloc_internal_0eb8ac65aa8fcab2(swig_intgo arg1);
+extern uintptr_t _wrap__swig_NewDirectorSolutionCallbackSolutionCallback_internal_0eb8ac65aa8fcab2(int);
+extern void _wrap_DeleteDirectorSolutionCallback_internal_0eb8ac65aa8fcab2(uintptr_t arg1);
+extern void _wrap_delete_SolutionCallback_internal_0eb8ac65aa8fcab2(uintptr_t arg1);
+extern void _wrap_SolutionCallback_OnSolutionCallback_internal_0eb8ac65aa8fcab2(uintptr_t arg1);
+extern swig_type_1 _wrap_SolutionCallback_NumBooleans_internal_0eb8ac65aa8fcab2(uintptr_t arg1);
+extern swig_type_2 _wrap_SolutionCallback_NumBranches_internal_0eb8ac65aa8fcab2(uintptr_t arg1);
+extern swig_type_3 _wrap_SolutionCallback_NumConflicts_internal_0eb8ac65aa8fcab2(uintptr_t arg1);
+extern swig_type_4 _wrap_SolutionCallback_NumBinaryPropagations_internal_0eb8ac65aa8fcab2(uintptr_t arg1);
+extern swig_type_5 _wrap_SolutionCallback_NumIntegerPropagations_internal_0eb8ac65aa8fcab2(uintptr_t arg1);
+extern double _wrap_SolutionCallback_WallTime_internal_0eb8ac65aa8fcab2(uintptr_t arg1);
+extern double _wrap_SolutionCallback_UserTime_internal_0eb8ac65aa8fcab2(uintptr_t arg1);
+extern double _wrap_SolutionCallback_ObjectiveValue_internal_0eb8ac65aa8fcab2(uintptr_t arg1);
+extern double _wrap_SolutionCallback_BestObjectiveBound_internal_0eb8ac65aa8fcab2(uintptr_t arg1);
+extern swig_type_6 _wrap_SolutionCallback_SolutionIntegerValue_internal_0eb8ac65aa8fcab2(uintptr_t arg1, swig_intgo arg2);
+extern _Bool _wrap_SolutionCallback_SolutionBooleanValue_internal_0eb8ac65aa8fcab2(uintptr_t arg1, swig_intgo arg2);
+extern void _wrap_SolutionCallback_StopSearch_internal_0eb8ac65aa8fcab2(uintptr_t arg1);
+extern swig_type_7 _wrap_SolutionCallback_Response_internal_0eb8ac65aa8fcab2(uintptr_t arg1);
+extern _Bool _wrap_SolutionCallback_HasResponse_internal_0eb8ac65aa8fcab2(uintptr_t arg1);
+extern uintptr_t _wrap__swig_NewDirectorLogCallbackLogCallback_internal_0eb8ac65aa8fcab2(int);
+extern void _wrap_DeleteDirectorLogCallback_internal_0eb8ac65aa8fcab2(uintptr_t arg1);
+extern void _wrap_delete_LogCallback_internal_0eb8ac65aa8fcab2(uintptr_t arg1);
+extern void _wrap_LogCallback_NewMessage_internal_0eb8ac65aa8fcab2(uintptr_t arg1, swig_type_8 arg2);
+extern void _wrap_SolveWrapper_SetParameters_internal_0eb8ac65aa8fcab2(uintptr_t arg1, swig_type_9 arg2);
+extern void _wrap_SolveWrapper_AddSolutionCallback_internal_0eb8ac65aa8fcab2(uintptr_t arg1, uintptr_t arg2);
+extern void _wrap_SolveWrapper_ClearSolutionCallback_internal_0eb8ac65aa8fcab2(uintptr_t arg1, uintptr_t arg2);
+extern void _wrap_SolveWrapper_AddLogCallback_internal_0eb8ac65aa8fcab2(uintptr_t arg1, uintptr_t arg2);
+extern swig_type_10 _wrap_SolveWrapper_Solve_internal_0eb8ac65aa8fcab2(uintptr_t arg1, swig_type_11 arg2);
+extern void _wrap_SolveWrapper_StopSearch_internal_0eb8ac65aa8fcab2(uintptr_t arg1);
+extern uintptr_t _wrap_new_SolveWrapper_internal_0eb8ac65aa8fcab2(void);
+extern void _wrap_delete_SolveWrapper_internal_0eb8ac65aa8fcab2(uintptr_t arg1);
+extern swig_type_12 _wrap_CpSatHelper_ModelStats_internal_0eb8ac65aa8fcab2(swig_type_13 arg1);
+extern swig_type_14 _wrap_CpSatHelper_SolverResponseStats_internal_0eb8ac65aa8fcab2(swig_type_15 arg1);
+extern swig_type_16 _wrap_CpSatHelper_ValidateModel_internal_0eb8ac65aa8fcab2(swig_type_17 arg1);
+extern uintptr_t _wrap_CpSatHelper_VariableDomain_internal_0eb8ac65aa8fcab2(swig_type_18 arg1);
+extern uintptr_t _wrap_new_CpSatHelper_internal_0eb8ac65aa8fcab2(void);
+extern void _wrap_delete_CpSatHelper_internal_0eb8ac65aa8fcab2(uintptr_t arg1);
 #undef intgo
 */
 import "C"
 
-import "unsafe"
-import _ "runtime/cgo"
-import "sync"
-import "fmt"
-import "github.com/golang/protobuf/proto"
-import "github.com/irfansharif/solver/internal/pb"
+import (
+	"fmt"
+	_ "runtime/cgo"
+	"sync"
+	"unsafe"
+
+	"github.com/golang/protobuf/proto"
+	"github.com/irfansharif/solver/internal/pb"
+)
 
 type _ unsafe.Pointer
 
@@ -165,13 +168,13 @@ func swigCopyString(s string) string {
 
 func Swig_free(arg1 uintptr) {
 	_swig_i_0 := arg1
-	C._wrap_Swig_free_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0))
+	C._wrap_Swig_free_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0))
 }
 
 func Swig_malloc(arg1 int) (_swig_ret uintptr) {
 	var swig_r uintptr
 	_swig_i_0 := arg1
-	swig_r = (uintptr)(C._wrap_Swig_malloc_internal_43b76517707a94b8(C.swig_intgo(_swig_i_0)))
+	swig_r = (uintptr)(C._wrap_Swig_malloc_internal_0eb8ac65aa8fcab2(C.swig_intgo(_swig_i_0)))
 	return swig_r
 }
 
@@ -193,17 +196,17 @@ func (p *_swig_DirectorSolutionCallback) DirectorInterface() interface{} {
 
 func NewDirectorSolutionCallback(v interface{}) SolutionCallback {
 	p := &_swig_DirectorSolutionCallback{0, v}
-	p.SwigcptrSolutionCallback = SwigcptrSolutionCallback(C._wrap__swig_NewDirectorSolutionCallbackSolutionCallback_internal_43b76517707a94b8(C.int(swigDirectorAdd(p))))
+	p.SwigcptrSolutionCallback = SwigcptrSolutionCallback(C._wrap__swig_NewDirectorSolutionCallbackSolutionCallback_internal_0eb8ac65aa8fcab2(C.int(swigDirectorAdd(p))))
 	return p
 }
 
 func DeleteDirectorSolutionCallback(arg1 SolutionCallback) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_DeleteDirectorSolutionCallback_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0))
+	C._wrap_DeleteDirectorSolutionCallback_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0))
 }
 
-//export Swiggo_DeleteDirector_SolutionCallback_internal_43b76517707a94b8
-func Swiggo_DeleteDirector_SolutionCallback_internal_43b76517707a94b8(c int) {
+//export Swiggo_DeleteDirector_SolutionCallback_internal_0eb8ac65aa8fcab2
+func Swiggo_DeleteDirector_SolutionCallback_internal_0eb8ac65aa8fcab2(c int) {
 	swigDirectorLookup(c).(*_swig_DirectorSolutionCallback).SwigcptrSolutionCallback = 0
 	swigDirectorDelete(c)
 }
@@ -220,8 +223,8 @@ func (swig_p *_swig_DirectorSolutionCallback) OnSolutionCallback() {
 	panic("call to pure virtual method")
 }
 
-//export Swig_DirectorSolutionCallback_callback_OnSolutionCallback_internal_43b76517707a94b8
-func Swig_DirectorSolutionCallback_callback_OnSolutionCallback_internal_43b76517707a94b8(swig_c int) {
+//export Swig_DirectorSolutionCallback_callback_OnSolutionCallback_internal_0eb8ac65aa8fcab2
+func Swig_DirectorSolutionCallback_callback_OnSolutionCallback_internal_0eb8ac65aa8fcab2(swig_c int) {
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorSolutionCallback)
 	swig_p.OnSolutionCallback()
 }
@@ -241,74 +244,74 @@ func (p SwigcptrSolutionCallback) DirectorInterface() interface{} {
 
 func DeleteSolutionCallback(arg1 SolutionCallback) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_SolutionCallback_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_SolutionCallback_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrSolutionCallback) OnSolutionCallback() {
 	_swig_i_0 := arg1
-	C._wrap_SolutionCallback_OnSolutionCallback_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0))
+	C._wrap_SolutionCallback_OnSolutionCallback_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrSolutionCallback) NumBooleans() (_swig_ret int64) {
 	var swig_r int64
 	_swig_i_0 := arg1
-	swig_r = (int64)(C._wrap_SolutionCallback_NumBooleans_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0)))
+	swig_r = (int64)(C._wrap_SolutionCallback_NumBooleans_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrSolutionCallback) NumBranches() (_swig_ret int64) {
 	var swig_r int64
 	_swig_i_0 := arg1
-	swig_r = (int64)(C._wrap_SolutionCallback_NumBranches_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0)))
+	swig_r = (int64)(C._wrap_SolutionCallback_NumBranches_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrSolutionCallback) NumConflicts() (_swig_ret int64) {
 	var swig_r int64
 	_swig_i_0 := arg1
-	swig_r = (int64)(C._wrap_SolutionCallback_NumConflicts_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0)))
+	swig_r = (int64)(C._wrap_SolutionCallback_NumConflicts_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrSolutionCallback) NumBinaryPropagations() (_swig_ret int64) {
 	var swig_r int64
 	_swig_i_0 := arg1
-	swig_r = (int64)(C._wrap_SolutionCallback_NumBinaryPropagations_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0)))
+	swig_r = (int64)(C._wrap_SolutionCallback_NumBinaryPropagations_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrSolutionCallback) NumIntegerPropagations() (_swig_ret int64) {
 	var swig_r int64
 	_swig_i_0 := arg1
-	swig_r = (int64)(C._wrap_SolutionCallback_NumIntegerPropagations_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0)))
+	swig_r = (int64)(C._wrap_SolutionCallback_NumIntegerPropagations_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrSolutionCallback) WallTime() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_SolutionCallback_WallTime_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_SolutionCallback_WallTime_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrSolutionCallback) UserTime() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_SolutionCallback_UserTime_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_SolutionCallback_UserTime_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrSolutionCallback) ObjectiveValue() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_SolutionCallback_ObjectiveValue_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_SolutionCallback_ObjectiveValue_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
 func (arg1 SwigcptrSolutionCallback) BestObjectiveBound() (_swig_ret float64) {
 	var swig_r float64
 	_swig_i_0 := arg1
-	swig_r = (float64)(C._wrap_SolutionCallback_BestObjectiveBound_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0)))
+	swig_r = (float64)(C._wrap_SolutionCallback_BestObjectiveBound_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
@@ -316,7 +319,7 @@ func (arg1 SwigcptrSolutionCallback) SolutionIntegerValue(arg2 int) (_swig_ret i
 	var swig_r int64
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (int64)(C._wrap_SolutionCallback_SolutionIntegerValue_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1)))
+	swig_r = (int64)(C._wrap_SolutionCallback_SolutionIntegerValue_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1)))
 	return swig_r
 }
 
@@ -324,19 +327,19 @@ func (arg1 SwigcptrSolutionCallback) SolutionBooleanValue(arg2 int) (_swig_ret b
 	var swig_r bool
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	swig_r = (bool)(C._wrap_SolutionCallback_SolutionBooleanValue_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1)))
+	swig_r = (bool)(C._wrap_SolutionCallback_SolutionBooleanValue_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0), C.swig_intgo(_swig_i_1)))
 	return swig_r
 }
 
 func (arg1 SwigcptrSolutionCallback) StopSearch() {
 	_swig_i_0 := arg1
-	C._wrap_SolutionCallback_StopSearch_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0))
+	C._wrap_SolutionCallback_StopSearch_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrSolutionCallback) Response() (_swig_ret pb.CpSolverResponse) {
 	var swig_r []byte
 	_swig_i_0 := arg1
-	swig_r_p := C._wrap_SolutionCallback_Response_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0))
+	swig_r_p := C._wrap_SolutionCallback_Response_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0))
 	swig_r = *(*[]byte)(unsafe.Pointer(&swig_r_p))
 	var swig_r_1 pb.CpSolverResponse
 	{
@@ -355,7 +358,7 @@ func (arg1 SwigcptrSolutionCallback) Response() (_swig_ret pb.CpSolverResponse) 
 func (arg1 SwigcptrSolutionCallback) HasResponse() (_swig_ret bool) {
 	var swig_r bool
 	_swig_i_0 := arg1
-	swig_r = (bool)(C._wrap_SolutionCallback_HasResponse_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0)))
+	swig_r = (bool)(C._wrap_SolutionCallback_HasResponse_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0)))
 	return swig_r
 }
 
@@ -398,17 +401,17 @@ func (p *_swig_DirectorLogCallback) DirectorInterface() interface{} {
 
 func NewDirectorLogCallback(v interface{}) LogCallback {
 	p := &_swig_DirectorLogCallback{0, v}
-	p.SwigcptrLogCallback = SwigcptrLogCallback(C._wrap__swig_NewDirectorLogCallbackLogCallback_internal_43b76517707a94b8(C.int(swigDirectorAdd(p))))
+	p.SwigcptrLogCallback = SwigcptrLogCallback(C._wrap__swig_NewDirectorLogCallbackLogCallback_internal_0eb8ac65aa8fcab2(C.int(swigDirectorAdd(p))))
 	return p
 }
 
 func DeleteDirectorLogCallback(arg1 LogCallback) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_DeleteDirectorLogCallback_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0))
+	C._wrap_DeleteDirectorLogCallback_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0))
 }
 
-//export Swiggo_DeleteDirector_LogCallback_internal_43b76517707a94b8
-func Swiggo_DeleteDirector_LogCallback_internal_43b76517707a94b8(c int) {
+//export Swiggo_DeleteDirector_LogCallback_internal_0eb8ac65aa8fcab2
+func Swiggo_DeleteDirector_LogCallback_internal_0eb8ac65aa8fcab2(c int) {
 	swigDirectorLookup(c).(*_swig_DirectorLogCallback).SwigcptrLogCallback = 0
 	swigDirectorDelete(c)
 }
@@ -425,8 +428,8 @@ func (swig_p *_swig_DirectorLogCallback) NewMessage(message string) {
 	panic("call to pure virtual method")
 }
 
-//export Swig_DirectorLogCallback_callback_NewMessage_internal_43b76517707a94b8
-func Swig_DirectorLogCallback_callback_NewMessage_internal_43b76517707a94b8(swig_c int, message string) {
+//export Swig_DirectorLogCallback_callback_NewMessage_internal_0eb8ac65aa8fcab2
+func Swig_DirectorLogCallback_callback_NewMessage_internal_0eb8ac65aa8fcab2(swig_c int, message string) {
 	var _swig_i_0 string
 	swig_p := swigDirectorLookup(swig_c).(*_swig_DirectorLogCallback)
 	_swig_i_0 = swigCopyString(message)
@@ -448,13 +451,13 @@ func (p SwigcptrLogCallback) DirectorInterface() interface{} {
 
 func DeleteLogCallback(arg1 LogCallback) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_LogCallback_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_LogCallback_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0))
 }
 
 func (arg1 SwigcptrLogCallback) NewMessage(arg2 string) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2
-	C._wrap_LogCallback_NewMessage_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0), *(*C.swig_type_8)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_LogCallback_NewMessage_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0), *(*C.swig_type_8)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = arg2
 	}
@@ -487,7 +490,7 @@ func (arg1 SwigcptrSolveWrapper) SetParameters(arg2 pb.SatParameters) {
 		}
 		_swig_i_1 = bytes
 	}
-	C._wrap_SolveWrapper_SetParameters_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0), *(*C.swig_type_9)(unsafe.Pointer(&_swig_i_1)))
+	C._wrap_SolveWrapper_SetParameters_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0), *(*C.swig_type_9)(unsafe.Pointer(&_swig_i_1)))
 	if Swig_escape_always_false {
 		Swig_escape_val = _swig_i_1
 	}
@@ -496,19 +499,19 @@ func (arg1 SwigcptrSolveWrapper) SetParameters(arg2 pb.SatParameters) {
 func (arg1 SwigcptrSolveWrapper) AddSolutionCallback(arg2 SolutionCallback) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_SolveWrapper_AddSolutionCallback_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_SolveWrapper_AddSolutionCallback_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrSolveWrapper) ClearSolutionCallback(arg2 SolutionCallback) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_SolveWrapper_ClearSolutionCallback_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_SolveWrapper_ClearSolutionCallback_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrSolveWrapper) AddLogCallback(arg2 Std_function_Sl_void_Sp_std_string_SS_const_SA__SP__Sg_) {
 	_swig_i_0 := arg1
 	_swig_i_1 := arg2.Swigcptr()
-	C._wrap_SolveWrapper_AddLogCallback_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
+	C._wrap_SolveWrapper_AddLogCallback_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0), C.uintptr_t(_swig_i_1))
 }
 
 func (arg1 SwigcptrSolveWrapper) Solve(arg2 pb.CpModelProto) (_swig_ret pb.CpSolverResponse) {
@@ -523,7 +526,7 @@ func (arg1 SwigcptrSolveWrapper) Solve(arg2 pb.CpModelProto) (_swig_ret pb.CpSol
 		}
 		_swig_i_1 = bytes
 	}
-	swig_r_p := C._wrap_SolveWrapper_Solve_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0), *(*C.swig_type_11)(unsafe.Pointer(&_swig_i_1)))
+	swig_r_p := C._wrap_SolveWrapper_Solve_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0), *(*C.swig_type_11)(unsafe.Pointer(&_swig_i_1)))
 	swig_r = *(*[]byte)(unsafe.Pointer(&swig_r_p))
 	if Swig_escape_always_false {
 		Swig_escape_val = _swig_i_1
@@ -544,18 +547,18 @@ func (arg1 SwigcptrSolveWrapper) Solve(arg2 pb.CpModelProto) (_swig_ret pb.CpSol
 
 func (arg1 SwigcptrSolveWrapper) StopSearch() {
 	_swig_i_0 := arg1
-	C._wrap_SolveWrapper_StopSearch_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0))
+	C._wrap_SolveWrapper_StopSearch_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0))
 }
 
 func NewSolveWrapper() (_swig_ret SolveWrapper) {
 	var swig_r SolveWrapper
-	swig_r = (SolveWrapper)(SwigcptrSolveWrapper(C._wrap_new_SolveWrapper_internal_43b76517707a94b8()))
+	swig_r = (SolveWrapper)(SwigcptrSolveWrapper(C._wrap_new_SolveWrapper_internal_0eb8ac65aa8fcab2()))
 	return swig_r
 }
 
 func DeleteSolveWrapper(arg1 SolveWrapper) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_SolveWrapper_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_SolveWrapper_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0))
 }
 
 type SolveWrapper interface {
@@ -589,7 +592,7 @@ func CpSatHelperModelStats(arg1 pb.CpModelProto) (_swig_ret string) {
 		}
 		_swig_i_0 = bytes
 	}
-	swig_r_p := C._wrap_CpSatHelper_ModelStats_internal_43b76517707a94b8(*(*C.swig_type_13)(unsafe.Pointer(&_swig_i_0)))
+	swig_r_p := C._wrap_CpSatHelper_ModelStats_internal_0eb8ac65aa8fcab2(*(*C.swig_type_13)(unsafe.Pointer(&_swig_i_0)))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	if Swig_escape_always_false {
 		Swig_escape_val = _swig_i_0
@@ -610,7 +613,7 @@ func CpSatHelperSolverResponseStats(arg1 pb.CpSolverResponse) (_swig_ret string)
 		}
 		_swig_i_0 = bytes
 	}
-	swig_r_p := C._wrap_CpSatHelper_SolverResponseStats_internal_43b76517707a94b8(*(*C.swig_type_15)(unsafe.Pointer(&_swig_i_0)))
+	swig_r_p := C._wrap_CpSatHelper_SolverResponseStats_internal_0eb8ac65aa8fcab2(*(*C.swig_type_15)(unsafe.Pointer(&_swig_i_0)))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	if Swig_escape_always_false {
 		Swig_escape_val = _swig_i_0
@@ -631,7 +634,7 @@ func CpSatHelperValidateModel(arg1 pb.CpModelProto) (_swig_ret string) {
 		}
 		_swig_i_0 = bytes
 	}
-	swig_r_p := C._wrap_CpSatHelper_ValidateModel_internal_43b76517707a94b8(*(*C.swig_type_17)(unsafe.Pointer(&_swig_i_0)))
+	swig_r_p := C._wrap_CpSatHelper_ValidateModel_internal_0eb8ac65aa8fcab2(*(*C.swig_type_17)(unsafe.Pointer(&_swig_i_0)))
 	swig_r = *(*string)(unsafe.Pointer(&swig_r_p))
 	if Swig_escape_always_false {
 		Swig_escape_val = _swig_i_0
@@ -652,7 +655,7 @@ func CpSatHelperVariableDomain(arg1 pb.IntegerVariableProto) (_swig_ret Operatio
 		}
 		_swig_i_0 = bytes
 	}
-	swig_r = (Operations_research_Domain)(SwigcptrOperations_research_Domain(C._wrap_CpSatHelper_VariableDomain_internal_43b76517707a94b8(*(*C.swig_type_18)(unsafe.Pointer(&_swig_i_0)))))
+	swig_r = (Operations_research_Domain)(SwigcptrOperations_research_Domain(C._wrap_CpSatHelper_VariableDomain_internal_0eb8ac65aa8fcab2(*(*C.swig_type_18)(unsafe.Pointer(&_swig_i_0)))))
 	if Swig_escape_always_false {
 		Swig_escape_val = _swig_i_0
 	}
@@ -661,13 +664,13 @@ func CpSatHelperVariableDomain(arg1 pb.IntegerVariableProto) (_swig_ret Operatio
 
 func NewCpSatHelper() (_swig_ret CpSatHelper) {
 	var swig_r CpSatHelper
-	swig_r = (CpSatHelper)(SwigcptrCpSatHelper(C._wrap_new_CpSatHelper_internal_43b76517707a94b8()))
+	swig_r = (CpSatHelper)(SwigcptrCpSatHelper(C._wrap_new_CpSatHelper_internal_0eb8ac65aa8fcab2()))
 	return swig_r
 }
 
 func DeleteCpSatHelper(arg1 CpSatHelper) {
 	_swig_i_0 := arg1.Swigcptr()
-	C._wrap_delete_CpSatHelper_internal_43b76517707a94b8(C.uintptr_t(_swig_i_0))
+	C._wrap_delete_CpSatHelper_internal_0eb8ac65aa8fcab2(C.uintptr_t(_swig_i_0))
 }
 
 type CpSatHelper interface {
