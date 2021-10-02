@@ -46,6 +46,7 @@ func (r Result) Feasible() bool {
 	return r.pb.Status == pb.CpSolverStatus_FEASIBLE
 }
 
+// Invalid is true if the model being solved was invalid.
 func (r Result) Invalid() bool {
 	return r.pb.Status == pb.CpSolverStatus_MODEL_INVALID
 }

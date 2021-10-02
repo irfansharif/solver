@@ -36,10 +36,17 @@ type Model struct {
 	minimize        bool
 }
 
-// XXX: Instead of having a name parameter for everything, we could maybe have a
-// .WithName(name string) method on all these types that returns the receiver
-// but annotates the receiver with the name itself. It would help clean up the
-// signatures by removing the debug only arguments.
+// TODO(irfansharif): Add assumption literals and examples for unsat debugging.
+// And add hints. Add some documentation from
+// https://github.com/google/or-tools/blob/stable/ortools/sat/doc/boolean_logic.md
+// (reification, channeling constraints). Export async handler to stop search
+// process. Probably part of enumerator?
+// TODO(irfansharif): Export solution hint/partial assignment, when previous one
+// is available.
+// TODO(irfansharif): Export model/result statistics. Export domain.complement
+// for reification.
+// TODO(irfansharif): Export verbose view of types (specifically -- include
+// internal indexes, so you could debug the validation error).
 
 // NewModel instantiates a new model.
 func NewModel(name string) *Model {

@@ -244,6 +244,12 @@ func TestDatadriven(t *testing.T) {
 							solver.NewProductConstraint(target, multiplands...),
 						)
 					}
+				case ast.NonOverlappingMethod: // constrain.non-overlapping(i, j)
+					argument := stmt.Argument.(*ast.VariablesArgument)
+					intervals := getIntervals(s, argument.Variables...)
+					model.AddConstraints(
+						solver.NewNonOverlappingConstraint(intervals...),
+					)
 				case ast.BoolsMethod: // result.bool(x,y to z)
 					require.True(t, solved)
 					argument := stmt.Argument.(*ast.VariablesArgument)
@@ -255,7 +261,7 @@ func TestDatadriven(t *testing.T) {
 							out.WriteString("\n")
 						}
 					}
-				case ast.ValuesMethod: // result.values(x,y to z)
+				case ast.ValuesMethod: // result.values(x, y to z)
 					require.True(t, solved)
 					argument := stmt.Argument.(*ast.VariablesArgument)
 					variables := getIntVars(s, argument.Variables...)

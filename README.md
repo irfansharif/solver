@@ -1,9 +1,10 @@
-OR-Tools for Go
+Solver
 ---
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/irfansharif/solver.svg)](https://godocs.io/github.com/irfansharif/solver)
 
-This project contains a cgo-based API for using Google's [Operations Research
+This is a SAT solver library; underneath the hood it's using cgo and links
+against Google's [Operations Research
 Tools](https://developers.google.com/optimization/). It exposes a high-level
 package for the [CP-SAT
 Solver](https://developers.google.com/optimization/cp/cp_solver), targeting the
