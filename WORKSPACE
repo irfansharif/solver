@@ -3,19 +3,19 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 git_repository(
     name = "ortools",
-    commit = "b37d9c786b69128f3505f15beca09e89bf078a89",  # tag v9.0
+    commit = "86d4c54",  # tag v9.1
     remote = "https://github.com/google/or-tools.git",
 )
 
 git_repository(
     name = "com_google_absl",
-    commit = "e1d388e", # release 20210324.1
+    commit = "278e0a0", # release 20210324.2
     remote = "https://github.com/abseil/abseil-cpp.git",
 )
 
 git_repository(
     name = "com_google_protobuf",
-    commit = "436bd78",  # release v3.15.8
+    commit = "89b14b1",  # release v3.18.0
     remote = "https://github.com/protocolbuffers/protobuf.git",
 )
 

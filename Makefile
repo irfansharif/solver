@@ -36,7 +36,8 @@ proto: internal/pb/*.proto
 bzl: FORCE
 	@echo "--- generating bazel files"
 	@echo "build --cxxopt=-std=c++17 --experimental_convenience_symlinks=ignore --define gotags=bazel" > $@.tmp
-	@echo "test --cxxopt=-std=c++17 --test_env=BAZEL_WORKSPACE=$(shell bazel info workspace) --define gotags=bazel \
+	@echo "test  --cxxopt=-std=c++17 --experimental_convenience_symlinks=ignore --define gotags=bazel \
+		--test_env=BAZEL_WORKSPACE=$(shell bazel info workspace) \
 		--sandbox_writable_path=$(shell bazel info workspace)/testdata \
 		--sandbox_writable_path=$(shell bazel info workspace)/internal/testutils/parser/testdata \
 		--sandbox_writable_path=$(shell bazel info workspace)/internal/testutils/parser/lexer/testdata" >> $@.tmp
