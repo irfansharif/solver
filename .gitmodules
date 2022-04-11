@@ -4,6 +4,3 @@
 [submodule "c-deps/abseil-cpp"]
 	path = c-deps/abseil-cpp
 	url = git@github.com:abseil/abseil-cpp.git
-[submodule "c-deps/protobuf"]
-	path = c-deps/protobuf
-	url = git@github.com:protocolbuffers/protobuf.git
