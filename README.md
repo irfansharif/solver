@@ -133,7 +133,7 @@ be found under `internal/`. SWIG generated code is ugly and difficult to work
 with; a sanitized API is exposed via the top-level package.
 
 Because of the C++ dependencies, the library is compiled/tested using
-[Bazel](https://bazel.build). The top-level Makefiles packages most things
+[Bazel](https://bazel.build). The top-level Makefile packages most things
 you'd need.
 
 ```sh
