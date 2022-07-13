@@ -40,6 +40,7 @@ func TestDatadriven(t *testing.T) {
 		itvM := make(map[string]solver.Interval)
 		varM := make(map[string]solver.IntVar)
 		litM := make(map[string]solver.Literal)
+		//lineM :=make (map[string]solver.LinearExpr)
 
 		var result solver.Result
 		var solved bool
@@ -82,6 +83,17 @@ func TestDatadriven(t *testing.T) {
 			}
 			return literals
 		}
+		/*getLinearExpression := func(s *testutils.Scanner, ls ...string) []solver.LinearExpr{
+			var linExpr []solver.LinearExpr
+			for _, l:=range ls {
+				linE, ok :=lineM[l]
+				if !ok {
+					s.Fatalf("unrecognized LinearExpression: %s", l)
+				}
+				linExpr = append(linExpr, linE)
+			}
+			return linExpr
+		}*/
 
 		datadriven.RunTest(t, path, func(t *testing.T, d *datadriven.TestData) string {
 			parts := strings.Split(d.Pos, ":")
@@ -250,6 +262,13 @@ func TestDatadriven(t *testing.T) {
 					model.AddConstraints(
 						solver.NewNonOverlappingConstraint(intervals...),
 					)
+				case ast.NonOverlapping2DMethod: // constrain.non-overlapping-2D([i, j], [j, k], true)
+					argument := stmt.Argument.(*ast.NonOverlapping2DArgument)
+					xintervals := getIntervals(s, argument.XVariables...)
+					yintervals := getIntervals(s, argument.YVariables...)
+					model.AddConstraints(
+						solver.NewNonOverlapping2DConstraint(xintervals, yintervals, argument.BoxesWithNoAreaCanOverlap),
+					)
 				case ast.BoolsMethod: // result.bool(x,y to z)
 					require.True(t, solved)
 					argument := stmt.Argument.(*ast.VariablesArgument)
@@ -272,6 +291,17 @@ func TestDatadriven(t *testing.T) {
 							out.WriteString("\n")
 						}
 					}
+
+				/*case ast.EqualityMethod: //Equality Method
+				argument := stmt.Argument.(*ast.LinearEqualityArgument)
+				switch argument.Op {
+				case "max":
+					model.AddConstraints(
+						solver.NewLinearMaximumConstraint(getLinearExpression(s,argument.Exprs), YVariables, argument.BoxesWithNoAreaCanOverlap),
+					)
+				case "min":
+				}*/
+
 				default:
 					t.Fatalf("unrecognized method: %s", stmt.Method)
 				}

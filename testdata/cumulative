@@ -9,6 +9,7 @@ model.constants(dB == 2)
 model.constants(dC == 3)
 model.intervals(iA as [sA,eA|size], iB as [sB,eB|size], iC as [sC,eC|size])
 constrain.cumulative(iA: dA, iB: dB, iC: dC | cap)
+constrain.non-overlapping(iA, iB)
 model.print()
 ----
 model=m
@@ -29,8 +30,9 @@ model=m
     [sA, eA | size]
     [sB, eB | size]
     [sC, eC | size]
-  constraints (num = 1)
+  constraints (num = 2)
     cumulative: iA: dA, iB: dB, iC: dC | cap
+    non-overlapping: {sA, eA}, {sB, eB}
 
 sat
 model.validate()

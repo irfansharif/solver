@@ -40,6 +40,7 @@ constrain.binary-op(a / b == c)
 constrain.binary-op(a * b == c)
 constrain.cumulative(i: d, j: e | C)
 constrain.non-overlapping(i, j)
+constrain.non-overlapping-2D([i, j], [i, j], false)
 model.print()
 ----
 model=m
@@ -58,7 +59,7 @@ model=m
   intervals (num = 2)
     [a, b | C]
     [b, c | C]
-  constraints (num = 14)
+  constraints (num = 15)
     all-different: a, b, c
     all-same: a, b, c
     at-most-k: x, y, z | 2
@@ -73,3 +74,4 @@ model=m
     c == a * b
     cumulative: i: d, j: e | C
     non-overlapping: {a, b}, {b, c}
+    NewNonOverlapping2DConstraint: i, ji, j 
