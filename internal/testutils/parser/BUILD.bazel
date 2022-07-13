@@ -29,3 +29,9 @@ go_test(
         "@org_golang_x_exp//ebnf",
     ],
 )
+
+alias(
+    name = "go_default_library",
+    actual = ":parser",
+    visibility = ["//:__subpackages__"],
+)

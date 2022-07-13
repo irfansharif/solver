@@ -9,3 +9,9 @@ go_library(
     importpath = "github.com/irfansharif/solver/internal/testutils/parser/token",
     visibility = ["//:__subpackages__"],
 )
+
+alias(
+    name = "go_default_library",
+    actual = ":token",
+    visibility = ["//:__subpackages__"],
+)

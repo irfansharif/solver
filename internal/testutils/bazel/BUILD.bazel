@@ -7,3 +7,9 @@ go_library(
     visibility = ["//:__subpackages__"],
     deps = ["@com_github_stretchr_testify//require"],
 )
+
+alias(
+    name = "go_default_library",
+    actual = ":bazel",
+    visibility = ["//:__subpackages__"],
+)

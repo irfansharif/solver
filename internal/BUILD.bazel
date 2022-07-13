@@ -37,3 +37,9 @@ cc_library(
         "@ortools//ortools/sat:sat_parameters_cc_proto",
     ],
 )
+
+alias(
+    name = "go_default_library",
+    actual = ":internal",
+    visibility = ["//:__subpackages__"],
+)
