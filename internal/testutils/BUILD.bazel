@@ -14,3 +14,9 @@ go_library(
         "//internal/testutils/parser/ast",
     ],
 )
+
+alias(
+    name = "go_default_library",
+    actual = ":testutils",
+    visibility = ["//:__subpackages__"],
+)

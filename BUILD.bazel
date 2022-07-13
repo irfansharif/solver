@@ -4,6 +4,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 # gazelle:exclude c-deps/or-tools
 # gazelle:exclude c-deps/abseil-cpp
 # gazelle:build_tags bazel
+# gazelle:go_naming_convention import_alias
 gazelle(
     name = "gazelle",
     prefix = "github.com/irfansharif/solver",
@@ -48,4 +49,10 @@ go_test(
         "@com_github_cockroachdb_datadriven//:datadriven",
         "@com_github_stretchr_testify//require",
     ],
+)
+
+alias(
+    name = "go_default_library",
+    actual = ":solver",
+    visibility = ["//visibility:public"],
 )

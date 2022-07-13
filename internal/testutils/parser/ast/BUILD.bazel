@@ -11,3 +11,9 @@ go_library(
     visibility = ["//:__subpackages__"],
     deps = ["//:solver"],
 )
+
+alias(
+    name = "go_default_library",
+    actual = ":ast",
+    visibility = ["//:__subpackages__"],
+)

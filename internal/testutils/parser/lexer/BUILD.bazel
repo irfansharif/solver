@@ -19,3 +19,9 @@ go_test(
         "@com_github_cockroachdb_datadriven//:datadriven",
     ],
 )
+
+alias(
+    name = "go_default_library",
+    actual = ":lexer",
+    visibility = ["//:__subpackages__"],
+)

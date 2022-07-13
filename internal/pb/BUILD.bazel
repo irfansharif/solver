@@ -24,3 +24,9 @@ go_library(
     importpath = "github.com/irfansharif/solver/internal/pb",
     visibility = ["//:__subpackages__"],
 )
+
+alias(
+    name = "go_default_library",
+    actual = ":pb",
+    visibility = ["//:__subpackages__"],
+)
