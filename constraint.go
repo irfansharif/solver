@@ -492,6 +492,19 @@ func NewNonOverlapping2DConstraint(
 	yintervals []Interval,
 	boxesWithNoAreaCanOverlap bool,
 ) Constraint {
+	var b strings.Builder
+	for i := range xintervals {
+		if i != 0 {
+			b.WriteString(", ")
+		}
+		b.WriteString(fmt.Sprintf("%s", xintervals[i].name()))
+	}
+	for i := range yintervals {
+		if i != 0 {
+			b.WriteString(", ")
+		}
+		b.WriteString(fmt.Sprintf("%s", yintervals[i].name()))
+	}
 	return &constraint{
 		pb: &pb.ConstraintProto{
 			Constraint: &pb.ConstraintProto_NoOverlap_2D{
@@ -503,6 +516,7 @@ func NewNonOverlapping2DConstraint(
 				},
 			},
 		},
+		str: fmt.Sprintf("NewNonOverlapping2DConstraint: %s ", b.String()),
 	}
 }
 
