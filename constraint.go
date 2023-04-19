@@ -16,6 +16,7 @@ package solver
 
 import (
 	"fmt"
+	"math"
 	"strings"
 
 	"github.com/irfansharif/solver/internal/pb"
@@ -370,8 +371,7 @@ func NewForbiddenAssignmentsConstraint(vars []IntVar, assignments [][]int64) Con
 // NewLinearConstraint ensures that the linear expression lies in the given
 // domain. It can be used to express linear equalities of the form:
 //
-// 		0 <= x + 2y <= 10
-//
+//	0 <= x + 2y <= 10
 func NewLinearConstraint(e LinearExpr, d Domain) Constraint {
 	var b strings.Builder
 	b.WriteString("linear-constraint: ")
@@ -391,6 +391,104 @@ func NewLinearConstraint(e LinearExpr, d Domain) Constraint {
 		},
 		str: b.String(),
 	}
+}
+
+/** Adds {@code expr == value}. */
+func NewEqualityConstraintInt64(expr LinearExpr, value int64) Constraint {
+	// TODO verify
+	return NewLinearConstraint(expr, NewDomain(value, value))
+}
+
+/** Adds {@code left == right}. */
+func NewEqualityConstraint(left IntVar, right IntVar) Constraint {
+	difference := NewLinearExpr(
+		[]IntVar{left, right},
+		[]int64{1, -1},
+		0,
+	)
+
+	return NewLinearConstraint(difference, NewDomain(0, 0))
+}
+
+/** Adds {@code expr <= value}. */
+func NewLessOrEqualConstraintInt64(expr LinearExpr, value int64) Constraint {
+	return NewLinearConstraint(expr, NewDomain(math.MinInt64, value))
+}
+
+/** Adds {@code left <= right}. */
+func NewLessOrEqualConstraint(left IntVar, right IntVar) Constraint {
+	difference := NewLinearExpr(
+		[]IntVar{left, right},
+		[]int64{1, -1},
+		0,
+	)
+
+	return NewLinearConstraint(difference, NewDomain(math.MinInt64, 0))
+}
+
+/** Adds {@code expr < value}. */
+func NewLessThanConstraintInt64(expr LinearExpr, value int64) Constraint {
+	return NewLinearConstraint(expr, NewDomain(math.MinInt64, value-1))
+}
+
+/** Adds {@code left < right}. */
+func NewLessThanConstraint(left IntVar, right IntVar) Constraint {
+	difference := NewLinearExpr(
+		[]IntVar{left, right},
+		[]int64{1, -1},
+		0,
+	)
+
+	return NewLinearConstraint(difference, NewDomain(math.MinInt64, -1))
+}
+
+/** Adds {@code expr >= value}. */
+func NewGreaterOrEqualConstraintInt64(expr LinearExpr, value int64) Constraint {
+	return NewLinearConstraint(expr, NewDomain(value, math.MaxInt64))
+}
+
+/** Adds {@code left >= right}. */
+func NewGreaterOrEqualConstraint(left IntVar, right IntVar) Constraint {
+	difference := NewLinearExpr(
+		[]IntVar{left, right},
+		[]int64{1, -1},
+		0,
+	)
+
+	return NewLinearConstraint(difference, NewDomain(0, math.MaxInt64))
+}
+
+/** Adds {@code expr > value}. */
+func NewGreaterThanConstraintInt64(expr LinearExpr, value int64) Constraint {
+	return NewLinearConstraint(expr, NewDomain(value+1, math.MaxInt64))
+}
+
+/** Adds {@code left > right}. */
+func NewGreaterThanConstraint(left IntVar, right IntVar) Constraint {
+	difference := NewLinearExpr(
+		[]IntVar{left, right},
+		[]int64{1, -1},
+		0,
+	)
+
+	return NewLinearConstraint(difference, NewDomain(1, math.MaxInt64))
+}
+
+/** Adds {@code expr != value}. */
+func NewDifferentConstraintInt64(expr LinearExpr, value int64) Constraint {
+	return NewLinearConstraint(expr,
+		NewDomain(math.MinInt64, value-1, value+1, math.MaxInt64))
+}
+
+/** Adds {@code left != right}. */
+func NewDifferentConstraint(left IntVar, right IntVar) Constraint {
+	difference := NewLinearExpr(
+		[]IntVar{left, right},
+		[]int64{1, -1},
+		0,
+	)
+
+	return NewLinearConstraint(difference, NewDomain(math.MinInt64, -1, 1, math.MaxInt64))
 }
 
 // NewLinearMaximumConstraint ensures that the target is equal to the maximum of
@@ -482,8 +580,8 @@ func NewNonOverlappingConstraint(intervals ...Interval) Constraint {
 // NewNonOverlapping2DConstraint ensures that the boxes defined by the following
 // don't overlap:
 //
-// 		[xintervals[i].start, xintervals[i].end)
-// 		[yintervals[i].start, yintervals[i].end)
+//	[xintervals[i].start, xintervals[i].end)
+//	[yintervals[i].start, yintervals[i].end)
 //
 // Intervals/boxes of size zero are considered for overlap if the last argument
 // is true.
